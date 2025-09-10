@@ -1,5 +1,4 @@
 #!/bin/bash
 
-cp ./.local/.env.example ./.local/.env
-
-op inject -i .local/.env -o .local/.env
+# Inject secrets into new environment file created from template
+op inject -i .local/.env.example -o .local/.env -f

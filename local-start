@@ -1,3 +1,10 @@
 #!/bin/bash
 
+# Import public environment variables
+source ./.local/.env.public
+
+# Start docker services to support local development
+docker-compose -f .local/docker-compose.yaml up -d
+
+# Start Spring Boot application
 sh mvnw spring-boot:run
