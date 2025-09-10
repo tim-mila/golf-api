@@ -1,3 +1,5 @@
 #!/bin/bash
 
 cp ./.local/.env.example ./.local/.env
+
+op inject -i .local/.env -o .local/.env
