@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.alimmit</groupId>
-	<artifactId>golf</artifactId>
+	<artifactId>golf-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>golf</name>
+	<name>golf-api</name>
 	<description>Golf scorecard and handicap index calculator</description>
 	<url/>
 	<licenses>
