@@ -1,0 +1,11 @@
+services:
+
+  postgres:
+    image: postgres:17.6
+    container_name: golf-postgres
+    ports:
+      - 9876:5432
+    env_file:
+      - ./.local/.docker.env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
