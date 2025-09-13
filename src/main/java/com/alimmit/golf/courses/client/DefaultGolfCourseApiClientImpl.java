@@ -3,10 +3,12 @@ package com.alimmit.golf.courses.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,8 +48,9 @@ class DefaultGolfCourseApiClientImpl implements GolfCourseApiClient {
 
   @Override
   public List<GolfCourse> search(String terms) {
+    String encodedTerms = URLEncoder.encode(terms, StandardCharsets.UTF_8);
     HttpRequest.Builder builder =
-        HttpRequest.newBuilder(URI.create(host + Path.SEARCH.value + terms)).GET();
+        HttpRequest.newBuilder(URI.create(host + Path.SEARCH.value + encodedTerms)).GET();
     GolfCourseSearchResponse response = makeRequest(builder, GolfCourseSearchResponse.class);
     return response.courses();
   }
