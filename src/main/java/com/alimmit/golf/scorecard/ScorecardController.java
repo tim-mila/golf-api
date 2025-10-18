@@ -2,36 +2,56 @@ package com.alimmit.golf.scorecard;
 
 import static com.alimmit.golf.scorecard.ScorecardConstants.SCORECARD_ENDPOINT;
 
-import java.security.Principal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import jakarta.validation.Valid;
 
+@RestController
 @RequestMapping(SCORECARD_ENDPOINT)
 class ScorecardController {
 
   private static final Map<String, List<ScorecardDto>> scores = new HashMap<>();
 
+  private final ScorecardIdGenerator scorecardIdGenerator;
+
+  public ScorecardController(ScorecardIdGenerator scorecardIdGenerator) {
+    this.scorecardIdGenerator = scorecardIdGenerator;
+  }
+
   @PostMapping
-  ScorecardDto create(@Valid @RequestBody ScorecardRequestDto request, Principal principal) {
+  ScorecardDto create(@RequestBody @Valid ScorecardRequestDto request) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    ScorecardDto scorecardDto = new ScorecardDto(
+        scorecardIdGenerator.generate(),
+        Instant.now(),
+        auth.getName(),
+        Instant.now(),
+        auth.getName(),
+        request.scoreDate(),
+        request.courseId(),
+        request.score());
 
-    ScorecardDto scorecardDto =
-        new ScorecardDto(UUID.randomUUID(), Instant.now(), principal.getName(), Instant.now(),
-            principal.getName(), request.scoreDate(), request.courseId(), request.score());
-
-    List<ScorecardDto> userScores =
-        scores.computeIfAbsent(principal.getName(), key -> new ArrayList<>());
+    List<ScorecardDto> userScores = scores.computeIfAbsent(auth.getName(), key -> new ArrayList<>());
     userScores.add(scorecardDto);
-    scores.put(principal.getName(), userScores);
+    scores.put(auth.getName(), userScores);
 
     return scorecardDto;
+  }
+
+  @GetMapping
+  List<ScorecardDto> list(Authentication authentication) {
+    return scores.computeIfAbsent(authentication.getName(), key -> new ArrayList<>());
   }
 
 }
