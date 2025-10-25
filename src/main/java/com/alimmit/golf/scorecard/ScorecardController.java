@@ -7,13 +7,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alimmit.golf.GlobalConstants;
@@ -76,4 +80,16 @@ class ScorecardController {
     }
   }
 
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
+  void delete(@PathVariable String id) {
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+    // Do get first to ensure id is valid
+    this.get(id);
+
+    scores.computeIfAbsent(auth.getName(), key -> new ArrayList<>())
+        .removeIf(predicate -> id.equals(predicate.scorecardId()));
+  }
 }
