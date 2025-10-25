@@ -1,5 +1,6 @@
 package com.alimmit.golf.scorecard;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -16,8 +17,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
-import com.alimmit.golf.utils.JwtPersonas;
+import com.alimmit.golf.utils.JwtPersona;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ActiveProfiles("test")
 @WebMvcTest
@@ -42,7 +45,7 @@ class ScorecardControllerTest {
     this.mockMvc.perform(
         post(ScorecardConstants.SCORECARD_ENDPOINT)
             .with(SecurityMockMvcRequestPostProcessors.jwt()
-                .jwt(JwtPersonas::forGaryGolfer))
+                .jwt(JwtPersona::forGaryGolfer))
             .content(requestBody)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -50,14 +53,15 @@ class ScorecardControllerTest {
             jsonPath("$.scorecardId").value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
             jsonPath("$.courseId").value(1),
             jsonPath("$.scoreDate").value("2025-09-21"),
-            jsonPath("$.createdBy").value("123"),
-            jsonPath("$.lastModifiedBy").value("123"),
+            jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.getSub()),
+            jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER
+                .getSub()),
             jsonPath("$.createdAt").isString(),
             jsonPath("$.lastModifiedAt").isString());
   }
 
   @Test
-  void canOnlySeeMyScorecards() throws Exception {
+  void canOnlyListMyScorecards() throws Exception {
 
     String requestBody = "{\"scoreDate\": \"2025-09-21\", \"courseId\": 1, \"score\": 88}";
 
@@ -65,7 +69,7 @@ class ScorecardControllerTest {
     this.mockMvc.perform(
         post(ScorecardConstants.SCORECARD_ENDPOINT)
             .with(SecurityMockMvcRequestPostProcessors.jwt()
-                .jwt(JwtPersonas::forGaryGolfer))
+                .jwt(JwtPersona::forGaryGolfer))
             .content(requestBody)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
@@ -73,8 +77,9 @@ class ScorecardControllerTest {
             jsonPath("$.scorecardId").value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
             jsonPath("$.courseId").value(1),
             jsonPath("$.scoreDate").value("2025-09-21"),
-            jsonPath("$.createdBy").value("123"),
-            jsonPath("$.lastModifiedBy").value("123"),
+            jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.getSub()),
+            jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER
+                .getSub()),
             jsonPath("$.createdAt").isString(),
             jsonPath("$.lastModifiedAt").isString());
 
@@ -82,7 +87,7 @@ class ScorecardControllerTest {
     this.mockMvc.perform(
         get(ScorecardConstants.SCORECARD_ENDPOINT)
             .with(SecurityMockMvcRequestPostProcessors.jwt()
-                .jwt(JwtPersonas::forGaryGolfer)))
+                .jwt(JwtPersona::forGaryGolfer)))
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.length()").value(1));
@@ -91,9 +96,51 @@ class ScorecardControllerTest {
     this.mockMvc.perform(
         get(ScorecardConstants.SCORECARD_ENDPOINT)
             .with(SecurityMockMvcRequestPostProcessors.jwt()
-                .jwt(JwtPersonas::forPatPutter)))
+                .jwt(JwtPersona::forPatPutter)))
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.length()").value(0));
+  }
+
+  @Test
+  void canOnlyFetchMyScorecards() throws Exception {
+
+    String requestBody = "{\"scoreDate\": \"2025-09-21\", \"courseId\": 1, \"score\": 88}";
+
+    // Create scorecard for Gary Golfer
+    String responseBody = this.mockMvc.perform(
+        post(ScorecardConstants.SCORECARD_ENDPOINT)
+            .with(SecurityMockMvcRequestPostProcessors.jwt()
+                .jwt(JwtPersona::forGaryGolfer))
+            .content(requestBody)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpectAll(
+            jsonPath("$.scorecardId").value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
+            jsonPath("$.courseId").value(1),
+            jsonPath("$.scoreDate").value("2025-09-21"),
+            jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.getSub()),
+            jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER
+                .getSub()),
+            jsonPath("$.createdAt").isString(),
+            jsonPath("$.lastModifiedAt").isString())
+        .andReturn().getResponse().getContentAsString();
+
+    String scorecardId = new ObjectMapper().readTree(responseBody).at("/scorecardId").asText();
+    assertThat(scorecardId).isNotBlank();
+
+    // Fetch scorecards for Pat Putter and expect ok
+    this.mockMvc.perform(
+        get(ScorecardConstants.SCORECARD_ENDPOINT + GlobalConstants.API_RECORD_SUFFIX, scorecardId)
+            .with(SecurityMockMvcRequestPostProcessors.jwt()
+                .jwt(JwtPersona::forGaryGolfer)))
+        .andExpect(status().isOk());
+
+    // Fetch scorecards for Pat Putter and expect not found
+    this.mockMvc.perform(
+        get(ScorecardConstants.SCORECARD_ENDPOINT + GlobalConstants.API_RECORD_SUFFIX, scorecardId)
+            .with(SecurityMockMvcRequestPostProcessors.jwt()
+                .jwt(JwtPersona::forPatPutter)))
+        .andExpect(status().isNotFound());
   }
 }

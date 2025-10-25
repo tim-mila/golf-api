@@ -10,10 +10,14 @@ import java.util.Map;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.alimmit.golf.GlobalConstants;
+import com.alimmit.golf.errors.NotFoundException;
 
 import jakarta.validation.Valid;
 
@@ -52,6 +56,24 @@ class ScorecardController {
   @GetMapping
   List<ScorecardDto> list(Authentication authentication) {
     return scores.computeIfAbsent(authentication.getName(), key -> new ArrayList<>());
+  }
+
+  @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
+  ScorecardDto get(@PathVariable String id) {
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    List<ScorecardDto> userScores = scores.computeIfAbsent(auth.getName(), key -> new ArrayList<>())
+        .stream()
+        .filter(score -> id.equals(score.scorecardId()))
+        .toList();
+
+    if (userScores.isEmpty()) {
+      throw new NotFoundException();
+    } else if (userScores.size() == 1) {
+      return userScores.getFirst();
+    } else {
+      throw new IllegalStateException("This won't happen once there's a DB");
+    }
   }
 
 }
