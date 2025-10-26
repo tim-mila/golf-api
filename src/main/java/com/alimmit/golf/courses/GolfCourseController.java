@@ -1,5 +1,9 @@
 package com.alimmit.golf.courses;
 
+import static com.alimmit.golf.GlobalConstants.API_RECORD_SUFFIX;
+import static com.alimmit.golf.courses.GolfCourseConstants.COURSES_ENDPOINT;
+import static com.alimmit.golf.courses.GolfCourseConstants.COURSES_SEARCH_ENDPOINT;
+
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +18,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/v1/courses")
+@RequestMapping(COURSES_ENDPOINT)
 @Tag(name = "Golf Courses")
 class GolfCourseController {
 
@@ -29,7 +33,7 @@ class GolfCourseController {
       parameters = {
           @Parameter(name = "q", in = ParameterIn.QUERY, description = "Golf course search terms")})
 
-  @GetMapping(path = "/search", params = {"q"})
+  @GetMapping(path = COURSES_SEARCH_ENDPOINT, params = {"q"})
   List<GolfCourse> search(@RequestParam("q") String searchTerms) {
     return client.search(searchTerms);
   }
@@ -39,7 +43,7 @@ class GolfCourseController {
       description = "Fetch a single course by it's unique identifier",
       parameters = {
           @Parameter(name = "id", in = ParameterIn.PATH, description = "Golf course identifier")})
-  @GetMapping(path = "/{id}")
+  @GetMapping(path = API_RECORD_SUFFIX)
   GolfCourse fetch(@PathVariable("id") Long id) {
     return client.fetch(id);
   }
