@@ -11,7 +11,9 @@ class WebMvcConfiguration {
 
   @Bean
   Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
-    return new Jackson2ObjectMapperBuilder().modules(new JavaTimeModule())
-        .serializationInclusion(JsonInclude.Include.NON_NULL);
+    return new Jackson2ObjectMapperBuilder()
+        .modules(new JavaTimeModule())
+        .serializationInclusion(JsonInclude.Include.NON_NULL)
+        .featuresToDisable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 }
