@@ -3,10 +3,6 @@ package com.alimmit.golf.scorecard;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,23 +12,21 @@ import java.util.List;
 
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import com.alimmit.golf.errors.NotFoundException;
 import com.alimmit.golf.utils.JwtPersona;
 
 @ActiveProfiles("test")
 @WebMvcTest
-class ScorecardControllerTest {
-
-  private final MockMvc mockMvc;
+class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
   @MockitoBean
   private GolfCourseApiClient golfCourseApiClient;
@@ -42,7 +36,7 @@ class ScorecardControllerTest {
 
   @Autowired
   ScorecardControllerTest(MockMvc mockMvc) {
-    this.mockMvc = mockMvc;
+    super(mockMvc);
   }
 
   @Test
@@ -61,12 +55,7 @@ class ScorecardControllerTest {
 
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
-    this.mockMvc.perform(
-        post(ScorecardConstants.SCORECARD_ENDPOINT)
-            .with(jwt().jwt(JwtPersona::forGaryGolfer))
-            .content(requestBody)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
+    createScorecard(JwtPersona::forGaryGolfer, requestBody, status().isOk())
         .andExpectAll(
             jsonPath("$.scorecardId").value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
             jsonPath("$.courseId").value(1),
@@ -92,10 +81,7 @@ class ScorecardControllerTest {
 
     when(scorecardService.listAll()).thenReturn(List.of(mockDto));
 
-    this.mockMvc.perform(
-        get(ScorecardConstants.SCORECARD_ENDPOINT)
-            .with(jwt().jwt(JwtPersona::forGaryGolfer)))
-        .andExpect(status().isOk())
+    listScorecards(JwtPersona::forGaryGolfer, status().isOk())
         .andExpectAll(
             jsonPath("$.length()").value(1),
             jsonPath("$[0].scorecardId").value(mockDto.scorecardId()));
@@ -117,10 +103,7 @@ class ScorecardControllerTest {
 
     when(scorecardService.getById(scorecardId)).thenReturn(mockDto);
 
-    this.mockMvc.perform(
-        get(ScorecardConstants.SCORECARD_ENDPOINT + GlobalConstants.API_RECORD_SUFFIX, scorecardId)
-            .with(jwt().jwt(JwtPersona::forGaryGolfer)))
-        .andExpect(status().isOk())
+    getScorecard(JwtPersona::forGaryGolfer, scorecardId, status().isOk())
         .andExpectAll(
             jsonPath("$.scorecardId").value(scorecardId));
   }
@@ -131,9 +114,7 @@ class ScorecardControllerTest {
 
     when(scorecardService.getById(scorecardId)).thenThrow(new NotFoundException());
 
-    this.mockMvc.perform(
-        get(ScorecardConstants.SCORECARD_ENDPOINT + GlobalConstants.API_RECORD_SUFFIX, scorecardId)
-            .with(jwt().jwt(JwtPersona::forGaryGolfer)))
+    getScorecard(JwtPersona::forGaryGolfer, scorecardId)
         .andExpect(status().isNotFound());
   }
 
@@ -143,9 +124,7 @@ class ScorecardControllerTest {
 
     // doNothing() is default for void methods, so no need to mock success case
 
-    this.mockMvc.perform(
-        delete(ScorecardConstants.SCORECARD_ENDPOINT + GlobalConstants.API_RECORD_SUFFIX, scorecardId)
-            .with(jwt().jwt(JwtPersona::forGaryGolfer)))
+    deleteScorecard(JwtPersona::forGaryGolfer, scorecardId)
         .andExpect(status().isNoContent());
   }
 
@@ -155,33 +134,17 @@ class ScorecardControllerTest {
 
     doThrow(new NotFoundException()).when(scorecardService).deleteById(scorecardId);
 
-    this.mockMvc.perform(
-        delete(ScorecardConstants.SCORECARD_ENDPOINT + GlobalConstants.API_RECORD_SUFFIX, scorecardId)
-            .with(jwt().jwt(JwtPersona::forGaryGolfer)))
+    deleteScorecard(JwtPersona::forGaryGolfer, scorecardId)
         .andExpect(status().isNotFound());
   }
 
-  @Test
-  void createWithMissingCourseAndExpectBadRequest() throws Exception {
-    String requestBody = "{\"scoreDate\": \"2025-09-21\", \"score\": 88}";
-
-    this.mockMvc.perform(
-        post(ScorecardConstants.SCORECARD_ENDPOINT)
-            .with(jwt().jwt(JwtPersona::forGaryGolfer))
-            .content(requestBody)
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest());
-  }
-
-  @Test
-  void createWithMissingScoreAndExpectBadRequest() throws Exception {
-    String requestBody = "{\"scoreDate\": \"2025-09-21\", \"coureseId\": 1}";
-
-    this.mockMvc.perform(
-        post(ScorecardConstants.SCORECARD_ENDPOINT)
-            .with(jwt().jwt(JwtPersona::forGaryGolfer))
-            .content(requestBody)
-            .contentType(MediaType.APPLICATION_JSON))
+  @ParameterizedTest
+  @ValueSource(strings = {
+      "{\"scoreDate\": \"2025-09-21\", \"score\": 88}", // Missing course
+      "{\"scoreDate\": \"2025-09-21\", \"coureseId\": 1}" // Missing score
+  })
+  void createAndExpectBadRequest(String requestBody) throws Exception {
+    createScorecard(JwtPersona::forGaryGolfer, requestBody)
         .andExpect(status().isBadRequest());
   }
 }
