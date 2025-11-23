@@ -2,16 +2,18 @@ package com.alimmit.golf.courses;
 
 import static com.alimmit.golf.GlobalConstants.API_RECORD_SUFFIX;
 import static com.alimmit.golf.courses.GolfCourseConstants.COURSES_ENDPOINT;
-import static com.alimmit.golf.courses.GolfCourseConstants.COURSES_SEARCH_ENDPOINT;
 
 import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.alimmit.golf.courses.client.GolfCourse;
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -28,23 +30,17 @@ class GolfCourseController {
     this.client = client;
   }
 
-  @Operation(method = "GET", operationId = "courses.search", summary = "Search for golf courses",
-      description = "Search for golf courses by name",
-      parameters = {
-          @Parameter(name = "q", in = ParameterIn.QUERY, description = "Golf course search terms")})
-
-  @GetMapping(path = COURSES_SEARCH_ENDPOINT, params = {"q"})
+  @Operation(method = "GET", operationId = "courses.search", summary = "Search for golf courses", description = "Search for golf courses by name", parameters = {
+      @Parameter(name = "q", in = ParameterIn.QUERY, description = "Golf course search terms") })
+  @GetMapping(params = { "q" })
   List<GolfCourse> search(@RequestParam("q") String searchTerms) {
     return client.search(searchTerms);
   }
 
-  @Operation(method = "GET", operationId = "courses.get",
-      summary = "Fetch a golf course by identifier",
-      description = "Fetch a single course by it's unique identifier",
-      parameters = {
-          @Parameter(name = "id", in = ParameterIn.PATH, description = "Golf course identifier")})
+  @Operation(method = "GET", operationId = "courses.get", summary = "Fetch a golf course by identifier", description = "Fetch a single course by it's unique identifier", parameters = {
+      @Parameter(name = "id", in = ParameterIn.PATH, description = "Golf course identifier") })
   @GetMapping(path = API_RECORD_SUFFIX)
-  GolfCourse fetch(@PathVariable("id") Long id) {
+  GolfCourse fetch(@PathVariable Long id) {
     return client.fetch(id);
   }
 }
