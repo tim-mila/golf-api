@@ -44,20 +44,29 @@ public class ScorecardEntity {
   @Column(name = "score_date", nullable = false)
   private LocalDate scoreDate;
 
-  @Column(name = "course_id", nullable = false)
-  private Long courseId;
+  @Column(name = "course_name", nullable = false)
+  private String courseName;
 
   @Column(name = "score", nullable = false)
   private Integer score;
 
+  @Column(name = "rating", nullable = false)
+  private Double rating;
+
+  @Column(name = "slope", nullable = false)
+  private Double slope;
+
   public ScorecardEntity() {
   }
 
-  public ScorecardEntity(String scorecardId, LocalDate scoreDate, Long courseId, Integer score) {
+  public ScorecardEntity(String scorecardId, LocalDate scoreDate, String courseName, Integer score,
+      Double rating, Double slope) {
     this.scorecardId = scorecardId;
     this.scoreDate = scoreDate;
-    this.courseId = courseId;
+    this.courseName = courseName;
     this.score = score;
+    this.rating = rating;
+    this.slope = slope;
   }
 
   public String getScorecardId() {
@@ -108,12 +117,12 @@ public class ScorecardEntity {
     this.scoreDate = scoreDate;
   }
 
-  public Long getCourseId() {
-    return courseId;
+  public String getCourseName() {
+    return courseName;
   }
 
-  public void setCourseId(Long courseId) {
-    this.courseId = courseId;
+  public void setCourseName(String courseName) {
+    this.courseName = courseName;
   }
 
   public Integer getScore() {
@@ -122,6 +131,22 @@ public class ScorecardEntity {
 
   public void setScore(Integer score) {
     this.score = score;
+  }
+
+  public Double getRating() {
+    return rating;
+  }
+
+  public void setRating(Double rating) {
+    this.rating = rating;
+  }
+
+  public Double getSlope() {
+    return slope;
+  }
+
+  public void setSlope(Double slopeRating) {
+    this.slope = slopeRating;
   }
 
   @Override
@@ -148,8 +173,10 @@ public class ScorecardEntity {
         ", lastModifiedAt=" + lastModifiedAt +
         ", lastModifiedBy='" + lastModifiedBy + '\'' +
         ", scoreDate=" + scoreDate +
-        ", courseId=" + courseId +
+        ", courseName=" + courseName +
         ", score=" + score +
+        ", rating=" + rating +
+        ", slope=" + slope +
         '}';
   }
 }

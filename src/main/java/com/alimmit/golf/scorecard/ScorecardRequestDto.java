@@ -5,10 +5,14 @@ import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-record ScorecardRequestDto(
+public record ScorecardRequestDto(
     @JsonProperty("scoreDate") @NotNull LocalDate scoreDate,
-    @JsonProperty("courseId") @NotNull Long courseId,
-    @JsonProperty("score") @NotNull @Min(1) Integer score) {
+    @JsonProperty("score") @NotNull @Min(1) Integer score,
+    @JsonProperty("courseName") @NotBlank String courseName,
+    @JsonProperty("teeName") @NotBlank String teeName,
+    @JsonProperty("rating") @NotNull Double rating,
+    @JsonProperty("slope") @NotNull Double slope) {
 }

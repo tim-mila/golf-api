@@ -6,8 +6,10 @@ CREATE TABLE scorecard (
     last_modified_at TIMESTAMP,
     last_modified_by VARCHAR(255),
     score_date DATE NOT NULL,
-    course_id BIGINT NOT NULL,
-    score INTEGER NOT NULL
+    course_name CHARACTER VARYING(255) NOT NULL,
+    score INTEGER NOT NULL,
+    rating DOUBLE PRECISION NOT NULL,
+    slope DOUBLE PRECISION NOT NULL
 );
 
 -- Index for querying scorecards by user (most common query pattern)

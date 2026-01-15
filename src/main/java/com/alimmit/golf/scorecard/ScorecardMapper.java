@@ -1,7 +1,8 @@
 package com.alimmit.golf.scorecard;
 
 /**
- * Maps between ScorecardEntity (persistence layer) and ScorecardDto (API layer).
+ * Maps between ScorecardEntity (persistence layer) and ScorecardDto (API
+ * layer).
  */
 class ScorecardMapper {
 
@@ -20,19 +21,24 @@ class ScorecardMapper {
         entity.getLastModifiedAt(),
         entity.getLastModifiedBy(),
         entity.getScoreDate(),
-        entity.getCourseId(),
-        entity.getScore());
+        entity.getCourseName(),
+        entity.getScore(),
+        entity.getRating(),
+        entity.getSlope());
   }
 
   /**
    * Convert request DTO to entity for persistence.
    * Audit fields will be populated automatically by JPA.
+   * Course rating and slope rating are resolved by the service layer.
    */
   static ScorecardEntity toEntity(String scorecardId, ScorecardRequestDto request) {
     return new ScorecardEntity(
         scorecardId,
         request.scoreDate(),
-        request.courseId(),
-        request.score());
+        request.courseName(),
+        request.score(),
+        request.rating(),
+        request.slope());
   }
 }

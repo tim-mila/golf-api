@@ -75,8 +75,10 @@ class ScorecardRepositoryTest {
     ScorecardEntity entity = new ScorecardEntity(
         "scr-test123",
         LocalDate.of(2025, 9, 21),
-        1L,
-        88);
+        "Test Course",
+        88,
+        72.1,
+        125.0);
     ScorecardEntity saved = scorecardRepository.save(entity);
 
     // Then: Audit fields should be populated automatically
@@ -112,7 +114,7 @@ class ScorecardRepositoryTest {
 
     // Then: Only Pat's scorecard should be returned
     assertThat(patResults).hasSize(1);
-    assertThat(patResults.get(0).getCreatedBy()).isEqualTo(JwtPersona.PAT_PUTTER.getSub());
+    assertThat(patResults.getFirst().getCreatedBy()).isEqualTo(JwtPersona.PAT_PUTTER.getSub());
   }
 
   @Test
@@ -184,8 +186,10 @@ class ScorecardRepositoryTest {
     return new ScorecardEntity(
         id,
         LocalDate.of(2025, 9, 21),
-        1L,
-        score);
+        "Test Course",
+        score,
+        72.1,
+        125.0);
   }
 
   private void setSecurityContext(String username) {
