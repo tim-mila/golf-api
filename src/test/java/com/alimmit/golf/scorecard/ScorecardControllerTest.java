@@ -34,6 +34,9 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     @MockitoBean
     private ScorecardService scorecardService;
 
+    @MockitoBean
+    private ScorecardEventPublisher scorecardEventPublisher;
+
     @Autowired
     ScorecardControllerTest(MockMvc mockMvc) {
         super(mockMvc);

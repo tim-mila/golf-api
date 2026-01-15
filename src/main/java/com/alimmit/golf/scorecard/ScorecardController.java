@@ -29,15 +29,19 @@ import jakarta.validation.Valid;
 class ScorecardController {
 
   private final ScorecardService scorecardService;
+  private final ScorecardEventPublisher scorecardEventPublisher;
 
-  ScorecardController(ScorecardService scorecardService) {
+  ScorecardController(ScorecardService scorecardService, ScorecardEventPublisher scorecardEventPublisher) {
     this.scorecardService = scorecardService;
+    this.scorecardEventPublisher = scorecardEventPublisher;
   }
 
-  @Operation(method = "GET", operationId = "scorecard.create", summary = "Create new scorecard", description = "Add a new score for a round of golf", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(schema = @Schema(implementation = ScorecardRequestDto.class, contentMediaType = "application/json"))))
+  @Operation(method = "POST", operationId = "scorecard.create", summary = "Create new scorecard", description = "Add a new score for a round of golf", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(schema = @Schema(implementation = ScorecardRequestDto.class, contentMediaType = "application/json"))))
   @PostMapping
   ScorecardDto create(@RequestBody @Valid ScorecardRequestDto request) {
-    return scorecardService.create(request);
+    ScorecardDto created = scorecardService.create(request);
+    scorecardEventPublisher.publishCreated(created);
+    return created;
   }
 
   @Operation(method = "GET", operationId = "scorecard.list", summary = "List your scorecards", description = "Get a list of your scorecards")

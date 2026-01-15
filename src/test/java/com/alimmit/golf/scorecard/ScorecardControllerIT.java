@@ -9,6 +9,7 @@ import java.util.function.Function;
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,6 +35,9 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
   @MockitoBean
   private GolfCourseApiClient golfCourseApiClient;
 
+  @MockitoBean
+  private ScorecardEventPublisher scorecardEventPublisher;
+
   @Autowired
   ScorecardControllerIT(MockMvc mockMvc) {
     super(mockMvc);
@@ -47,6 +51,8 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
   @Test
   void addScorecard() throws Exception {
     createAndAssertScorecard(JwtPersona::forGaryGolfer);
+
+    Mockito.verify(scorecardEventPublisher, Mockito.times(1)).publishCreated(Mockito.any(ScorecardDto.class));
   }
 
   @Test
