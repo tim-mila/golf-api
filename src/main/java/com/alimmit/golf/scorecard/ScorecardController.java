@@ -4,8 +4,8 @@ import static com.alimmit.golf.scorecard.ScorecardConstants.SCORECARD_ENDPOINT;
 
 import java.util.List;
 
+import com.alimmit.golf.errors.NotFoundException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,14 +46,14 @@ class ScorecardController {
 
   @Operation(method = "GET", operationId = "scorecard.list", summary = "List your scorecards", description = "Get a list of your scorecards")
   @GetMapping
-  List<ScorecardDto> list(Authentication authentication) {
+  List<ScorecardDto> list() {
     return scorecardService.listAll();
   }
 
-  @Operation(method = "GET", operationId = "scorecard.get", summary = "Get scorecord", description = "Get one of your scorecards")
+  @Operation(method = "GET", operationId = "scorecard.get", summary = "Get scorecard", description = "Get one of your scorecards")
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   ScorecardDto get(@PathVariable String id) {
-    return scorecardService.getById(id);
+    return scorecardService.getById(id).orElseThrow(NotFoundException::new);
   }
 
   @Operation(method = "DELETE", operationId = "scorecard.delete", summary = "Delete a scorecard", description = "Delete one of your scorecards")

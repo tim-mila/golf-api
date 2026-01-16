@@ -1,5 +1,7 @@
 package com.alimmit.golf.scorecard;
 
+import java.util.Optional;
+
 /**
  * Maps between ScorecardEntity (persistence layer) and ScorecardDto (API
  * layer).
@@ -25,6 +27,10 @@ class ScorecardMapper {
         entity.getScore(),
         entity.getRating(),
         entity.getSlope());
+  }
+
+  static Optional<ScorecardDto> toOptionalDto(ScorecardEntity entity) {
+    return Optional.of(toDto(entity));
   }
 
   /**

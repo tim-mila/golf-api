@@ -1,11 +1,10 @@
 package com.alimmit.golf.scorecard;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.alimmit.golf.errors.NotFoundException;
 
 /**
  * Service layer for scorecard operations.
@@ -52,27 +51,20 @@ class JpaScorecardServiceImpl implements ScorecardService {
 
   /**
    * Get a single scorecard by ID for the current authenticated user.
-   *
-   * @throws NotFoundException if scorecard not found or not owned by current user
    */
   @Transactional(readOnly = true)
   @Override
-  public ScorecardDto getById(String id) {
-    return scorecardRepository.findByIdForCurrentUser(id)
-        .map(ScorecardMapper::toDto)
-        .orElseThrow(NotFoundException::new);
+  public Optional<ScorecardDto> getById(String id) {
+    return scorecardRepository
+            .findByIdForCurrentUser(id)
+            .flatMap(ScorecardMapper::toOptionalDto);
   }
 
   /**
    * Delete a scorecard by ID for the current authenticated user.
-   *
-   * @throws NotFoundException if scorecard not found or not owned by current user
    */
   @Override
   public void deleteById(String id) {
-    int deletedCount = scorecardRepository.deleteByIdForCurrentUser(id);
-    if (deletedCount == 0) {
-      throw new NotFoundException();
-    }
+    scorecardRepository.deleteByIdForCurrentUser(id);
   }
 }
