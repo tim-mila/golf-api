@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
@@ -110,7 +111,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
                 72.1,
                 125.0);
 
-        when(scorecardService.getById(scorecardId)).thenReturn(mockDto);
+        when(scorecardService.getById(scorecardId)).thenReturn(Optional.of(mockDto));
 
         getScorecard(JwtPersona::forGaryGolfer, scorecardId, status().isOk())
                 .andExpectAll(
