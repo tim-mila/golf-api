@@ -13,6 +13,6 @@ class ScorecardEventPublisher {
     }
 
     void publishCreated(ScorecardDto scorecardDto) {
-        applicationEventPublisher.publishEvent(new ScorecardEvent(scorecardDto.scorecardId(), ScorecardEvent.Type.CREATED));
+        applicationEventPublisher.publishEvent(new ScorecardEvent(scorecardDto.scorecardId(), scorecardDto.createdBy(), ScorecardEvent.Type.CREATED));
     }
 }

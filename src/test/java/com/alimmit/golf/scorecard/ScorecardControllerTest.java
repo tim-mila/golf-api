@@ -50,9 +50,9 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         ScorecardDto mockDto = new ScorecardDto(
                 "scr-" + "a".repeat(32),
                 Instant.now(),
-                JwtPersona.GARY_GOLFER.getSub(),
+                JwtPersona.GARY_GOLFER.sub(),
                 Instant.now(),
-                JwtPersona.GARY_GOLFER.getSub(),
+                JwtPersona.GARY_GOLFER.sub(),
                 LocalDate.of(2025, 9, 21),
                 "Test Course",
                 88,
@@ -67,8 +67,8 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
                         jsonPath("$.courseName").value("Test Course"),
                         jsonPath("$.scoreDate").value("2025-09-21"),
                         jsonPath("$.score").value(88),
-                        jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.getSub()),
-                        jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER.getSub()),
+                        jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.sub()),
+                        jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER.sub()),
                         jsonPath("$.createdAt").isString(),
                         jsonPath("$.lastModifiedAt").isString());
     }
@@ -78,9 +78,9 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         ScorecardDto mockDto = new ScorecardDto(
                 "scr-" + "a".repeat(32),
                 Instant.now(),
-                JwtPersona.GARY_GOLFER.getSub(),
+                JwtPersona.GARY_GOLFER.sub(),
                 Instant.now(),
-                JwtPersona.GARY_GOLFER.getSub(),
+                JwtPersona.GARY_GOLFER.sub(),
                 LocalDate.of(2025, 9, 21),
                 "Test Course",
                 88,
@@ -102,9 +102,9 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         ScorecardDto mockDto = new ScorecardDto(
                 scorecardId,
                 Instant.now(),
-                JwtPersona.GARY_GOLFER.getSub(),
+                JwtPersona.GARY_GOLFER.sub(),
                 Instant.now(),
-                JwtPersona.GARY_GOLFER.getSub(),
+                JwtPersona.GARY_GOLFER.sub(),
                 LocalDate.of(2025, 9, 21),
                 "Test Course",
                 88,

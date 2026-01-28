@@ -35,7 +35,7 @@ import com.alimmit.golf.utils.JwtPersona;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(ScorecardRepositoryTest.TestConfig.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
-@Sql(scripts = "classpath:cleanup-scorecard.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(scripts = "classpath:cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ScorecardRepositoryTest {
 
   @TestConfiguration
@@ -83,8 +83,8 @@ class ScorecardRepositoryTest {
 
     // Then: Audit fields should be populated automatically
     assertThat(saved.getScorecardId()).isEqualTo("scr-test123");
-    assertThat(saved.getCreatedBy()).isEqualTo(JwtPersona.GARY_GOLFER.getSub());
-    assertThat(saved.getLastModifiedBy()).isEqualTo(JwtPersona.GARY_GOLFER.getSub());
+    assertThat(saved.getCreatedBy()).isEqualTo(JwtPersona.GARY_GOLFER.sub());
+    assertThat(saved.getLastModifiedBy()).isEqualTo(JwtPersona.GARY_GOLFER.sub());
     assertThat(saved.getCreatedAt()).isNotNull();
     assertThat(saved.getLastModifiedAt()).isNotNull();
   }
@@ -92,35 +92,35 @@ class ScorecardRepositoryTest {
   @Test
   void shouldFindAllForCurrentUser() {
     // Given: Multiple users with scorecards
-    setSecurityContext(JwtPersona.GARY_GOLFER.getSub());
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
     scorecardRepository.save(createScorecard("scr-gary1", 88));
     scorecardRepository.save(createScorecard("scr-gary2", 90));
 
-    setSecurityContext(JwtPersona.PAT_PUTTER.getSub());
+    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
     scorecardRepository.save(createScorecard("scr-pat1", 85));
 
     // When: Gary searches for his scorecards
-    setSecurityContext(JwtPersona.GARY_GOLFER.getSub());
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
     List<ScorecardEntity> garyResults = scorecardRepository.findAllForCurrentUser();
 
     // Then: Only Gary's scorecards should be returned
     assertThat(garyResults)
         .hasSize(2)
-        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.GARY_GOLFER.getSub()));
+        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.GARY_GOLFER.sub()));
 
     // When: Pat searches for their scorecards
-    setSecurityContext(JwtPersona.PAT_PUTTER.getSub());
+    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
     List<ScorecardEntity> patResults = scorecardRepository.findAllForCurrentUser();
 
     // Then: Only Pat's scorecard should be returned
     assertThat(patResults).hasSize(1);
-    assertThat(patResults.getFirst().getCreatedBy()).isEqualTo(JwtPersona.PAT_PUTTER.getSub());
+    assertThat(patResults.getFirst().getCreatedBy()).isEqualTo(JwtPersona.PAT_PUTTER.sub());
   }
 
   @Test
   void shouldFindByIdForCurrentUser() {
     // Given: Gary creates a scorecard
-    setSecurityContext(JwtPersona.GARY_GOLFER.getSub());
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
     scorecardRepository.save(createScorecard("scr-gary1", 88));
 
     // When: Gary looks up his own scorecard
@@ -131,7 +131,7 @@ class ScorecardRepositoryTest {
     assertThat(garyResult.get().getScorecardId()).isEqualTo("scr-gary1");
 
     // When: Pat tries to access Gary's scorecard
-    setSecurityContext(JwtPersona.PAT_PUTTER.getSub());
+    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
     Optional<ScorecardEntity> patResult = scorecardRepository.findByIdForCurrentUser("scr-gary1");
 
     // Then: Scorecard should not be found (authorization check)
@@ -141,18 +141,18 @@ class ScorecardRepositoryTest {
   @Test
   void shouldDeleteByIdForCurrentUser() {
     // Given: Gary creates a scorecard
-    setSecurityContext(JwtPersona.GARY_GOLFER.getSub());
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
     scorecardRepository.save(createScorecard("scr-gary1", 88));
 
     // When: Pat tries to delete Gary's scorecard
-    setSecurityContext(JwtPersona.PAT_PUTTER.getSub());
+    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
     int patDeleteCount = scorecardRepository.deleteByIdForCurrentUser("scr-gary1");
 
     // Then: Nothing should be deleted (authorization check)
     assertThat(patDeleteCount).isZero();
 
     // Verify scorecard still exists
-    setSecurityContext(JwtPersona.GARY_GOLFER.getSub());
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
     assertThat(scorecardRepository.findByIdForCurrentUser("scr-gary1")).isPresent();
 
     // When: Gary deletes his own scorecard
@@ -167,19 +167,19 @@ class ScorecardRepositoryTest {
   @Transactional(propagation = Propagation.NEVER)
   void shouldUpdateLastModifiedByWhenEntityIsUpdated() {
     // Given: Gary creates a scorecard
-    setSecurityContext(JwtPersona.GARY_GOLFER.getSub());
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
     ScorecardEntity entity = createScorecard("scr-gary1", 88);
     ScorecardEntity saved = scorecardRepository.save(entity);
     String originalCreatedBy = saved.getCreatedBy();
 
     // When: Dana updates the score (hypothetically if update were allowed)
-    setSecurityContext(JwtPersona.DANA_DRIVER.getSub());
+    setSecurityContext(JwtPersona.DANA_DRIVER.sub());
     saved.setScore(92);
     ScorecardEntity updated = scorecardRepository.save(saved);
 
     // Then: createdBy should remain unchanged, but lastModifiedBy should update
     assertThat(updated.getCreatedBy()).isEqualTo(originalCreatedBy);
-    assertThat(updated.getLastModifiedBy()).isEqualTo(JwtPersona.DANA_DRIVER.getSub());
+    assertThat(updated.getLastModifiedBy()).isEqualTo(JwtPersona.DANA_DRIVER.sub());
   }
 
   private ScorecardEntity createScorecard(String id, Integer score) {

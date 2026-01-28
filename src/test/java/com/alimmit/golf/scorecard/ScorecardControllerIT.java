@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Sql(scripts = "classpath:cleanup-scorecard.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(scripts = "classpath:cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
   @MockitoBean
@@ -115,9 +115,9 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
             jsonPath("$.courseName").value("Test Course"),
             jsonPath("$.score").value(88),
             jsonPath("$.scoreDate").value("2025-09-21"),
-            jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.getSub()),
+            jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.sub()),
             jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER
-                .getSub()),
+                .sub()),
             jsonPath("$.createdAt").isString(),
             jsonPath("$.lastModifiedAt").isString());
   }

@@ -1,0 +1,67 @@
+package com.alimmit.golf.handicap;
+
+import com.alimmit.golf.courses.client.GolfCourseApiClient;
+import com.alimmit.golf.scorecard.ScorecardService;
+import com.alimmit.golf.utils.JwtPersona;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.Instant;
+import java.util.Optional;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@ActiveProfiles("test")
+@WebMvcTest(HandicapController.class)
+class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
+
+  @MockitoBean
+  private GolfCourseApiClient golfCourseApiClient;
+
+  @MockitoBean
+  private ScorecardService scorecardService;
+
+  @MockitoBean
+  private HandicapService handicapService;
+
+  @Autowired
+  HandicapControllerTest(MockMvc mockMvc) {
+    super(mockMvc);
+  }
+
+  @Test
+  void getMyHandicap() throws Exception {
+    when(handicapService.getHandicap())
+        .thenReturn(Optional.of(
+                new HandicapDto(
+                    "hdcp-123",
+                    JwtPersona.GARY_GOLFER.sub(),
+                    Instant.now(),
+                    10.2,
+                    8,
+                    20)));
+    super.getMyHandicap(JwtPersona::forGaryGolfer)
+        .andExpect(status().isOk())
+        .andExpectAll(
+            jsonPath("handicapId").value("hdcp-123"),
+            jsonPath("handicapIndex").value(10.2),
+            jsonPath("roundsUsed").value(8),
+            jsonPath("totalRounds").value(20),
+            jsonPath("golferId").value(JwtPersona.GARY_GOLFER.sub()),
+            jsonPath("createdAt").exists()
+        );
+  }
+
+  @Test
+  void getMyHandicap_ExpectMissing() throws Exception {
+    when(handicapService.getHandicap()).thenReturn(Optional.empty());
+    super.getMyHandicap(JwtPersona::forGaryGolfer)
+        .andExpect(status().isNotFound());
+  }
+}

@@ -1,0 +1,2 @@
+INSERT INTO handicap VALUES ('hdcp-1234', CURRENT_TIMESTAMP - INTERVAL '3 days', '123', 6.4, 3, 3);
+INSERT INTO handicap VALUES ('hdcp-5678', CURRENT_TIMESTAMP - INTERVAL '1 days', '123', 6.1, 4, 4);

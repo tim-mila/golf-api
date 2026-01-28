@@ -19,7 +19,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "scorecard")
 @EntityListeners(AuditingEntityListener.class)
-public class ScorecardEntity {
+class ScorecardEntity {
 
   @Id
   @Column(name = "scorecard_id", nullable = false, length = 36)
