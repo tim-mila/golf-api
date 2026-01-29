@@ -11,12 +11,12 @@ import java.util.concurrent.Executor;
 @EnableAsync
 class AsyncConfiguration {
 
-    @Bean
-    Executor scorecardEventListenerExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(3);
-        executor.setMaxPoolSize(3);
-        executor.initialize();
-        return executor;
-    }
+  @Bean
+  Executor scorecardEventListenerExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(3);
+    executor.setMaxPoolSize(3);
+    executor.initialize();
+    return executor;
+  }
 }

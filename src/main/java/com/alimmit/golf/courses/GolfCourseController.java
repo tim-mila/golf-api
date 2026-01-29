@@ -30,15 +30,25 @@ class GolfCourseController {
     this.client = client;
   }
 
-  @Operation(method = "GET", operationId = "courses.search", summary = "Search for golf courses", description = "Search for golf courses by name", parameters = {
-      @Parameter(name = "q", in = ParameterIn.QUERY, description = "Golf course search terms") })
+  @Operation(
+      method = "GET",
+      operationId = "courses.search",
+      summary = "Search for golf courses",
+      description = "Search for golf courses by name",
+      parameters = {
+        @Parameter(name = "q", in = ParameterIn.QUERY, description = "Golf course search terms") })
   @GetMapping(params = { "q" })
   List<GolfCourse> search(@RequestParam("q") String searchTerms) {
     return client.search(searchTerms);
   }
 
-  @Operation(method = "GET", operationId = "courses.get", summary = "Fetch a golf course by identifier", description = "Fetch a single course by it's unique identifier", parameters = {
-      @Parameter(name = "id", in = ParameterIn.PATH, description = "Golf course identifier") })
+  @Operation(
+      method = "GET",
+      operationId = "courses.get",
+      summary = "Fetch a golf course by identifier",
+      description = "Fetch a single course by it's unique identifier",
+      parameters = {
+        @Parameter(name = "id", in = ParameterIn.PATH, description = "Golf course identifier") })
   @GetMapping(path = API_RECORD_SUFFIX)
   GolfCourse fetch(@PathVariable Long id) {
     return client.fetch(id);
