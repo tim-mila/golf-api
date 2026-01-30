@@ -1,6 +1,7 @@
 package com.alimmit.golf.handicap;
 
 import com.alimmit.golf.scorecard.ScorecardDto;
+import com.alimmit.golf.scorecard.ScorecardType;
 import com.alimmit.golf.utils.JwtPersona;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
@@ -58,6 +59,6 @@ class HandicapCalculatorImplTest {
             score,
             rating,
             slope,
-            18);
+            ScorecardType.EIGHTEEN);
     }
 }

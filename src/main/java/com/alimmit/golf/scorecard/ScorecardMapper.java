@@ -27,7 +27,7 @@ class ScorecardMapper {
         entity.getScore(),
         entity.getRating(),
         entity.getSlope(),
-        entity.getHolesPlayed());
+        entity.getScoreType());
   }
 
   static Optional<ScorecardDto> toOptionalDto(ScorecardEntity entity) {
@@ -47,6 +47,6 @@ class ScorecardMapper {
         request.score(),
         request.rating(),
         request.slope(),
-        request.holesPlayed());
+        request.scorecardType());
   }
 }

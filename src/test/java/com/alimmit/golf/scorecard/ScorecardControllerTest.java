@@ -43,7 +43,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
   @Test
   void createScorecard() throws Exception {
-    String requestBody = "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"rating\": 72.1, \"slope\": 125.0, \"holesPlayed\": 18}";
+    String requestBody = "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}";
 
     ScorecardDto mockDto = new ScorecardDto(
         "scr-" + "a".repeat(32),
@@ -56,7 +56,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         88,
         72.1,
         125.0,
-        18);
+        ScorecardType.EIGHTEEN);
 
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
@@ -66,7 +66,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
             jsonPath("$.courseName").value("Test Course"),
             jsonPath("$.scoreDate").value("2025-09-21"),
             jsonPath("$.score").value(88),
-            jsonPath("$.holesPlayed").value(18),
+            jsonPath("$.scorecardType").value("EIGHTEEN"),
             jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.sub()),
             jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER.sub()),
             jsonPath("$.createdAt").isString(),
@@ -86,7 +86,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         88,
         72.1,
         125.0,
-        18);
+        ScorecardType.EIGHTEEN);
 
     when(scorecardService.listAll()).thenReturn(List.of(mockDto));
 
@@ -111,7 +111,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         88,
         72.1,
         125.0,
-        18);
+        ScorecardType.EIGHTEEN);
 
     when(scorecardService.getById(scorecardId)).thenReturn(Optional.of(mockDto));
 
@@ -153,23 +153,23 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
   @ParameterizedTest
   @ValueSource(strings = {
-      "{\"scoreDate\": \"2025-09-21\", \"score\": 88}", // Missing course and tee, or courseName, slope, rating, and holesPlayed
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\"}", // Missing tee, score, and holesPlayed
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"holesPlayed\": 18}", // Missing tee, and score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"tee\": \"Blue\"}", // Missing score and holesPlayed
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"tee\": \"Blue\", \"holesPlayed\": 18}", // Missing score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\"}", // Missing slope, rating, score, and holesPlayed
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"holesPlayed\": 18}", // Missing slope, rating, and score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0}", // Missing course rating, score, and holesPlayed
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0, \"holesPlayed\": 18}", // Missing course rating, and score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0, \"score\": 88}", // Missing course rating and holesPlayed
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0, \"score\": 88, \"holesPlayed\": 18}", // Missing course rating
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0}", // Missing slope, score, and holesPlayed
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"holesPlayed\": 18}", // Missing slope, and score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"score\": 89}", // Missing slope and holesPlayed
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"score\": 89, \"holesPlayed\": 18}", // Missing slope
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"slope\": 73.0}", // Missing score and holesPlayed
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"slope\": 73.0, \"holesPlayed\": 18}" // Missing score
+      "{\"scoreDate\": \"2025-09-21\", \"score\": 88}", // Missing course and tee, or courseName, slope, rating, and scorecardType
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\"}", // Missing tee, score, and scorecardType
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"scorecardType\": \"EIGHTEEN\"}", // Missing tee, and score
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"tee\": \"Blue\"}", // Missing score and scorecardType
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"tee\": \"Blue\", \"scorecardType\": \"EIGHTEEN\"}", // Missing score
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\"}", // Missing slope, rating, score, and scorecardType
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"scorecardType\": \"EIGHTEEN\"}", // Missing slope, rating, and score
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0}", // Missing course rating, score, and scorecardType
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing course rating, and score
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0, \"score\": 88}", // Missing course rating and scorecardType
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0, \"score\": 88, \"scorecardType\": \"EIGHTEEN\"}", // Missing course rating
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0}", // Missing slope, score, and scorecardType
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing slope, and score
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"score\": 89}", // Missing slope and scorecardType
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"score\": 89, \"scorecardType\": \"EIGHTEEN\"}", // Missing slope
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"slope\": 73.0}", // Missing score and scorecardType
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"slope\": 73.0, \"scorecardType\": \"EIGHTEEN\"}" // Missing score
   })
   void createAndExpectBadRequest(String requestBody) throws Exception {
     createScorecard(JwtPersona::forGaryGolfer, requestBody)

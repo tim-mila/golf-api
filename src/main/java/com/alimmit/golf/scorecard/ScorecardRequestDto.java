@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 public record ScorecardRequestDto(
     @JsonProperty("scoreDate") @NotNull LocalDate scoreDate,
-    @JsonProperty("holesPlayed") @NotNull @Min(9) Integer holesPlayed,
+    @JsonProperty("scorecardType") @NotNull ScorecardType scorecardType,
     @JsonProperty("score") @NotNull @Min(1) Integer score,
     @JsonProperty("courseName") @NotBlank String courseName,
     @JsonProperty("teeName") @NotBlank String teeName,

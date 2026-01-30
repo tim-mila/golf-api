@@ -14,5 +14,5 @@ public record ScorecardDto(
     Integer score,
     Double courseRating,
     Double slopeRating,
-    Integer holesPlayed) {
+    ScorecardType scorecardType) {
 }

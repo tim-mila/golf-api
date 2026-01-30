@@ -10,7 +10,7 @@ CREATE TABLE scorecard (
     score INTEGER NOT NULL,
     rating DOUBLE PRECISION NOT NULL,
     slope DOUBLE PRECISION NOT NULL,
-    holes_played INTEGER NOT NULL
+    scorecard_type CHARACTER VARYING(20) NOT NULL
 );
 
 -- Index for querying scorecards by user (most common query pattern)

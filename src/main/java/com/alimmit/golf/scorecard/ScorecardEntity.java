@@ -4,17 +4,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "scorecard")
@@ -56,8 +51,9 @@ class ScorecardEntity {
   @Column(name = "slope", nullable = false)
   private Double slope;
 
-  @Column(name = "holes_played", nullable = false)
-  private Integer holesPlayed;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "scorecard_type", nullable = false, updatable = false)
+  private ScorecardType scorecardType;
 
   public ScorecardEntity() {
   }
@@ -69,14 +65,14 @@ class ScorecardEntity {
       Integer score,
       Double rating,
       Double slope,
-      Integer holesPlayed) {
+      ScorecardType scorecardType) {
     this.scorecardId = scorecardId;
     this.scoreDate = scoreDate;
     this.courseName = courseName;
     this.score = score;
     this.rating = rating;
     this.slope = slope;
-    this.holesPlayed = holesPlayed;
+    this.scorecardType = scorecardType;
   }
 
   public String getScorecardId() {
@@ -159,12 +155,12 @@ class ScorecardEntity {
     this.slope = slopeRating;
   }
 
-  public Integer getHolesPlayed() {
-    return holesPlayed;
+  public ScorecardType getScoreType() {
+    return scorecardType;
   }
 
-  public void setHolesPlayed(Integer holesPlayed) {
-    this.holesPlayed = holesPlayed;
+  public void setScoreType(ScorecardType scorecardType) {
+    this.scorecardType = scorecardType;
   }
 
   @Override
@@ -190,6 +186,6 @@ class ScorecardEntity {
         score,
         rating,
         slope,
-        holesPlayed);
+        scorecardType);
   }
 }
