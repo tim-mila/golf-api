@@ -45,7 +45,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
   // , "rating": 72.1, "slope": 125
   private static final String REQUEST_BODY = """
-      {"scoreDate": "2025-09-21", "courseName": "Test Course", "teeName": "Blue", "score": 88, "rating": 72.1, "slope": 125.0}
+      {"scoreDate": "2025-09-21", "courseName": "Test Course", "teeName": "Blue", "score": 88, "rating": 72.1, "slope": 125.0, "holesPlayed": 18}
       """;
 
   @Test
@@ -114,6 +114,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
             jsonPath("$.scorecardId").value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
             jsonPath("$.courseName").value("Test Course"),
             jsonPath("$.score").value(88),
+            jsonPath("$.holesPlayed").value(18),
             jsonPath("$.scoreDate").value("2025-09-21"),
             jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.sub()),
             jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER

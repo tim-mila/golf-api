@@ -40,5 +40,5 @@ public interface ScorecardService {
      *
      * @param id Scorecard identifier
      */
-    void deleteById(String id);
+    int deleteById(String id);
 }

@@ -78,7 +78,8 @@ class ScorecardRepositoryTest {
         "Test Course",
         88,
         72.1,
-        125.0);
+        125.0,
+        18);
     ScorecardEntity saved = scorecardRepository.save(entity);
 
     // Then: Audit fields should be populated automatically
@@ -189,7 +190,8 @@ class ScorecardRepositoryTest {
         "Test Course",
         score,
         72.1,
-        125.0);
+        125.0,
+        18);
   }
 
   private void setSecurityContext(String username) {

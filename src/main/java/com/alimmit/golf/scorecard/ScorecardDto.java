@@ -13,5 +13,6 @@ public record ScorecardDto(
     String courseName,
     Integer score,
     Double courseRating,
-    Double slopeRating) {
+    Double slopeRating,
+    Integer holesPlayed) {
 }

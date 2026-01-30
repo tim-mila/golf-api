@@ -56,17 +56,27 @@ class ScorecardEntity {
   @Column(name = "slope", nullable = false)
   private Double slope;
 
+  @Column(name = "holes_played", nullable = false)
+  private Integer holesPlayed;
+
   public ScorecardEntity() {
   }
 
-  public ScorecardEntity(String scorecardId, LocalDate scoreDate, String courseName, Integer score,
-      Double rating, Double slope) {
+  public ScorecardEntity(
+      String scorecardId,
+      LocalDate scoreDate,
+      String courseName,
+      Integer score,
+      Double rating,
+      Double slope,
+      Integer holesPlayed) {
     this.scorecardId = scorecardId;
     this.scoreDate = scoreDate;
     this.courseName = courseName;
     this.score = score;
     this.rating = rating;
     this.slope = slope;
+    this.holesPlayed = holesPlayed;
   }
 
   public String getScorecardId() {
@@ -149,6 +159,14 @@ class ScorecardEntity {
     this.slope = slopeRating;
   }
 
+  public Integer getHolesPlayed() {
+    return holesPlayed;
+  }
+
+  public void setHolesPlayed(Integer holesPlayed) {
+    this.holesPlayed = holesPlayed;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -161,22 +179,17 @@ class ScorecardEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(scorecardId);
-  }
-
-  @Override
-  public String toString() {
-    return "ScorecardEntity{" +
-        "scorecardId='" + scorecardId + '\'' +
-        ", createdAt=" + createdAt +
-        ", createdBy='" + createdBy + '\'' +
-        ", lastModifiedAt=" + lastModifiedAt +
-        ", lastModifiedBy='" + lastModifiedBy + '\'' +
-        ", scoreDate=" + scoreDate +
-        ", courseName=" + courseName +
-        ", score=" + score +
-        ", rating=" + rating +
-        ", slope=" + slope +
-        '}';
+    return Objects.hash(
+        scorecardId,
+        createdAt,
+        createdBy,
+        lastModifiedAt,
+        lastModifiedBy,
+        scoreDate,
+        courseName,
+        score,
+        rating,
+        slope,
+        holesPlayed);
   }
 }

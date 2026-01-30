@@ -60,6 +60,11 @@ class ScorecardController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   void delete(@PathVariable String id) {
-    scorecardService.deleteById(id);
+    int deleted = scorecardService.deleteById(id);
+    if (deleted == 0) {
+      throw new NotFoundException();
+    } else if (deleted > 1) {
+      throw new IllegalStateException();
+    }
   }
 }

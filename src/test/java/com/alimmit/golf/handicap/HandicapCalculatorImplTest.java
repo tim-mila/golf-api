@@ -47,7 +47,17 @@ class HandicapCalculatorImplTest {
 
     private ScorecardDto createScorecard(int offsetDays, int score, double rating, double slope) {
         String id = "scr-" + RandomStringUtils.insecure().nextAlphanumeric(32);
-        return new ScorecardDto(id, Instant.now().minus(offsetDays, ChronoUnit.DAYS), JwtPersona.GARY_GOLFER.sub(),
-                Instant.now().minus(offsetDays, ChronoUnit.DAYS), JwtPersona.GARY_GOLFER.sub(), LocalDate.now().minusDays(offsetDays), "Test Course", score, rating, slope);
+        return new ScorecardDto(
+            id,
+            Instant.now().minus(offsetDays, ChronoUnit.DAYS),
+            JwtPersona.GARY_GOLFER.sub(),
+            Instant.now().minus(offsetDays, ChronoUnit.DAYS),
+            JwtPersona.GARY_GOLFER.sub(),
+            LocalDate.now().minusDays(offsetDays),
+            "Test Course",
+            score,
+            rating,
+            slope,
+            18);
     }
 }

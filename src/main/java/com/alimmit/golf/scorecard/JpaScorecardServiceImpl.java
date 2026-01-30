@@ -76,7 +76,7 @@ class JpaScorecardServiceImpl implements ScorecardService {
    * Delete a scorecard by ID for the current authenticated user.
    */
   @Override
-  public void deleteById(String id) {
-    scorecardRepository.deleteByIdForCurrentUser(id);
+  public int deleteById(String id) {
+    return scorecardRepository.deleteByIdForCurrentUser(id);
   }
 }
