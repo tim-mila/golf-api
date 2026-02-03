@@ -1,11 +1,7 @@
 package com.alimmit.golf.scorecard;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
+import com.alimmit.golf.utils.JwtPersona;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -25,10 +21,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.alimmit.golf.utils.JwtPersona;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -76,18 +74,27 @@ class ScorecardRepositoryTest {
         "scr-test123",
         LocalDate.of(2025, 9, 21),
         "Test Course",
+        "Test Tee",
         88,
         72.1,
         125.0,
-        ScorecardType.EIGHTEEN);
+        ScorecardType.EIGHTEEN,
+        14.4,
+        true);
     ScorecardEntity saved = scorecardRepository.save(entity);
 
     // Then: Audit fields should be populated automatically
-    assertThat(saved.getScorecardId()).isEqualTo("scr-test123");
-    assertThat(saved.getCreatedBy()).isEqualTo(JwtPersona.GARY_GOLFER.sub());
-    assertThat(saved.getLastModifiedBy()).isEqualTo(JwtPersona.GARY_GOLFER.sub());
-    assertThat(saved.getCreatedAt()).isNotNull();
-    assertThat(saved.getLastModifiedAt()).isNotNull();
+    Assertions.assertThat(saved)
+        .hasFieldOrPropertyWithValue("scorecardId", "scr-test123")
+        .hasFieldOrPropertyWithValue("createdBy", JwtPersona.GARY_GOLFER.sub())
+        .hasFieldOrProperty("createdAt")
+        .hasFieldOrPropertyWithValue("courseName", "Test Course")
+        .hasFieldOrPropertyWithValue("teeName", "Test Tee")
+        .hasFieldOrPropertyWithValue("score", 88)
+        .hasFieldOrPropertyWithValue("rating", 72.1)
+        .hasFieldOrPropertyWithValue("slope", 125.0)
+        .hasFieldOrPropertyWithValue("differential", 14.4)
+        .hasFieldOrPropertyWithValue("indexEstablished", true);
   }
 
   @Test
@@ -164,34 +171,18 @@ class ScorecardRepositoryTest {
     assertThat(scorecardRepository.findByIdForCurrentUser("scr-gary1")).isEmpty();
   }
 
-  @Test
-  @Transactional(propagation = Propagation.NEVER)
-  void shouldUpdateLastModifiedByWhenEntityIsUpdated() {
-    // Given: Gary creates a scorecard
-    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    ScorecardEntity entity = createScorecard("scr-gary1", 88);
-    ScorecardEntity saved = scorecardRepository.save(entity);
-    String originalCreatedBy = saved.getCreatedBy();
-
-    // When: Dana updates the score (hypothetically if update were allowed)
-    setSecurityContext(JwtPersona.DANA_DRIVER.sub());
-    saved.setScore(92);
-    ScorecardEntity updated = scorecardRepository.save(saved);
-
-    // Then: createdBy should remain unchanged, but lastModifiedBy should update
-    assertThat(updated.getCreatedBy()).isEqualTo(originalCreatedBy);
-    assertThat(updated.getLastModifiedBy()).isEqualTo(JwtPersona.DANA_DRIVER.sub());
-  }
-
   private ScorecardEntity createScorecard(String id, Integer score) {
     return new ScorecardEntity(
         id,
         LocalDate.of(2025, 9, 21),
         "Test Course",
+        "Test Tee",
         score,
         72.1,
         125.0,
-        ScorecardType.EIGHTEEN);
+        ScorecardType.EIGHTEEN,
+        14.4,
+        true);
   }
 
   private void setSecurityContext(String username) {

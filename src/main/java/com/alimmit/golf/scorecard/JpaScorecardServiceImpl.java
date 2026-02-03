@@ -3,6 +3,8 @@ package com.alimmit.golf.scorecard;
 import java.util.List;
 import java.util.Optional;
 
+import com.alimmit.golf.differential.Differential;
+import com.alimmit.golf.differential.DifferentialCalculator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,13 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 class JpaScorecardServiceImpl implements ScorecardService {
 
   private final ScorecardRepository scorecardRepository;
-  private final ScorecardIdGenerator scorecardIdGenerator;
+  private final ScorecardMapper scorecardMapper;
+  private final DifferentialCalculator differentialCalculator;
 
   JpaScorecardServiceImpl(
           ScorecardRepository scorecardRepository,
-          ScorecardIdGenerator scorecardIdGenerator) {
+          ScorecardMapper scorecardMapper,
+          DifferentialCalculator differentialCalculator) {
     this.scorecardRepository = scorecardRepository;
-    this.scorecardIdGenerator = scorecardIdGenerator;
+    this.scorecardMapper = scorecardMapper;
+    this.differentialCalculator = differentialCalculator;
   }
 
   /**
@@ -31,10 +36,10 @@ class JpaScorecardServiceImpl implements ScorecardService {
    */
   @Override
   public ScorecardDto create(ScorecardRequestDto request) {
-    String scorecardId = scorecardIdGenerator.generate();
-    ScorecardEntity entity = ScorecardMapper.toEntity(scorecardId, request);
-    ScorecardEntity saved = scorecardRepository.save(entity);
-    return ScorecardMapper.toDto(saved);
+    Differential differential = differentialCalculator.calculateDifferential(request);
+    ScorecardEntity saved = scorecardRepository.save(
+        scorecardMapper.toEntity(request, differential.differential(), differential.indexEstablished()));
+    return scorecardMapper.toDto(saved);
   }
 
   /**
@@ -45,7 +50,7 @@ class JpaScorecardServiceImpl implements ScorecardService {
   public List<ScorecardDto> listAll() {
     return scorecardRepository.findAllForCurrentUser()
         .stream()
-        .map(ScorecardMapper::toDto)
+        .map(scorecardMapper::toDto)
         .toList();
   }
 
@@ -58,7 +63,7 @@ class JpaScorecardServiceImpl implements ScorecardService {
   @Transactional(readOnly = true)
   @Override
   public List<ScorecardDto> listAll(String userId) {
-    return scorecardRepository.findAllCreatedBy(userId).stream().map(ScorecardMapper::toDto).toList();
+    return scorecardRepository.findAllCreatedBy(userId).stream().map(scorecardMapper::toDto).toList();
   }
 
   /**
@@ -69,7 +74,7 @@ class JpaScorecardServiceImpl implements ScorecardService {
   public Optional<ScorecardDto> getById(String id) {
     return scorecardRepository
             .findByIdForCurrentUser(id)
-            .flatMap(ScorecardMapper::toOptionalDto);
+            .flatMap(scorecardMapper::toOptionalDto);
   }
 
   /**

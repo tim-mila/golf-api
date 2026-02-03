@@ -1,10 +1,13 @@
 package com.alimmit.golf.handicap;
 
+import com.alimmit.golf.scorecard.ScorecardDto;
+
+import java.util.List;
 import java.util.Optional;
 
-interface HandicapService {
+public interface HandicapService {
 
-  void calculate(String userId);
+  void calculate(List<ScorecardDto> scorecards, String golferId);
 
   /**
    * Get handicap for currently authenticated user

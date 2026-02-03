@@ -7,10 +7,13 @@ CREATE TABLE scorecard (
     last_modified_by VARCHAR(255),
     score_date DATE NOT NULL,
     course_name CHARACTER VARYING(255) NOT NULL,
+    tee_name CHARACTER VARYING(255) NOT NULL,
     score INTEGER NOT NULL,
     rating DOUBLE PRECISION NOT NULL,
     slope DOUBLE PRECISION NOT NULL,
-    scorecard_type CHARACTER VARYING(20) NOT NULL
+    scorecard_type CHARACTER VARYING(20) NOT NULL,
+    differential DOUBLE PRECISION NOT NULL,
+    index_established BOOLEAN NOT NULL
 );
 
 -- Index for querying scorecards by user (most common query pattern)

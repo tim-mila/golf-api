@@ -15,50 +15,51 @@ import java.util.List;
 
 class HandicapCalculatorImplTest {
 
-    private final HandicapCalculator handicapCalculator = new HandicapCalculatorImpl();
+  private final HandicapCalculator handicapCalculator = new HandicapCalculatorImpl();
 
-    @Test
-    void assertEmptyHandicap() {
+  @Test
+  void assertEmptyHandicap() {
 
-        ScorecardDto scorecard1 = createScorecard(3, 99, 72.1, 123.3);
-        ScorecardDto scorecard2 = createScorecard(2, 98, 72.2, 123.2);
+    ScorecardDto scorecard1 = createScorecard(3, 99, 72.1, 123.3, 23.8);
+    ScorecardDto scorecard2 = createScorecard(2, 98, 72.2, 123.2, 23.7);
 
-        // Any input less than two should not return a calculated handicap handicapIndex
-        Assertions.assertThat(handicapCalculator.calculate(Collections.emptyList())).isEmpty();
-        Assertions.assertThat(handicapCalculator.calculate(List.of(scorecard1))).isEmpty();
-        Assertions.assertThat(handicapCalculator.calculate(List.of(scorecard1, scorecard2))).isEmpty();
-    }
+    // Any input less than two should not return a calculated handicap handicapIndex
+    Assertions.assertThat(handicapCalculator.calculate(Collections.emptyList())).isEmpty();
+    Assertions.assertThat(handicapCalculator.calculate(List.of(scorecard1))).isEmpty();
+    Assertions.assertThat(handicapCalculator.calculate(List.of(scorecard1, scorecard2))).isEmpty();
+  }
 
-    @Test
-    void assertHandicapPresent() {
+  @Test
+  void assertHandicapPresent() {
 
-        ScorecardDto scorecard1 = createScorecard(3, 99, 72.1, 123.3);
-        ScorecardDto scorecard2 = createScorecard(2, 98, 72.2, 123.2);
-        ScorecardDto scorecard3 = createScorecard(1, 97, 72.3, 123.1);
+    ScorecardDto scorecard1 = createScorecard(3, 99, 72.1, 123.3, 23.9);
+    ScorecardDto scorecard2 = createScorecard(2, 98, 72.2, 123.2, 23.8);
+    ScorecardDto scorecard3 = createScorecard(1, 97, 72.3, 123.1, 23.7);
 
-        // Any input less than two should not return a calculated handicap handicapIndex
-        Assertions.assertThat(handicapCalculator.calculate(List.of(scorecard1, scorecard2, scorecard3)))
-                .isPresent()
-                .get()
-                .hasFieldOrPropertyWithValue("roundsUsed", 1)
-                .hasFieldOrPropertyWithValue("totalRounds", 3)
-                .hasFieldOrProperty("differentials")
-        ;
-    }
+    // Any input less than two should not return a calculated handicap handicapIndex
+    Assertions.assertThat(handicapCalculator.calculate(List.of(scorecard1, scorecard2, scorecard3)))
+        .isPresent()
+        .get()
+        .hasFieldOrPropertyWithValue("roundsUsed", 1)
+        .hasFieldOrPropertyWithValue("totalRounds", 3)
+        .hasFieldOrProperty("differentials")
+    ;
+  }
 
-    private ScorecardDto createScorecard(int offsetDays, int score, double rating, double slope) {
-        String id = "scr-" + RandomStringUtils.insecure().nextAlphanumeric(32);
-        return new ScorecardDto(
-            id,
-            Instant.now().minus(offsetDays, ChronoUnit.DAYS),
-            JwtPersona.GARY_GOLFER.sub(),
-            Instant.now().minus(offsetDays, ChronoUnit.DAYS),
-            JwtPersona.GARY_GOLFER.sub(),
-            LocalDate.now().minusDays(offsetDays),
-            "Test Course",
-            score,
-            rating,
-            slope,
-            ScorecardType.EIGHTEEN);
-    }
+  private ScorecardDto createScorecard(int offsetDays, int score, double rating, double slope, double differential) {
+    String id = "scr-" + RandomStringUtils.insecure().nextAlphanumeric(32);
+    return new ScorecardDto(
+        id,
+        Instant.now().minus(offsetDays, ChronoUnit.DAYS),
+        JwtPersona.GARY_GOLFER.sub(),
+        LocalDate.now().minusDays(offsetDays),
+        "Test Course",
+        "Test Tee",
+        score,
+        rating,
+        slope,
+        ScorecardType.EIGHTEEN,
+        differential,
+        true);
+  }
 }

@@ -49,14 +49,15 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         "scr-" + "a".repeat(32),
         Instant.now(),
         JwtPersona.GARY_GOLFER.sub(),
-        Instant.now(),
-        JwtPersona.GARY_GOLFER.sub(),
         LocalDate.of(2025, 9, 21),
         "Test Course",
+        "Test Tee",
         88,
         72.1,
         125.0,
-        ScorecardType.EIGHTEEN);
+        ScorecardType.EIGHTEEN,
+        14.4,
+        true);
 
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
@@ -64,13 +65,16 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         .andExpectAll(
             jsonPath("$.scorecardId").value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
             jsonPath("$.courseName").value("Test Course"),
+            jsonPath("$.teeName").value("Test Tee"),
             jsonPath("$.scoreDate").value("2025-09-21"),
             jsonPath("$.score").value(88),
+            jsonPath("$.courseRating").value(72.1),
+            jsonPath("$.slopeRating").value(125.0),
             jsonPath("$.scorecardType").value("EIGHTEEN"),
+            jsonPath("$.differential").value(14.4),
+            jsonPath("$.indexEstablished").value(true),
             jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.sub()),
-            jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER.sub()),
-            jsonPath("$.createdAt").isString(),
-            jsonPath("$.lastModifiedAt").isString());
+            jsonPath("$.createdAt").isString());
   }
 
   @Test
@@ -79,14 +83,15 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         "scr-" + "a".repeat(32),
         Instant.now(),
         JwtPersona.GARY_GOLFER.sub(),
-        Instant.now(),
-        JwtPersona.GARY_GOLFER.sub(),
         LocalDate.of(2025, 9, 21),
         "Test Course",
+        "Test Tee",
         88,
         72.1,
         125.0,
-        ScorecardType.EIGHTEEN);
+        ScorecardType.EIGHTEEN,
+        14.4,
+        true);
 
     when(scorecardService.listAll()).thenReturn(List.of(mockDto));
 
@@ -104,14 +109,15 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         scorecardId,
         Instant.now(),
         JwtPersona.GARY_GOLFER.sub(),
-        Instant.now(),
-        JwtPersona.GARY_GOLFER.sub(),
         LocalDate.of(2025, 9, 21),
         "Test Course",
+        "Test Tee",
         88,
         72.1,
         125.0,
-        ScorecardType.EIGHTEEN);
+        ScorecardType.EIGHTEEN,
+        14.4,
+        true);
 
     when(scorecardService.getById(scorecardId)).thenReturn(Optional.of(mockDto));
 

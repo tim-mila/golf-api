@@ -1,15 +1,13 @@
 package com.alimmit.golf.scorecard;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Objects;
-
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "scorecard")
@@ -28,32 +26,33 @@ class ScorecardEntity {
   @Column(name = "created_by", nullable = false, updatable = false, length = 255)
   private String createdBy;
 
-  @LastModifiedDate
-  @Column(name = "last_modified_at")
-  private Instant lastModifiedAt;
-
-  @LastModifiedBy
-  @Column(name = "last_modified_by", length = 255)
-  private String lastModifiedBy;
-
-  @Column(name = "score_date", nullable = false)
+  @Column(name = "score_date", nullable = false, updatable = false)
   private LocalDate scoreDate;
 
-  @Column(name = "course_name", nullable = false)
+  @Column(name = "course_name", nullable = false, updatable = false)
   private String courseName;
 
-  @Column(name = "score", nullable = false)
-  private Integer score;
+  @Column(name = "tee_name", nullable = false, updatable = false)
+  private String teeName;
 
-  @Column(name = "rating", nullable = false)
-  private Double rating;
+  @Column(name = "score", nullable = false, updatable = false)
+  private int score;
 
-  @Column(name = "slope", nullable = false)
-  private Double slope;
+  @Column(name = "rating", nullable = false, updatable = false)
+  private double rating;
+
+  @Column(name = "slope", nullable = false, updatable = false)
+  private double slope;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "scorecard_type", nullable = false, updatable = false)
   private ScorecardType scorecardType;
+
+  @Column(name = "differential", nullable = false, updatable = false)
+  private double differential;
+
+  @Column(name = "index_established", nullable = false, updatable = false)
+  private boolean indexEstablished;
 
   public ScorecardEntity() {
   }
@@ -62,17 +61,23 @@ class ScorecardEntity {
       String scorecardId,
       LocalDate scoreDate,
       String courseName,
+      String teeName,
       Integer score,
       Double rating,
       Double slope,
-      ScorecardType scorecardType) {
+      ScorecardType scorecardType,
+      double differential,
+      boolean indexEstablished) {
     this.scorecardId = scorecardId;
     this.scoreDate = scoreDate;
     this.courseName = courseName;
+    this.teeName = teeName;
     this.score = score;
     this.rating = rating;
     this.slope = slope;
     this.scorecardType = scorecardType;
+    this.differential = differential;
+    this.indexEstablished = indexEstablished;
   }
 
   public String getScorecardId() {
@@ -99,22 +104,6 @@ class ScorecardEntity {
     this.createdBy = createdBy;
   }
 
-  public Instant getLastModifiedAt() {
-    return lastModifiedAt;
-  }
-
-  public void setLastModifiedAt(Instant lastModifiedAt) {
-    this.lastModifiedAt = lastModifiedAt;
-  }
-
-  public String getLastModifiedBy() {
-    return lastModifiedBy;
-  }
-
-  public void setLastModifiedBy(String lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
-
   public LocalDate getScoreDate() {
     return scoreDate;
   }
@@ -131,36 +120,60 @@ class ScorecardEntity {
     this.courseName = courseName;
   }
 
-  public Integer getScore() {
+  public String getTeeName() {
+    return teeName;
+  }
+
+  public void setTeeName(String teeName) {
+    this.teeName = teeName;
+  }
+
+  public int getScore() {
     return score;
   }
 
-  public void setScore(Integer score) {
+  public void setScore(int score) {
     this.score = score;
   }
 
-  public Double getRating() {
+  public double getRating() {
     return rating;
   }
 
-  public void setRating(Double rating) {
+  public void setRating(double rating) {
     this.rating = rating;
   }
 
-  public Double getSlope() {
+  public double getSlope() {
     return slope;
   }
 
-  public void setSlope(Double slopeRating) {
-    this.slope = slopeRating;
+  public void setSlope(double slope) {
+    this.slope = slope;
   }
 
-  public ScorecardType getScoreType() {
+  public ScorecardType getScorecardType() {
     return scorecardType;
   }
 
-  public void setScoreType(ScorecardType scorecardType) {
+  public void setScorecardType(ScorecardType scorecardType) {
     this.scorecardType = scorecardType;
+  }
+
+  public double getDifferential() {
+    return differential;
+  }
+
+  public void setDifferential(double differential) {
+    this.differential = differential;
+  }
+
+  public boolean isIndexEstablished() {
+    return indexEstablished;
+  }
+
+  public void setIndexEstablished(boolean indexEstablished) {
+    this.indexEstablished = indexEstablished;
   }
 
   @Override
@@ -179,8 +192,6 @@ class ScorecardEntity {
         scorecardId,
         createdAt,
         createdBy,
-        lastModifiedAt,
-        lastModifiedBy,
         scoreDate,
         courseName,
         score,

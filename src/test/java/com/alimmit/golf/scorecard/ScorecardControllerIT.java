@@ -45,7 +45,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
   // , "rating": 72.1, "slope": 125
   private static final String REQUEST_BODY = """
-      {"scoreDate": "2025-09-21", "courseName": "Test Course", "teeName": "Blue", "score": 88, "rating": 72.1, "slope": 125.0, "scorecardType": 18}
+      {"scoreDate": "2025-09-21", "courseName": "Test Course", "teeName": "Blue", "score": 88, "rating": 72.1, "slope": 125.0, "scorecardType": "EIGHTEEN"}
       """;
 
   @Test
@@ -113,13 +113,13 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
         .andExpectAll(
             jsonPath("$.scorecardId").value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
             jsonPath("$.courseName").value("Test Course"),
+            jsonPath("$.teeName").value("Blue"),
             jsonPath("$.score").value(88),
-            jsonPath("$.holesPlayed").value(18),
+            jsonPath("$.courseRating").value(72.1),
+            jsonPath("$.slopeRating").value(125.0),
+            jsonPath("$.scorecardType").value("EIGHTEEN"),
             jsonPath("$.scoreDate").value("2025-09-21"),
             jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.sub()),
-            jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER
-                .sub()),
-            jsonPath("$.createdAt").isString(),
-            jsonPath("$.lastModifiedAt").isString());
+            jsonPath("$.createdAt").isString());
   }
 }

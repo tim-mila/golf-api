@@ -1,26 +1,23 @@
 package com.alimmit.golf.handicap;
 
+import com.alimmit.golf.scorecard.ScorecardDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alimmit.golf.scorecard.ScorecardService;
-
+import java.util.List;
 import java.util.Optional;
 
 @Service
 class JpaHandicapServiceImpl implements HandicapService {
 
-  private final ScorecardService scorecardService;
   private final HandicapCalculator handicapCalculator;
   private final HandicapMapper handicapMapper;
   private final HandicapRepository handicapRepository;
 
   JpaHandicapServiceImpl(
-      ScorecardService scorecardService,
       HandicapCalculator handicapCalculator,
       HandicapMapper handicapMapper,
       HandicapRepository handicapRepository) {
-    this.scorecardService = scorecardService;
     this.handicapCalculator = handicapCalculator;
     this.handicapMapper = handicapMapper;
     this.handicapRepository = handicapRepository;
@@ -28,9 +25,9 @@ class JpaHandicapServiceImpl implements HandicapService {
 
   @Override
   @Transactional
-  public void calculate(String userId) {
-    handicapCalculator.calculate(scorecardService.listAll(userId))
-        .ifPresent(handicapDto -> handicapRepository.save(handicapMapper.toEntity(handicapDto, userId)));
+  public void calculate(List<ScorecardDto> scorecards, String golferId) {
+    handicapCalculator.calculate(scorecards)
+        .ifPresent(handicapDto -> handicapRepository.save(handicapMapper.toEntity(handicapDto, golferId)));
   }
 
   @Override

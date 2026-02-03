@@ -7,12 +7,13 @@ public record ScorecardDto(
     String scorecardId,
     Instant createdAt,
     String createdBy,
-    Instant lastModifiedAt,
-    String lastModifiedBy,
     LocalDate scoreDate,
     String courseName,
+    String teeName,
     Integer score,
     Double courseRating,
     Double slopeRating,
-    ScorecardType scorecardType) {
+    ScorecardType scorecardType,
+    Double differential,
+    Boolean indexEstablished) {
 }
