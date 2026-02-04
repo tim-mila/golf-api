@@ -36,7 +36,16 @@ class ScorecardController {
     this.scorecardEventPublisher = scorecardEventPublisher;
   }
 
-  @Operation(method = "POST", operationId = "scorecard.create", summary = "Create new scorecard", description = "Add a new score for a round of golf", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, content = @Content(schema = @Schema(implementation = ScorecardRequestDto.class, contentMediaType = "application/json"))))
+  @Operation(
+      method = "POST",
+      operationId = "scorecard.create",
+      summary = "Create new scorecard",
+      description = "Add a new score for a round of golf",
+      requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+          required = true,
+          content = @Content(
+              schema = @Schema(
+                  implementation = ScorecardRequestDto.class, contentMediaType = "application/json"))))
   @PostMapping
   ScorecardDto create(@RequestBody @Valid ScorecardRequestDto request) {
     ScorecardDto created = scorecardService.create(request);
@@ -44,24 +53,38 @@ class ScorecardController {
     return created;
   }
 
-  @Operation(method = "GET", operationId = "scorecard.list", summary = "List your scorecards", description = "Get a list of your scorecards")
+  @Operation(
+      method = "GET",
+      operationId = "scorecard.list",
+      summary = "List your scorecards",
+      description = "Get a list of your scorecards")
   @GetMapping
   List<ScorecardDto> list() {
     return scorecardService.listAll();
   }
 
-  @Operation(method = "GET", operationId = "scorecard.get", summary = "Get scorecard", description = "Get one of your scorecards")
+  @Operation(
+      method = "GET",
+      operationId = "scorecard.get",
+      summary = "Get scorecard",
+      description = "Get one of your scorecards")
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   ScorecardDto get(@PathVariable String id) {
     return scorecardService.getById(id).orElseThrow(NotFoundException::new);
   }
 
-  @Operation(method = "DELETE", operationId = "scorecard.delete", summary = "Delete a scorecard", description = "Delete one of your scorecards")
+  @Operation(
+      method = "DELETE",
+      operationId = "scorecard.delete",
+      summary = "Delete a scorecard",
+      description = "Delete one of your scorecards")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   void delete(@PathVariable String id) {
     int deleted = scorecardService.deleteById(id);
-    if (deleted == 0) {
+    if (deleted == 1) {
+      scorecardEventPublisher.publishedDeleted();
+    } else if (deleted == 0) {
       throw new NotFoundException();
     } else if (deleted > 1) {
       throw new IllegalStateException();
