@@ -20,8 +20,8 @@ class HandicapCalculatorImplTest {
   @Test
   void assertEmptyHandicap() {
 
-    ScorecardDto scorecard1 = createScorecard(3, 99, 72.1, 123.3, 23.8);
-    ScorecardDto scorecard2 = createScorecard(2, 98, 72.2, 123.2, 23.7);
+    ScorecardDto scorecard1 = createScorecard(3, 99, 72, 72.1, 123.3, 23.8);
+    ScorecardDto scorecard2 = createScorecard(2, 98, 72, 72.2, 123.2, 23.7);
 
     // Any input less than two should not return a calculated handicap handicapIndex
     Assertions.assertThat(handicapCalculator.calculate(Collections.emptyList())).isEmpty();
@@ -32,9 +32,9 @@ class HandicapCalculatorImplTest {
   @Test
   void assertHandicapPresent() {
 
-    ScorecardDto scorecard1 = createScorecard(3, 99, 72.1, 123.3, 23.9);
-    ScorecardDto scorecard2 = createScorecard(2, 98, 72.2, 123.2, 23.8);
-    ScorecardDto scorecard3 = createScorecard(1, 97, 72.3, 123.1, 23.7);
+    ScorecardDto scorecard1 = createScorecard(3, 99, 72, 72.1, 123.3, 23.9);
+    ScorecardDto scorecard2 = createScorecard(2, 98, 72, 72.2, 123.2, 23.8);
+    ScorecardDto scorecard3 = createScorecard(1, 97, 72, 72.3, 123.1, 23.7);
 
     // Any input less than two should not return a calculated handicap handicapIndex
     Assertions.assertThat(handicapCalculator.calculate(List.of(scorecard1, scorecard2, scorecard3)))
@@ -46,7 +46,7 @@ class HandicapCalculatorImplTest {
     ;
   }
 
-  private ScorecardDto createScorecard(int offsetDays, int score, double rating, double slope, double differential) {
+  private ScorecardDto createScorecard(int offsetDays, int score, int par, double rating, double slope, double differential) {
     String id = "scr-" + RandomStringUtils.insecure().nextAlphanumeric(32);
     return new ScorecardDto(
         id,
@@ -56,6 +56,7 @@ class HandicapCalculatorImplTest {
         "Test Course",
         "Test Tee",
         score,
+        par,
         rating,
         slope,
         ScorecardType.EIGHTEEN,

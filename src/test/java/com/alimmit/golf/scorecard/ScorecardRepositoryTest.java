@@ -76,6 +76,7 @@ class ScorecardRepositoryTest {
         "Test Course",
         "Test Tee",
         88,
+        72,
         72.1,
         125.0,
         ScorecardType.EIGHTEEN,
@@ -91,6 +92,7 @@ class ScorecardRepositoryTest {
         .hasFieldOrPropertyWithValue("courseName", "Test Course")
         .hasFieldOrPropertyWithValue("teeName", "Test Tee")
         .hasFieldOrPropertyWithValue("score", 88)
+        .hasFieldOrPropertyWithValue("par", 72)
         .hasFieldOrPropertyWithValue("rating", 72.1)
         .hasFieldOrPropertyWithValue("slope", 125.0)
         .hasFieldOrPropertyWithValue("differential", 14.4)
@@ -178,6 +180,7 @@ class ScorecardRepositoryTest {
         "Test Course",
         "Test Tee",
         score,
+        72,
         72.1,
         125.0,
         ScorecardType.EIGHTEEN,

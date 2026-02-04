@@ -13,6 +13,7 @@ public record ScorecardRequestDto(
     @JsonProperty("courseName") @NotBlank String courseName,
     @JsonProperty("teeName") @NotBlank String teeName,
     @JsonProperty("score") @NotNull @Min(1) Integer score,
+    @JsonProperty("par") @NotNull @Min(1) Integer par,
     @JsonProperty("rating") @NotNull Double rating,
     @JsonProperty("slope") @NotNull Double slope) {
 }

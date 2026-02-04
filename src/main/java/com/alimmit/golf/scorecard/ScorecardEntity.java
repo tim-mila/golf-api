@@ -15,43 +15,46 @@ import java.util.Objects;
 class ScorecardEntity {
 
   @Id
-  @Column(name = "scorecard_id", nullable = false, length = 36)
+  @Column(nullable = false, length = 36)
   private String scorecardId;
 
   @CreatedDate
-  @Column(name = "created_at", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private Instant createdAt;
 
   @CreatedBy
-  @Column(name = "created_by", nullable = false, updatable = false, length = 255)
+  @Column(nullable = false, updatable = false)
   private String createdBy;
 
-  @Column(name = "score_date", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private LocalDate scoreDate;
 
-  @Column(name = "course_name", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private String courseName;
 
-  @Column(name = "tee_name", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private String teeName;
 
-  @Column(name = "score", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private int score;
 
-  @Column(name = "rating", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
+  private int par;
+
+  @Column(nullable = false, updatable = false)
   private double rating;
 
-  @Column(name = "slope", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private double slope;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "scorecard_type", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private ScorecardType scorecardType;
 
-  @Column(name = "differential", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private double differential;
 
-  @Column(name = "index_established", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private boolean indexEstablished;
 
   public ScorecardEntity() {
@@ -63,6 +66,7 @@ class ScorecardEntity {
       String courseName,
       String teeName,
       Integer score,
+      Integer par,
       Double rating,
       Double slope,
       ScorecardType scorecardType,
@@ -73,6 +77,7 @@ class ScorecardEntity {
     this.courseName = courseName;
     this.teeName = teeName;
     this.score = score;
+    this.par = par;
     this.rating = rating;
     this.slope = slope;
     this.scorecardType = scorecardType;
@@ -136,6 +141,14 @@ class ScorecardEntity {
     this.score = score;
   }
 
+  public int getPar() {
+    return par;
+  }
+
+  public void setPar(int par) {
+    this.par = par;
+  }
+
   public double getRating() {
     return rating;
   }
@@ -195,6 +208,7 @@ class ScorecardEntity {
         scoreDate,
         courseName,
         score,
+        par,
         rating,
         slope,
         scorecardType);

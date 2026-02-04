@@ -11,6 +11,7 @@ public record ScorecardDto(
     String courseName,
     String teeName,
     Integer score,
+    Integer par,
     Double courseRating,
     Double slopeRating,
     ScorecardType scorecardType,

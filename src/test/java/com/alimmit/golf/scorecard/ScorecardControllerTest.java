@@ -43,7 +43,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
   @Test
   void createScorecard() throws Exception {
-    String requestBody = "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}";
+    String requestBody = "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}";
 
     ScorecardDto mockDto = new ScorecardDto(
         "scr-" + "a".repeat(32),
@@ -53,6 +53,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         "Test Course",
         "Test Tee",
         88,
+        72,
         72.1,
         125.0,
         ScorecardType.EIGHTEEN,
@@ -87,6 +88,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         "Test Course",
         "Test Tee",
         88,
+        72,
         72.1,
         125.0,
         ScorecardType.EIGHTEEN,
@@ -113,6 +115,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         "Test Course",
         "Test Tee",
         88,
+        72,
         72.1,
         125.0,
         ScorecardType.EIGHTEEN,
@@ -159,23 +162,14 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
   @ParameterizedTest
   @ValueSource(strings = {
-      "{\"scoreDate\": \"2025-09-21\", \"score\": 88}", // Missing course and tee, or courseName, slope, rating, and scorecardType
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\"}", // Missing tee, score, and scorecardType
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"scorecardType\": \"EIGHTEEN\"}", // Missing tee, and score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"tee\": \"Blue\"}", // Missing score and scorecardType
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"tee\": \"Blue\", \"scorecardType\": \"EIGHTEEN\"}", // Missing score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\"}", // Missing slope, rating, score, and scorecardType
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"scorecardType\": \"EIGHTEEN\"}", // Missing slope, rating, and score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0}", // Missing course rating, score, and scorecardType
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing course rating, and score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0, \"score\": 88}", // Missing course rating and scorecardType
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"slope\": 72.0, \"score\": 88, \"scorecardType\": \"EIGHTEEN\"}", // Missing course rating
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0}", // Missing slope, score, and scorecardType
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing slope, and score
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"score\": 89}", // Missing slope and scorecardType
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"score\": 89, \"scorecardType\": \"EIGHTEEN\"}", // Missing slope
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"slope\": 73.0}", // Missing score and scorecardType
-      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test course\", \"rating\": 72.0, \"slope\": 73.0, \"scorecardType\": \"EIGHTEEN\"}" // Missing score
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0}", // Missing scorecard type
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"scorecardType\": \"EIGHTEEN\"}", // Missing slope
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing rating
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing par
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing score
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing teeName
+      "{\"scoreDate\": \"2025-09-21\", \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing courseName
+      "{\"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing scoreDate
   })
   void createAndExpectBadRequest(String requestBody) throws Exception {
     createScorecard(JwtPersona::forGaryGolfer, requestBody)

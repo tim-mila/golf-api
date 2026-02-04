@@ -43,6 +43,7 @@ class DifferentialCalculatorImplTest {
             "Test Course",
             "Test Tee",
             42,
+            36,
             35.6,
             126.0));
 
@@ -73,6 +74,7 @@ class DifferentialCalculatorImplTest {
             "Test Course",
             "Test Tee",
             38,
+            36,
             35.6,
             126.0));
 
@@ -100,6 +102,7 @@ class DifferentialCalculatorImplTest {
             "Test Course",
             "Test Tee",
             87,
+            72,
             70.9,
             123.0));
 
@@ -132,6 +135,7 @@ class DifferentialCalculatorImplTest {
             "Test Course",
             "Test Tee",
             85,
+            72,
             71.2,
             124.0));
 
