@@ -2,6 +2,8 @@ package com.alimmit.golf.handicap;
 
 import com.alimmit.golf.scorecard.ScorecardDto;
 import com.alimmit.golf.scorecard.ScorecardType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -11,6 +13,8 @@ import java.util.Optional;
 
 @Service
 class HandicapCalculatorImpl implements HandicapCalculator {
+
+  private static final Logger logger = LoggerFactory.getLogger(HandicapCalculatorImpl.class);
 
   private static final double EXCELLENCE_MULTIPLIER = 0.96;
   private static final int MINIMUM_HOLES = 54;
@@ -25,9 +29,11 @@ class HandicapCalculatorImpl implements HandicapCalculator {
 
     // Normalize to holes played rather than rounds to account for nine scores
     int holesPlayed = scorecards.stream().map(ScorecardDto::scorecardType).mapToInt(ScorecardType::getHolesPlayed).sum();
+    logger.debug("calculate handicap | holes played = {}", holesPlayed);
 
     // Need minimum 54 holes played to calculate handicap
     if (holesPlayed < MINIMUM_HOLES) {
+      logger.debug("calculate handicap | did not meet minimum hole threshold");
       return Optional.empty();
     }
 
@@ -40,21 +46,27 @@ class HandicapCalculatorImpl implements HandicapCalculator {
 
     // Determine how many differentials to use and any adjustment
     int differentialsToUse = getDifferentialsToUse(holesPlayed);
+    logger.debug("calculate handicap | based on {} holes played using {} differentials", holesPlayed, differentialsToUse);
     double adjustment = getAdjustment(holesPlayed);
+    logger.debug("calculate handicap | based on {} holes played using {} adjustment", holesPlayed, adjustment);
 
     // Get the best (lowest) differentials
     List<Double> bestDifferentials = allDifferentials.stream()
         .sorted()
         .limit(differentialsToUse)
         .toList();
+    logger.debug("calculate handicap | best differentials {}", bestDifferentials);
+
 
     // Calculate average and apply multiplier
     double average = bestDifferentials.stream()
         .mapToDouble(Double::doubleValue)
         .average()
         .orElse(0.0);
+    logger.debug("calculate handicap | average differential {}", average);
 
     double handicapIndex = (average + adjustment) * EXCELLENCE_MULTIPLIER;
+    logger.debug("calculate handicap | handicap index after applying adjust and excellence multiplier {}", average);
 
     // Round to one decimal place
     handicapIndex = Math.round(handicapIndex * 10.0) / 10.0;
@@ -89,6 +101,7 @@ class HandicapCalculatorImpl implements HandicapCalculator {
   private double getAdjustment(int holesPlayed) {
     if (holesPlayed >= 54 && holesPlayed < 72) return -2.0;
     if (holesPlayed >= 72 && holesPlayed < 108) return -1.0;
+    if (holesPlayed == 108) return -1.0;
     return 0.0;
   }
 }

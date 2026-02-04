@@ -22,6 +22,13 @@ class HandicapMapper {
         dto.totalRounds());
   }
 
+  HandicapEntity updateEntity(HandicapEntity existing, HandicapCalculation dto) {
+    existing.setHandicapIndex(dto.handicapIndex());
+    existing.setRoundsUsed(dto.roundsUsed());
+    existing.setTotalRounds(dto.totalRounds());
+    return existing;
+  }
+
   Optional<HandicapDto> toOptionalDto(Optional<HandicapEntity> entity) {
     return entity.flatMap(e -> Optional.of(toDto(e)));
   }

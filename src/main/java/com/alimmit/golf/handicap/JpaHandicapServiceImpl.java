@@ -26,8 +26,17 @@ class JpaHandicapServiceImpl implements HandicapService {
   @Override
   @Transactional
   public void calculate(List<ScorecardDto> scorecards, String golferId) {
+
+    // handicap may not be calculated based on number of holes played
     handicapCalculator.calculate(scorecards)
-        .ifPresent(handicapDto -> handicapRepository.save(handicapMapper.toEntity(handicapDto, golferId)));
+        .ifPresent(handicapDto -> {
+          // Update existing or create new handicap
+          HandicapEntity handicap = handicapRepository
+              .findHandicapForUser(golferId)
+              .map(entity -> handicapMapper.updateEntity(entity, handicapDto))
+              .orElse(handicapMapper.toEntity(handicapDto, golferId));
+          handicapRepository.save(handicap);
+        });
   }
 
   @Override

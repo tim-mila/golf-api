@@ -86,12 +86,14 @@ class HandicapRepositoryTest {
     HandicapEntity saved = handicapRepository.save(entity);
 
     // Then: Audit fields should be populated automatically
-    assertThat(saved.getHandicapId()).isEqualTo(id);
-    assertThat(saved.getGolferId()).isEqualTo(JwtPersona.GARY_GOLFER.sub());
-    assertThat(saved.getCreatedAt()).isNotNull();
-    assertThat(saved.getHandicapIndex()).isEqualTo(15.1);
-    assertThat(saved.getRoundsUsed()).isEqualTo(5);
-    assertThat(saved.getTotalRounds()).isEqualTo(5);
+    assertThat(saved)
+        .hasFieldOrPropertyWithValue("handicapId", id)
+        .hasFieldOrPropertyWithValue("golferId", JwtPersona.GARY_GOLFER.sub())
+        .hasFieldOrProperty("createdAt")
+        .hasFieldOrProperty("lastModifiedAt")
+        .hasFieldOrPropertyWithValue("handicapIndex", 15.1)
+        .hasFieldOrPropertyWithValue("roundsUsed", 5)
+        .hasFieldOrPropertyWithValue("totalRounds", 5);
   }
 
   @Test
@@ -103,51 +105,47 @@ class HandicapRepositoryTest {
 
     // When: Gary searches for his scorecards
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    List<HandicapEntity> garyResults = handicapRepository.findAllForCurrentUser();
+    Optional<HandicapEntity> garyResults = handicapRepository.findHandicapForCurrentUser();
 
     // Then: Only Gary's scorecards should be returned
     assertThat(garyResults)
-        .hasSize(2)
-        .allMatch(s -> s.getGolferId().equals(JwtPersona.GARY_GOLFER.sub()));
+        .isPresent()
+        .get()
+        .hasFieldOrPropertyWithValue("golferId", JwtPersona.GARY_GOLFER.sub())
+        .hasFieldOrPropertyWithValue("handicapIndex", 15.0)
+        .hasFieldOrPropertyWithValue("roundsUsed", 6)
+        .hasFieldOrPropertyWithValue("totalRounds", 6);
 
     // When: Pat searches for their scorecards
     setSecurityContext(JwtPersona.PAT_PUTTER.sub());
-    List<HandicapEntity> patResults = handicapRepository.findAllForCurrentUser();
+    Optional<HandicapEntity> patResults = handicapRepository.findHandicapForCurrentUser();
 
     // Then: Only Pat's scorecard should be returned
-    assertThat(patResults).hasSize(1);
-    assertThat(patResults.getFirst().getGolferId()).isEqualTo(JwtPersona.PAT_PUTTER.sub());
-  }
-
-  @Test
-  void shouldFindByIdForCurrentUser() {
-    // Given: Gary has a handicap
-    HandicapEntity garyHandicap = handicapRepository.save(createHandicap(JwtPersona.GARY_GOLFER.sub(), 10.3, 8, 18));
-
-    // When: Gary looks up his own scorecard
-    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    Optional<HandicapEntity> garyResult = handicapRepository.findByIdForCurrentUser(garyHandicap.getHandicapId());
-
-    // Then: Scorecard should be found
-    assertThat(garyResult).isPresent();
-    assertThat(garyResult.get().getHandicapId()).isEqualTo(garyHandicap.getHandicapId());
-
-    // When: Pat tries to access Gary's scorecard
-    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
-    Optional<HandicapEntity> patResult = handicapRepository.findByIdForCurrentUser(garyHandicap.getHandicapId());
-
-    // Then: Scorecard should not be found (authorization check)
-    assertThat(patResult).isEmpty();
+    assertThat(patResults).isPresent()
+        .get()
+        .hasFieldOrPropertyWithValue("golferId", JwtPersona.PAT_PUTTER.sub())
+        .hasFieldOrPropertyWithValue("handicapIndex", 5.6)
+        .hasFieldOrPropertyWithValue("roundsUsed", 8)
+        .hasFieldOrPropertyWithValue("totalRounds", 20);
   }
 
   private HandicapEntity createHandicap(String golferId, Double index, Integer roundsUsed, Integer totalRounds) {
-    return new HandicapEntity(
-        handicapIdGenerator.generate(),
-        golferId,
-        index,
-        roundsUsed,
-        totalRounds
-    );
+
+    return handicapRepository
+        .findHandicapForUser(golferId)
+        .map(h -> {
+          h.setHandicapIndex(index);
+          h.setTotalRounds(totalRounds);
+          h.setRoundsUsed(roundsUsed);
+          return h;
+        })
+        .orElse(
+            new HandicapEntity(
+                handicapIdGenerator.generate(),
+                golferId,
+                index,
+                roundsUsed,
+                totalRounds));
   }
 
   private void setSecurityContext(String username) {
