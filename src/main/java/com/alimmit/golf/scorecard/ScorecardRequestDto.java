@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
+@ValidRating
 public record ScorecardRequestDto(
     @JsonProperty("scoreDate") @NotNull LocalDate scoreDate,
     @JsonProperty("scorecardType") @NotNull ScorecardType scorecardType,

@@ -168,8 +168,10 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
       "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing par
       "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing score
       "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing teeName
-      "{\"scoreDate\": \"2025-09-21\", \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing courseName
+      "{\"scoreDate\": \"2025-09-21\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing courseName
       "{\"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing scoreDate
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 77.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Rating above range
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 66.9, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}" // Rating below range
   })
   void createAndExpectBadRequest(String requestBody) throws Exception {
     createScorecard(JwtPersona::forGaryGolfer, requestBody)
