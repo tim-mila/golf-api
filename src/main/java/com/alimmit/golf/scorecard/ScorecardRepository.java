@@ -2,6 +2,7 @@ package com.alimmit.golf.scorecard;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -45,7 +46,7 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, String> {
    * @return the scorecard if found and belongs to current user
    */
   @Query("SELECT s FROM ScorecardEntity s WHERE s.scorecardId = :scorecardId AND s.createdBy = ?#{authentication.name}")
-  Optional<ScorecardEntity> findByIdForCurrentUser(@Param("scorecardId") String scorecardId);
+  Optional<ScorecardEntity> findByIdForCurrentUser(@Param("scorecardId") UUID scorecardId);
 
   /**
    * Delete a scorecard by ID for the currently authenticated user.
@@ -57,5 +58,5 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, String> {
    */
   @Modifying
   @Query("DELETE FROM ScorecardEntity s WHERE s.scorecardId = :scorecardId AND s.createdBy = ?#{authentication.name}")
-  int deleteByIdForCurrentUser(@Param("scorecardId") String scorecardId);
+  int deleteByIdForCurrentUser(@Param("scorecardId") UUID scorecardId);
 }

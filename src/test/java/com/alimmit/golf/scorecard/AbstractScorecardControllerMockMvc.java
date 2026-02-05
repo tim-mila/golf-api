@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import java.util.UUID;
 import java.util.function.Function;
 
 import org.springframework.http.MediaType;
@@ -44,7 +45,7 @@ abstract class AbstractScorecardControllerMockMvc extends AbstractControllerMock
 
   ResultActions getScorecard(
       Function<Jwt.Builder, Jwt.Builder> fn,
-      String scorecardId,
+      UUID scorecardId,
       ResultMatcher... expect) throws Exception {
 
     return performMockMvc(
@@ -55,7 +56,7 @@ abstract class AbstractScorecardControllerMockMvc extends AbstractControllerMock
 
   ResultActions deleteScorecard(
       Function<Jwt.Builder, Jwt.Builder> fn,
-      String scorecardId,
+      UUID scorecardId,
       ResultMatcher... expect) throws Exception {
 
     return performMockMvc(

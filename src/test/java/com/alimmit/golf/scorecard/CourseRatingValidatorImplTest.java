@@ -55,7 +55,7 @@ class CourseRatingValidatorImplTest {
         "Test",
         88,
         72,
-        77.1,
+        82.1,
         125.0);
 
     assertThat(validator.isValid(request, mock(ConstraintValidatorContext.class))).isFalse();
@@ -71,7 +71,7 @@ class CourseRatingValidatorImplTest {
         "Test",
         88,
         72,
-        66.9,
+        61.9,
         125.0);
 
     assertThat(validator.isValid(request, mock(ConstraintValidatorContext.class))).isFalse();

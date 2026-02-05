@@ -2,6 +2,7 @@ package com.alimmit.golf.scorecard;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ScorecardService {
 
@@ -33,12 +34,12 @@ public interface ScorecardService {
      * @param id Scorecard identifier
      * @return Optional of scorecard
      */
-    Optional<ScorecardDto> getById(String id);
+    Optional<ScorecardDto> getById(UUID id);
 
     /**
      * Delete a scorecard
      *
      * @param id Scorecard identifier
      */
-    int deleteById(String id);
+    int deleteById(UUID id);
 }

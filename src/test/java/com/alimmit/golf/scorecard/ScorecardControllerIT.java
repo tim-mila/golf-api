@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
 import java.util.function.Function;
 
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
@@ -78,8 +79,8 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
     String responseBody = createAndAssertScorecard(JwtPersona::forGaryGolfer)
         .andReturn().getResponse().getContentAsString();
 
-    String scorecardId = new ObjectMapper().readTree(responseBody).at("/scorecardId").asText();
-    assertThat(scorecardId).isNotBlank();
+    UUID scorecardId = UUID.fromString(new ObjectMapper().readTree(responseBody).at("/scorecardId").asText());
+    assertThat(scorecardId).isNotNull();
 
     // Fetch scorecards for Gary Golfer and expect ok
     getScorecard(JwtPersona::forGaryGolfer, scorecardId, status().isOk());
@@ -94,8 +95,8 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
     String responseBody = createAndAssertScorecard(JwtPersona::forGaryGolfer)
         .andReturn().getResponse().getContentAsString();
 
-    String scorecardId = new ObjectMapper().readTree(responseBody).at("/scorecardId").asText();
-    assertThat(scorecardId).isNotBlank();
+    UUID scorecardId = UUID.fromString(new ObjectMapper().readTree(responseBody).at("/scorecardId").asText());
+    assertThat(scorecardId).isNotNull();
 
     // Delete scorecards as Pat Putter and expect not found
     deleteScorecard(JwtPersona::forPatPutter, scorecardId, status().isNotFound());

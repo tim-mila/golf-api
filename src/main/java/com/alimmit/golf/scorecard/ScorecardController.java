@@ -3,6 +3,7 @@ package com.alimmit.golf.scorecard;
 import static com.alimmit.golf.scorecard.ScorecardConstants.SCORECARD_ENDPOINT;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.alimmit.golf.errors.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -69,7 +70,7 @@ class ScorecardController {
       summary = "Get scorecard",
       description = "Get one of your scorecards")
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
-  ScorecardDto get(@PathVariable String id) {
+  ScorecardDto get(@PathVariable UUID id) {
     return scorecardService.getById(id).orElseThrow(NotFoundException::new);
   }
 
@@ -80,7 +81,7 @@ class ScorecardController {
       description = "Delete one of your scorecards")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
-  void delete(@PathVariable String id) {
+  void delete(@PathVariable UUID id) {
     int deleted = scorecardService.deleteById(id);
     if (deleted == 1) {
       scorecardEventPublisher.publishedDeleted();

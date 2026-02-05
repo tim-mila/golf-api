@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "scorecard")
@@ -15,8 +16,9 @@ import java.util.Objects;
 class ScorecardEntity {
 
   @Id
+  @GeneratedValue
   @Column(nullable = false, length = 36)
-  private String scorecardId;
+  private UUID scorecardId;
 
   @CreatedDate
   @Column(nullable = false, updatable = false)
@@ -61,7 +63,6 @@ class ScorecardEntity {
   }
 
   public ScorecardEntity(
-      String scorecardId,
       LocalDate scoreDate,
       String courseName,
       String teeName,
@@ -72,7 +73,6 @@ class ScorecardEntity {
       ScorecardType scorecardType,
       double differential,
       boolean indexEstablished) {
-    this.scorecardId = scorecardId;
     this.scoreDate = scoreDate;
     this.courseName = courseName;
     this.teeName = teeName;
@@ -85,11 +85,11 @@ class ScorecardEntity {
     this.indexEstablished = indexEstablished;
   }
 
-  public String getScorecardId() {
+  public UUID getScorecardId() {
     return scorecardId;
   }
 
-  public void setScorecardId(String scorecardId) {
+  public void setScorecardId(UUID scorecardId) {
     this.scorecardId = scorecardId;
   }
 

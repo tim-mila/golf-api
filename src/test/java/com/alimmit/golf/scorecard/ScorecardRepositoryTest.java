@@ -71,7 +71,6 @@ class ScorecardRepositoryTest {
 
     // When: Creating a new scorecard
     ScorecardEntity entity = new ScorecardEntity(
-        "scr-test123",
         LocalDate.of(2025, 9, 21),
         "Test Course",
         "Test Tee",
@@ -86,7 +85,7 @@ class ScorecardRepositoryTest {
 
     // Then: Audit fields should be populated automatically
     Assertions.assertThat(saved)
-        .hasFieldOrPropertyWithValue("scorecardId", "scr-test123")
+        .hasFieldOrProperty("scorecardId")
         .hasFieldOrPropertyWithValue("createdBy", JwtPersona.GARY_GOLFER.sub())
         .hasFieldOrProperty("createdAt")
         .hasFieldOrPropertyWithValue("courseName", "Test Course")
@@ -103,11 +102,11 @@ class ScorecardRepositoryTest {
   void shouldFindAllForCurrentUser() {
     // Given: Multiple users with scorecards
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    scorecardRepository.save(createScorecard("scr-gary1", 88));
-    scorecardRepository.save(createScorecard("scr-gary2", 90));
+    scorecardRepository.save(createScorecard(88));
+    scorecardRepository.save(createScorecard(90));
 
     setSecurityContext(JwtPersona.PAT_PUTTER.sub());
-    scorecardRepository.save(createScorecard("scr-pat1", 85));
+    scorecardRepository.save(createScorecard(85));
 
     // When: Gary searches for his scorecards
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
@@ -131,18 +130,18 @@ class ScorecardRepositoryTest {
   void shouldFindByIdForCurrentUser() {
     // Given: Gary creates a scorecard
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    scorecardRepository.save(createScorecard("scr-gary1", 88));
+    ScorecardEntity saved = scorecardRepository.save(createScorecard(88));
 
     // When: Gary looks up his own scorecard
-    Optional<ScorecardEntity> garyResult = scorecardRepository.findByIdForCurrentUser("scr-gary1");
+    Optional<ScorecardEntity> garyResult = scorecardRepository.findByIdForCurrentUser(saved.getScorecardId());
 
     // Then: Scorecard should be found
     assertThat(garyResult).isPresent();
-    assertThat(garyResult.get().getScorecardId()).isEqualTo("scr-gary1");
+    assertThat(garyResult.get().getScorecardId()).isEqualTo(saved.getScorecardId());
 
     // When: Pat tries to access Gary's scorecard
     setSecurityContext(JwtPersona.PAT_PUTTER.sub());
-    Optional<ScorecardEntity> patResult = scorecardRepository.findByIdForCurrentUser("scr-gary1");
+    Optional<ScorecardEntity> patResult = scorecardRepository.findByIdForCurrentUser(saved.getScorecardId());
 
     // Then: Scorecard should not be found (authorization check)
     assertThat(patResult).isEmpty();
@@ -152,30 +151,29 @@ class ScorecardRepositoryTest {
   void shouldDeleteByIdForCurrentUser() {
     // Given: Gary creates a scorecard
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    scorecardRepository.save(createScorecard("scr-gary1", 88));
+    ScorecardEntity saved = scorecardRepository.save(createScorecard(88));
 
     // When: Pat tries to delete Gary's scorecard
     setSecurityContext(JwtPersona.PAT_PUTTER.sub());
-    int patDeleteCount = scorecardRepository.deleteByIdForCurrentUser("scr-gary1");
+    int patDeleteCount = scorecardRepository.deleteByIdForCurrentUser(saved.getScorecardId());
 
     // Then: Nothing should be deleted (authorization check)
     assertThat(patDeleteCount).isZero();
 
     // Verify scorecard still exists
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    assertThat(scorecardRepository.findByIdForCurrentUser("scr-gary1")).isPresent();
+    assertThat(scorecardRepository.findByIdForCurrentUser(saved.getScorecardId())).isPresent();
 
     // When: Gary deletes his own scorecard
-    int garyDeleteCount = scorecardRepository.deleteByIdForCurrentUser("scr-gary1");
+    int garyDeleteCount = scorecardRepository.deleteByIdForCurrentUser(saved.getScorecardId());
 
     // Then: Scorecard should be deleted
     assertThat(garyDeleteCount).isEqualTo(1);
-    assertThat(scorecardRepository.findByIdForCurrentUser("scr-gary1")).isEmpty();
+    assertThat(scorecardRepository.findByIdForCurrentUser(saved.getScorecardId())).isEmpty();
   }
 
-  private ScorecardEntity createScorecard(String id, Integer score) {
+  private ScorecardEntity createScorecard(Integer score) {
     return new ScorecardEntity(
-        id,
         LocalDate.of(2025, 9, 21),
         "Test Course",
         "Test Tee",
