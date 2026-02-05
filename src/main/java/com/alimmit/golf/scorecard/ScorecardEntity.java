@@ -1,13 +1,12 @@
 package com.alimmit.golf.scorecard;
 
 import jakarta.persistence.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "scorecard")
@@ -57,8 +56,7 @@ class ScorecardEntity {
   @Column(nullable = false, updatable = false)
   private boolean indexEstablished;
 
-  public ScorecardEntity() {
-  }
+  public ScorecardEntity() {}
 
   public ScorecardEntity(
       String scorecardId,
@@ -191,10 +189,8 @@ class ScorecardEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
     ScorecardEntity that = (ScorecardEntity) o;
     return Objects.equals(scorecardId, that.scorecardId);
   }

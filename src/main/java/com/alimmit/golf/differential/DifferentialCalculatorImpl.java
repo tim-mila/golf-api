@@ -4,9 +4,8 @@ import com.alimmit.golf.handicap.HandicapDto;
 import com.alimmit.golf.handicap.HandicapService;
 import com.alimmit.golf.scorecard.ScorecardRequestDto;
 import com.alimmit.golf.scorecard.ScorecardType;
-import org.springframework.stereotype.Service;
-
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 @Service
 class DifferentialCalculatorImpl implements DifferentialCalculator {
@@ -49,22 +48,23 @@ class DifferentialCalculatorImpl implements DifferentialCalculator {
   }
 
   /**
-   * Calculate score differential for a single round.
-   * Formula: (113 / Slope Rating) × (Score - Course Rating)
+   * Calculate score differential for a single round. Formula: (113 / Slope Rating) × (Score -
+   * Course Rating)
    */
   private double standardDifferential(ScorecardRequestDto scorecard) {
-    double differential = (STANDARD_SLOPE / scorecard.slope())
-        * (scorecard.score() - scorecard.rating());
+    double differential =
+        (STANDARD_SLOPE / scorecard.slope()) * (scorecard.score() - scorecard.rating());
     // Round to one decimal place
     return Math.round(differential * 10.0) / 10.0;
   }
 
   /**
-   * Calculate the expected differential, used for nine hole scores after a handicap index is established
-   * Formula: handicap index * 0.52 + 1.2
+   * Calculate the expected differential, used for nine hole scores after a handicap index is
+   * established Formula: handicap index * 0.52 + 1.2
    *
    * @return Expected differential if handicap established
-   * @see <a href="https://www.usga.org/content/dam/usga/images/handicapping/infographics/Understanding%20Expected%20Score%20Infographic.pdf">https://www.usga.org/content/dam/usga/images/handicapping/infographics/Understanding%20Expected%20Score%20Infographic.pdf</a>
+   * @see <a
+   *     href="https://www.usga.org/content/dam/usga/images/handicapping/infographics/Understanding%20Expected%20Score%20Infographic.pdf">https://www.usga.org/content/dam/usga/images/handicapping/infographics/Understanding%20Expected%20Score%20Infographic.pdf</a>
    */
   private double expectedDifferential(Optional<HandicapDto> handicap) {
     double index = handicap.map(HandicapDto::handicapIndex).orElse(0.0);

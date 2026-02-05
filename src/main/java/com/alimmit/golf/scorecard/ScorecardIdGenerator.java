@@ -1,8 +1,7 @@
 package com.alimmit.golf.scorecard;
 
-import org.springframework.stereotype.Component;
-
 import com.alimmit.golf.id.IdGenerator;
+import org.springframework.stereotype.Component;
 
 @Component
 class ScorecardIdGenerator extends IdGenerator {

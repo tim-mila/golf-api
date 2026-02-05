@@ -26,7 +26,8 @@ class ScorecardEventListener {
   void scorecardEvent(ScorecardEvent event) {
     logger.info("scorecardEvent | event received {}", event);
 
-    if (event.type() == ScorecardEvent.Type.CREATED || event.type() == ScorecardEvent.Type.DELETED) {
+    if (event.type() == ScorecardEvent.Type.CREATED
+        || event.type() == ScorecardEvent.Type.DELETED) {
       handicapService.calculate(scorecardService.listAll(event.userId()), event.userId());
     }
   }

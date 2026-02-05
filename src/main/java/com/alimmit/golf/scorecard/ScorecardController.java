@@ -2,9 +2,14 @@ package com.alimmit.golf.scorecard;
 
 import static com.alimmit.golf.scorecard.ScorecardConstants.SCORECARD_ENDPOINT;
 
-import java.util.List;
-
+import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.errors.NotFoundException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,14 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alimmit.golf.GlobalConstants;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-
 @RestController
 @RequestMapping(SCORECARD_ENDPOINT)
 @Tag(name = "Scorecards")
@@ -31,7 +28,8 @@ class ScorecardController {
   private final ScorecardService scorecardService;
   private final ScorecardEventPublisher scorecardEventPublisher;
 
-  ScorecardController(ScorecardService scorecardService, ScorecardEventPublisher scorecardEventPublisher) {
+  ScorecardController(
+      ScorecardService scorecardService, ScorecardEventPublisher scorecardEventPublisher) {
     this.scorecardService = scorecardService;
     this.scorecardEventPublisher = scorecardEventPublisher;
   }
@@ -41,11 +39,15 @@ class ScorecardController {
       operationId = "scorecard.create",
       summary = "Create new scorecard",
       description = "Add a new score for a round of golf",
-      requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-          required = true,
-          content = @Content(
-              schema = @Schema(
-                  implementation = ScorecardRequestDto.class, contentMediaType = "application/json"))))
+      requestBody =
+          @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              required = true,
+              content =
+                  @Content(
+                      schema =
+                          @Schema(
+                              implementation = ScorecardRequestDto.class,
+                              contentMediaType = "application/json"))))
   @PostMapping
   ScorecardDto create(@RequestBody @Valid ScorecardRequestDto request) {
     ScorecardDto created = scorecardService.create(request);

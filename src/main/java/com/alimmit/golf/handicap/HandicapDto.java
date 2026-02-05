@@ -8,5 +8,4 @@ public record HandicapDto(
     Instant createdAt,
     Double handicapIndex,
     Integer roundsUsed,
-    Integer totalRounds) {
-}
+    Integer totalRounds) {}

@@ -14,8 +14,7 @@ public abstract class AbstractControllerMockMvc {
   }
 
   protected ResultActions performMockMvc(
-      MockHttpServletRequestBuilder builder,
-      ResultMatcher... resultMatchers) throws Exception {
+      MockHttpServletRequestBuilder builder, ResultMatcher... resultMatchers) throws Exception {
     return mockMvc.perform(builder).andExpectAll(resultMatchers);
   }
 }

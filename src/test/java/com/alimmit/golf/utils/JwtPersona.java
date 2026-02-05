@@ -2,9 +2,7 @@ package com.alimmit.golf.utils;
 
 import org.springframework.security.oauth2.jwt.Jwt;
 
-/**
- * Build some standard personas to use in MockMvc tests
- */
+/** Build some standard personas to use in MockMvc tests */
 public interface JwtPersona {
 
   String name();

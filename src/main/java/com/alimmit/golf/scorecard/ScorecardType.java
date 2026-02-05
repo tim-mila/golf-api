@@ -1,7 +1,8 @@
 package com.alimmit.golf.scorecard;
 
 public enum ScorecardType {
-  NINE(9), EIGHTEEN(18);
+  NINE(9),
+  EIGHTEEN(18);
 
   private final int holesPlayed;
 

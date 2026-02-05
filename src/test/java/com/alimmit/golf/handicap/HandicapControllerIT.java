@@ -36,13 +36,11 @@ class HandicapControllerIT extends AbstractHandicapControllerMockMvc {
             jsonPath("$.handicapIndex").value(6.1),
             jsonPath("$.roundsUsed").value(4),
             jsonPath("$.totalRounds").value(4),
-            jsonPath("$.createdAt").exists()
-        );
+            jsonPath("$.createdAt").exists());
   }
 
   @Test
   void testGetHandicap_ExpectMissing() throws Exception {
-    getMyHandicap(JwtPersona::forPatPutter)
-        .andExpect(status().isNotFound());
+    getMyHandicap(JwtPersona::forPatPutter).andExpect(status().isNotFound());
   }
 }

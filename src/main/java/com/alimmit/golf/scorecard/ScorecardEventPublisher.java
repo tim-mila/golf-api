@@ -7,18 +7,19 @@ import org.springframework.stereotype.Component;
 @Component
 class ScorecardEventPublisher {
 
-    private final ApplicationEventPublisher applicationEventPublisher;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
-    public ScorecardEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        this.applicationEventPublisher = applicationEventPublisher;
-    }
+  public ScorecardEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+    this.applicationEventPublisher = applicationEventPublisher;
+  }
 
-    void publishCreated(ScorecardDto scorecardDto) {
-        applicationEventPublisher.publishEvent(new ScorecardEvent(scorecardDto.createdBy(), ScorecardEvent.Type.CREATED));
-    }
+  void publishCreated(ScorecardDto scorecardDto) {
+    applicationEventPublisher.publishEvent(
+        new ScorecardEvent(scorecardDto.createdBy(), ScorecardEvent.Type.CREATED));
+  }
 
-    void publishedDeleted() {
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        applicationEventPublisher.publishEvent(new ScorecardEvent(name, ScorecardEvent.Type.DELETED));
-    }
+  void publishedDeleted() {
+    String name = SecurityContextHolder.getContext().getAuthentication().getName();
+    applicationEventPublisher.publishEvent(new ScorecardEvent(name, ScorecardEvent.Type.DELETED));
+  }
 }

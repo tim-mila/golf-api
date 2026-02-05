@@ -4,18 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.jupiter.api.Test;
 
 class ScorecardIdGeneratorTest {
 
-  private ScorecardIdGenerator generator = new ScorecardIdGenerator();
+  private final ScorecardIdGenerator generator = new ScorecardIdGenerator();
 
   @Test
   void testGenerate() {
-    assertThat(generator.generate())
-        .hasSize(36)
-        .startsWith("scr-");
+    assertThat(generator.generate()).hasSize(36).startsWith("scr-");
   }
 
   @Test

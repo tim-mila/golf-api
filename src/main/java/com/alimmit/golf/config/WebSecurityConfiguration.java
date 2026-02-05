@@ -13,9 +13,13 @@ class WebSecurityConfiguration {
 
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    return http.securityMatcher("/**").authorizeHttpRequests(requests -> {
-      requests.requestMatchers("/v1/api-docs/**").permitAll();
-      requests.anyRequest().authenticated();
-    }).oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults())).build();
+    return http.securityMatcher("/**")
+        .authorizeHttpRequests(
+            requests -> {
+              requests.requestMatchers("/v1/api-docs/**").permitAll();
+              requests.anyRequest().authenticated();
+            })
+        .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()))
+        .build();
   }
 }

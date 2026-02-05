@@ -1,6 +1,11 @@
 package com.alimmit.golf.scorecard;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.alimmit.golf.utils.JwtPersona;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +26,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -70,18 +69,19 @@ class ScorecardRepositoryTest {
     // Given: Gary Golfer is authenticated
 
     // When: Creating a new scorecard
-    ScorecardEntity entity = new ScorecardEntity(
-        "scr-test123",
-        LocalDate.of(2025, 9, 21),
-        "Test Course",
-        "Test Tee",
-        88,
-        72,
-        72.1,
-        125.0,
-        ScorecardType.EIGHTEEN,
-        14.4,
-        true);
+    ScorecardEntity entity =
+        new ScorecardEntity(
+            "scr-test123",
+            LocalDate.of(2025, 9, 21),
+            "Test Course",
+            "Test Tee",
+            88,
+            72,
+            72.1,
+            125.0,
+            ScorecardType.EIGHTEEN,
+            14.4,
+            true);
     ScorecardEntity saved = scorecardRepository.save(entity);
 
     // Then: Audit fields should be populated automatically
@@ -190,8 +190,8 @@ class ScorecardRepositoryTest {
 
   private void setSecurityContext(String username) {
     SecurityContext context = SecurityContextHolder.createEmptyContext();
-    Authentication authentication = new UsernamePasswordAuthenticationToken(
-        username, null, List.of());
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken(username, null, List.of());
     context.setAuthentication(authentication);
     SecurityContextHolder.setContext(context);
   }

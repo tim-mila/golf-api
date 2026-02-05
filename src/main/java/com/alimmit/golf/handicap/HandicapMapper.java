@@ -1,9 +1,8 @@
 package com.alimmit.golf.handicap;
 
+import java.util.Optional;
 import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 class HandicapMapper {
@@ -41,8 +40,7 @@ class HandicapMapper {
         entity.getCreatedAt(),
         entity.getHandicapIndex(),
         entity.getRoundsUsed(),
-        entity.getTotalRounds()
-    );
+        entity.getTotalRounds());
   }
 
   HandicapRevisionDto toRevision(Revision<Integer, HandicapEntity> revision) {

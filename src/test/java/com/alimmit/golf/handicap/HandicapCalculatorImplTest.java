@@ -3,15 +3,14 @@ package com.alimmit.golf.handicap;
 import com.alimmit.golf.scorecard.ScorecardDto;
 import com.alimmit.golf.scorecard.ScorecardType;
 import com.alimmit.golf.utils.JwtPersona;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class HandicapCalculatorImplTest {
 
@@ -42,11 +41,11 @@ class HandicapCalculatorImplTest {
         .get()
         .hasFieldOrPropertyWithValue("roundsUsed", 1)
         .hasFieldOrPropertyWithValue("totalRounds", 3)
-        .hasFieldOrProperty("differentials")
-    ;
+        .hasFieldOrProperty("differentials");
   }
 
-  private ScorecardDto createScorecard(int offsetDays, int score, int par, double rating, double slope, double differential) {
+  private ScorecardDto createScorecard(
+      int offsetDays, int score, int par, double rating, double slope, double differential) {
     String id = "scr-" + RandomStringUtils.insecure().nextAlphanumeric(32);
     return new ScorecardDto(
         id,
