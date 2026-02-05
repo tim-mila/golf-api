@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.history.Revisions;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -127,6 +130,23 @@ class HandicapRepositoryTest {
         .hasFieldOrPropertyWithValue("handicapIndex", 5.6)
         .hasFieldOrPropertyWithValue("roundsUsed", 8)
         .hasFieldOrPropertyWithValue("totalRounds", 20);
+  }
+
+  @Test
+  @Transactional(propagation = Propagation.NEVER)
+  void testGetRevisions() {
+
+    // Given: Multiple handicaps for Gary Golfer
+    handicapRepository.save(createHandicap(JwtPersona.GARY_GOLFER.sub(), 15.1, 5, 5));
+    handicapRepository.save(createHandicap(JwtPersona.GARY_GOLFER.sub(), 15.0, 6, 6));
+    HandicapEntity handicap = handicapRepository.save(createHandicap(JwtPersona.GARY_GOLFER.sub(), 14.3, 7, 7));
+
+    // WHEN: fetching handicap revision history
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
+    Revisions<Integer, HandicapEntity> revisions = handicapRepository.findRevisions(handicap.getHandicapId());
+
+    // THEN: the history contains three handicaps
+    assertThat(revisions).hasSize(3);
   }
 
   private HandicapEntity createHandicap(String golferId, Double index, Integer roundsUsed, Integer totalRounds) {

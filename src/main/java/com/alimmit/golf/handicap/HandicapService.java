@@ -15,4 +15,11 @@ public interface HandicapService {
    * @return Optional, most recent handicap
    */
   Optional<HandicapDto> getHandicap();
+
+  /**
+   * Get handicap history for currently authenticated user
+   *
+   * @return List of handicap indexes
+   */
+  List<HandicapRevisionDto> getHistory();
 }

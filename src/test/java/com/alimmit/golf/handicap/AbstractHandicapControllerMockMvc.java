@@ -1,6 +1,7 @@
 package com.alimmit.golf.handicap;
 
 import com.alimmit.golf.AbstractControllerMockMvc;
+import com.alimmit.golf.GlobalConstants;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -23,6 +24,16 @@ abstract class AbstractHandicapControllerMockMvc extends AbstractControllerMockM
 
     return performMockMvc(
         get(HandicapConstants.HANDICAP_ENDPOINT)
+            .with(jwt().jwt(fn::apply)),
+        expect);
+  }
+
+  ResultActions getMyHandicapHistory(
+      Function<Jwt.Builder, Jwt.Builder> fn,
+      ResultMatcher... expect) throws Exception {
+
+    return performMockMvc(
+        get(HandicapConstants.HANDICAP_ENDPOINT + GlobalConstants.API_HISTORY_SUFFIX)
             .with(jwt().jwt(fn::apply)),
         expect);
   }

@@ -2,13 +2,16 @@ package com.alimmit.golf.handicap;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-interface HandicapRepository extends JpaRepository<HandicapEntity, String> {
+interface HandicapRepository extends
+    JpaRepository<HandicapEntity, String>,
+    RevisionRepository<HandicapEntity, String, Integer> {
 
   /**
    * Find calculated handicap for the currently authenticated user.

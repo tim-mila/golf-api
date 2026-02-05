@@ -1,6 +1,8 @@
 package com.alimmit.golf.handicap;
 
+import com.alimmit.golf.errors.NotFoundException;
 import com.alimmit.golf.scorecard.ScorecardDto;
+import org.springframework.data.history.Revisions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,5 +45,14 @@ class JpaHandicapServiceImpl implements HandicapService {
   @Transactional(readOnly = true)
   public Optional<HandicapDto> getHandicap() {
     return handicapMapper.toOptionalDto(handicapRepository.findHandicapForCurrentUser());
+  }
+
+  @Override
+  public List<HandicapRevisionDto> getHistory() {
+    HandicapEntity handicap = handicapRepository
+        .findHandicapForCurrentUser()
+        .orElseThrow(NotFoundException::new);
+    Revisions<Integer, HandicapEntity> revisions = handicapRepository.findRevisions(handicap.getHandicapId());
+    return revisions.stream().map(handicapMapper::toRevision).toList();
   }
 }

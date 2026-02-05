@@ -7,4 +7,6 @@ public final class GlobalConstants {
   public static final String API_V1_PREFIX = "/v1";
 
   public static final String API_RECORD_SUFFIX = "/{id}";
+
+  public static final String API_HISTORY_SUFFIX = "/history";
 }

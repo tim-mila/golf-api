@@ -1,5 +1,6 @@
 package com.alimmit.golf.handicap;
 
+import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -42,5 +43,19 @@ class HandicapMapper {
         entity.getRoundsUsed(),
         entity.getTotalRounds()
     );
+  }
+
+  HandicapRevisionDto toRevision(Revision<Integer, HandicapEntity> revision) {
+    HandicapEntity entity = revision.getEntity();
+    return new HandicapRevisionDto(
+        entity.getHandicapId(),
+        entity.getGolferId(),
+        entity.getCreatedAt(),
+        entity.getHandicapIndex(),
+        entity.getRoundsUsed(),
+        entity.getTotalRounds(),
+        revision.getRequiredRevisionNumber(),
+        revision.getMetadata().getRevisionType(),
+        revision.getRequiredRevisionInstant());
   }
 }

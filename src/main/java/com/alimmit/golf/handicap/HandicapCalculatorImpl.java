@@ -82,16 +82,16 @@ class HandicapCalculatorImpl implements HandicapCalculator {
   /**
    * Determine how many differentials to use based on total holes played.
    */
-  private int getDifferentialsToUse(int holesPlayed) {
-    if (holesPlayed >= 360) return 8;
-    if (holesPlayed == 342) return 7;
-    if (holesPlayed >= 306) return 6;
-    if (holesPlayed >= 270) return 5;
-    if (holesPlayed >= 216) return 4;
-    if (holesPlayed >= 162) return 3;
-    if (holesPlayed >= 126) return 2;
-    if (holesPlayed >= 90) return 1;
-    if (holesPlayed >= 54) return 1;
+  private int getDifferentialsToUse(int totalRounds) {
+    if (totalRounds >= 20) return 8;
+    if (totalRounds == 19) return 7;
+    if (totalRounds >= 17) return 6;
+    if (totalRounds >= 15) return 5;
+    if (totalRounds >= 12) return 4;
+    if (totalRounds >= 9) return 3;
+    if (totalRounds >= 7) return 2;
+    if (totalRounds >= 5) return 1;
+    if (totalRounds >= 3) return 1;
     return 0;
   }
 
@@ -100,8 +100,7 @@ class HandicapCalculatorImpl implements HandicapCalculator {
    */
   private double getAdjustment(int holesPlayed) {
     if (holesPlayed >= 54 && holesPlayed < 72) return -2.0;
-    if (holesPlayed >= 72 && holesPlayed < 108) return -1.0;
-    if (holesPlayed == 108) return -1.0;
+    if (holesPlayed >= 72 && holesPlayed <= 108) return -1.0;
     return 0.0;
   }
 }

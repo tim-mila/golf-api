@@ -6,11 +6,13 @@ import com.alimmit.golf.utils.JwtPersona;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.history.RevisionMetadata;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
@@ -63,5 +65,25 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
     when(handicapService.getHandicap()).thenReturn(Optional.empty());
     super.getMyHandicap(JwtPersona::forGaryGolfer)
         .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void getMyHandicapHistory() throws Exception {
+
+    when(handicapService.getHistory())
+        .thenReturn(List.of(
+            new HandicapRevisionDto(
+                "hdcp-123",
+                JwtPersona.GARY_GOLFER.sub(),
+                Instant.now(),
+                10.2,
+                8,
+                20,
+                1,
+                RevisionMetadata.RevisionType.INSERT,
+                Instant.now())));
+
+    super.getMyHandicapHistory(JwtPersona::forGaryGolfer)
+        .andExpect(status().isOk());
   }
 }
