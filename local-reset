@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Remove local containers
+docker-compose -f .local/docker-compose.yaml down
+
+# Remove postgres data volume
+docker volume rm local_pg_data

@@ -4,8 +4,11 @@ services:
     image: postgres:17.6
     container_name: golf-postgres
     ports:
-      - 9876:5432
+      - "9876:5432"
     env_file:
       - .env
     volumes:
-      - /var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:

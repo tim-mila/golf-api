@@ -1,71 +1,44 @@
 package com.alimmit.golf.scorecard;
 
 import java.util.List;
+import java.util.Optional;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+public interface ScorecardService {
 
-import com.alimmit.golf.errors.NotFoundException;
+    /**
+     * Create a new scorecard.
+     * Generates ID and persists to database with audit fields.
+     * If the rating and slope are not provided, they are looked up from the golf course API.
+     */
+    ScorecardDto create(ScorecardRequestDto request);
 
-/**
- * Service layer for scorecard operations.
- * Handles business logic and transaction management.
- */
-@Service
-@Transactional
-class ScorecardService {
+    /**
+     * List all scorecards for the current authenticated user.
+     *
+     * @return List of scorecards
+     */
+    List<ScorecardDto> listAll();
 
-  private final ScorecardRepository scorecardRepository;
-  private final ScorecardIdGenerator scorecardIdGenerator;
+    /**
+     * List all scorecards for the provided user
+     *
+     * @param userId User identifier
+     * @return List of scorecards
+     */
+    List<ScorecardDto> listAll(String userId);
 
-  ScorecardService(ScorecardRepository scorecardRepository, ScorecardIdGenerator scorecardIdGenerator) {
-    this.scorecardRepository = scorecardRepository;
-    this.scorecardIdGenerator = scorecardIdGenerator;
-  }
+    /**
+     * Get a scorecard by identifier
+     *
+     * @param id Scorecard identifier
+     * @return Optional of scorecard
+     */
+    Optional<ScorecardDto> getById(String id);
 
-  /**
-   * Create a new scorecard.
-   * Generates ID and persists to database with audit fields.
-   */
-  ScorecardDto create(ScorecardRequestDto request) {
-    String scorecardId = scorecardIdGenerator.generate();
-    ScorecardEntity entity = ScorecardMapper.toEntity(scorecardId, request);
-    ScorecardEntity saved = scorecardRepository.save(entity);
-    return ScorecardMapper.toDto(saved);
-  }
-
-  /**
-   * List all scorecards for the current authenticated user.
-   */
-  @Transactional(readOnly = true)
-  List<ScorecardDto> listAll() {
-    return scorecardRepository.findAllForCurrentUser()
-        .stream()
-        .map(ScorecardMapper::toDto)
-        .toList();
-  }
-
-  /**
-   * Get a single scorecard by ID for the current authenticated user.
-   *
-   * @throws NotFoundException if scorecard not found or not owned by current user
-   */
-  @Transactional(readOnly = true)
-  ScorecardDto getById(String id) {
-    return scorecardRepository.findByIdForCurrentUser(id)
-        .map(ScorecardMapper::toDto)
-        .orElseThrow(NotFoundException::new);
-  }
-
-  /**
-   * Delete a scorecard by ID for the current authenticated user.
-   *
-   * @throws NotFoundException if scorecard not found or not owned by current user
-   */
-  void deleteById(String id) {
-    int deletedCount = scorecardRepository.deleteByIdForCurrentUser(id);
-    if (deletedCount == 0) {
-      throw new NotFoundException();
-    }
-  }
+    /**
+     * Delete a scorecard
+     *
+     * @param id Scorecard identifier
+     */
+    int deleteById(String id);
 }

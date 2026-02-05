@@ -1,8 +1,10 @@
 package com.alimmit.golf.scorecard;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,7 +25,16 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, String> {
    * @return list of scorecards for the current user
    */
   @Query("SELECT s FROM ScorecardEntity s WHERE s.createdBy = ?#{authentication.name}")
-  java.util.List<ScorecardEntity> findAllForCurrentUser();
+  List<ScorecardEntity> findAllForCurrentUser();
+
+  /**
+   * Find all scorecards for the provided user
+   *
+   * @param createdBy User that created the scorecards
+   * @return list of scorecards for the provided user
+   */
+  @Query("SELECT s FROM ScorecardEntity s WHERE s.createdBy = :createdBy")
+  List<ScorecardEntity> findAllCreatedBy(@Param("createdBy") String createdBy);
 
   /**
    * Find a scorecard by ID for the currently authenticated user.
@@ -44,7 +55,7 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, String> {
    * @param scorecardId the scorecard ID
    * @return number of records deleted (0 if not found or not owned by user)
    */
-  @org.springframework.data.jpa.repository.Modifying
+  @Modifying
   @Query("DELETE FROM ScorecardEntity s WHERE s.scorecardId = :scorecardId AND s.createdBy = ?#{authentication.name}")
   int deleteByIdForCurrentUser(@Param("scorecardId") String scorecardId);
 }

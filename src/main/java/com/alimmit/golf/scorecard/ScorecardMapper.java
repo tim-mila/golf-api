@@ -1,38 +1,63 @@
 package com.alimmit.golf.scorecard;
 
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
 /**
- * Maps between ScorecardEntity (persistence layer) and ScorecardDto (API layer).
+ * Maps between ScorecardEntity (persistence layer) and ScorecardDto (API
+ * layer).
  */
+@Component
 class ScorecardMapper {
 
-  private ScorecardMapper() {
-    // Utility class
+  private final ScorecardIdGenerator scorecardIdGenerator;
+
+  ScorecardMapper(ScorecardIdGenerator scorecardIdGenerator) {
+    this.scorecardIdGenerator = scorecardIdGenerator;
   }
 
   /**
    * Convert entity to DTO for API responses.
    */
-  static ScorecardDto toDto(ScorecardEntity entity) {
+  ScorecardDto toDto(ScorecardEntity entity) {
     return new ScorecardDto(
         entity.getScorecardId(),
         entity.getCreatedAt(),
         entity.getCreatedBy(),
-        entity.getLastModifiedAt(),
-        entity.getLastModifiedBy(),
         entity.getScoreDate(),
-        entity.getCourseId(),
-        entity.getScore());
+        entity.getCourseName(),
+        entity.getTeeName(),
+        entity.getScore(),
+        entity.getPar(),
+        entity.getRating(),
+        entity.getSlope(),
+        entity.getScorecardType(),
+        entity.getDifferential(),
+        entity.isIndexEstablished());
+  }
+
+  Optional<ScorecardDto> toOptionalDto(ScorecardEntity entity) {
+    return Optional.of(toDto(entity));
   }
 
   /**
    * Convert request DTO to entity for persistence.
    * Audit fields will be populated automatically by JPA.
+   * Course rating and slope rating are resolved by the service layer.
    */
-  static ScorecardEntity toEntity(String scorecardId, ScorecardRequestDto request) {
+  ScorecardEntity toEntity(ScorecardRequestDto request, double differential, boolean indexEstablished1) {
     return new ScorecardEntity(
-        scorecardId,
+        scorecardIdGenerator.generate(),
         request.scoreDate(),
-        request.courseId(),
-        request.score());
+        request.courseName(),
+        request.teeName(),
+        request.score(),
+        request.par(),
+        request.rating(),
+        request.slope(),
+        request.scorecardType(),
+        differential,
+        indexEstablished1);
   }
 }

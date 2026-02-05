@@ -1,15 +1,8 @@
 package com.alimmit.golf.scorecard;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-
+import com.alimmit.golf.courses.client.GolfCourseApiClient;
+import com.alimmit.golf.errors.NotFoundException;
+import com.alimmit.golf.utils.JwtPersona;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,12 +13,18 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.alimmit.golf.courses.client.GolfCourseApiClient;
-import com.alimmit.golf.errors.NotFoundException;
-import com.alimmit.golf.utils.JwtPersona;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
-@WebMvcTest
+@WebMvcTest(ScorecardController.class)
 class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
   @MockitoBean
@@ -34,6 +33,9 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
   @MockitoBean
   private ScorecardService scorecardService;
 
+  @MockitoBean
+  private ScorecardEventPublisher scorecardEventPublisher;
+
   @Autowired
   ScorecardControllerTest(MockMvc mockMvc) {
     super(mockMvc);
@@ -41,30 +43,39 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
   @Test
   void createScorecard() throws Exception {
-    String requestBody = "{\"scoreDate\": \"2025-09-21\", \"courseId\": 1, \"score\": 88}";
+    String requestBody = "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}";
 
     ScorecardDto mockDto = new ScorecardDto(
         "scr-" + "a".repeat(32),
         Instant.now(),
-        JwtPersona.GARY_GOLFER.getSub(),
-        Instant.now(),
-        JwtPersona.GARY_GOLFER.getSub(),
+        JwtPersona.GARY_GOLFER.sub(),
         LocalDate.of(2025, 9, 21),
-        1L,
-        88);
+        "Test Course",
+        "Test Tee",
+        88,
+        72,
+        72.1,
+        125.0,
+        ScorecardType.EIGHTEEN,
+        14.4,
+        true);
 
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
     createScorecard(JwtPersona::forGaryGolfer, requestBody, status().isOk())
         .andExpectAll(
             jsonPath("$.scorecardId").value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
-            jsonPath("$.courseId").value(1),
+            jsonPath("$.courseName").value("Test Course"),
+            jsonPath("$.teeName").value("Test Tee"),
             jsonPath("$.scoreDate").value("2025-09-21"),
             jsonPath("$.score").value(88),
-            jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.getSub()),
-            jsonPath("$.lastModifiedBy").value(JwtPersona.GARY_GOLFER.getSub()),
-            jsonPath("$.createdAt").isString(),
-            jsonPath("$.lastModifiedAt").isString());
+            jsonPath("$.courseRating").value(72.1),
+            jsonPath("$.slopeRating").value(125.0),
+            jsonPath("$.scorecardType").value("EIGHTEEN"),
+            jsonPath("$.differential").value(14.4),
+            jsonPath("$.indexEstablished").value(true),
+            jsonPath("$.createdBy").value(JwtPersona.GARY_GOLFER.sub()),
+            jsonPath("$.createdAt").isString());
   }
 
   @Test
@@ -72,12 +83,17 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     ScorecardDto mockDto = new ScorecardDto(
         "scr-" + "a".repeat(32),
         Instant.now(),
-        JwtPersona.GARY_GOLFER.getSub(),
-        Instant.now(),
-        JwtPersona.GARY_GOLFER.getSub(),
+        JwtPersona.GARY_GOLFER.sub(),
         LocalDate.of(2025, 9, 21),
-        1L,
-        88);
+        "Test Course",
+        "Test Tee",
+        88,
+        72,
+        72.1,
+        125.0,
+        ScorecardType.EIGHTEEN,
+        14.4,
+        true);
 
     when(scorecardService.listAll()).thenReturn(List.of(mockDto));
 
@@ -94,14 +110,19 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     ScorecardDto mockDto = new ScorecardDto(
         scorecardId,
         Instant.now(),
-        JwtPersona.GARY_GOLFER.getSub(),
-        Instant.now(),
-        JwtPersona.GARY_GOLFER.getSub(),
+        JwtPersona.GARY_GOLFER.sub(),
         LocalDate.of(2025, 9, 21),
-        1L,
-        88);
+        "Test Course",
+        "Test Tee",
+        88,
+        72,
+        72.1,
+        125.0,
+        ScorecardType.EIGHTEEN,
+        14.4,
+        true);
 
-    when(scorecardService.getById(scorecardId)).thenReturn(mockDto);
+    when(scorecardService.getById(scorecardId)).thenReturn(Optional.of(mockDto));
 
     getScorecard(JwtPersona::forGaryGolfer, scorecardId, status().isOk())
         .andExpectAll(
@@ -123,6 +144,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     String scorecardId = "scr-" + "a".repeat(32);
 
     // doNothing() is default for void methods, so no need to mock success case
+    when(scorecardService.deleteById(scorecardId)).thenReturn(1);
 
     deleteScorecard(JwtPersona::forGaryGolfer, scorecardId)
         .andExpect(status().isNoContent());
@@ -132,7 +154,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
   void deleteScorecardNotFound() throws Exception {
     String scorecardId = "scr-" + "a".repeat(32);
 
-    doThrow(new NotFoundException()).when(scorecardService).deleteById(scorecardId);
+    when(scorecardService.deleteById(scorecardId)).thenReturn(0);
 
     deleteScorecard(JwtPersona::forGaryGolfer, scorecardId)
         .andExpect(status().isNotFound());
@@ -140,8 +162,16 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
   @ParameterizedTest
   @ValueSource(strings = {
-      "{\"scoreDate\": \"2025-09-21\", \"score\": 88}", // Missing course
-      "{\"scoreDate\": \"2025-09-21\", \"coureseId\": 1}" // Missing score
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0}", // Missing scorecard type
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"scorecardType\": \"EIGHTEEN\"}", // Missing slope
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing rating
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing par
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing score
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing teeName
+      "{\"scoreDate\": \"2025-09-21\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing courseName
+      "{\"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Missing scoreDate
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 77.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}", // Rating above range
+      "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 66.9, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}" // Rating below range
   })
   void createAndExpectBadRequest(String requestBody) throws Exception {
     createScorecard(JwtPersona::forGaryGolfer, requestBody)

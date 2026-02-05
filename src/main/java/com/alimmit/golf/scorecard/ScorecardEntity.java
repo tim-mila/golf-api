@@ -1,63 +1,88 @@
 package com.alimmit.golf.scorecard;
 
+import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
 @Entity
 @Table(name = "scorecard")
 @EntityListeners(AuditingEntityListener.class)
-public class ScorecardEntity {
+class ScorecardEntity {
 
   @Id
-  @Column(name = "scorecard_id", nullable = false, length = 36)
+  @Column(nullable = false, length = 36)
   private String scorecardId;
 
   @CreatedDate
-  @Column(name = "created_at", nullable = false, updatable = false)
+  @Column(nullable = false, updatable = false)
   private Instant createdAt;
 
   @CreatedBy
-  @Column(name = "created_by", nullable = false, updatable = false, length = 255)
+  @Column(nullable = false, updatable = false)
   private String createdBy;
 
-  @LastModifiedDate
-  @Column(name = "last_modified_at")
-  private Instant lastModifiedAt;
-
-  @LastModifiedBy
-  @Column(name = "last_modified_by", length = 255)
-  private String lastModifiedBy;
-
-  @Column(name = "score_date", nullable = false)
+  @Column(nullable = false, updatable = false)
   private LocalDate scoreDate;
 
-  @Column(name = "course_id", nullable = false)
-  private Long courseId;
+  @Column(nullable = false, updatable = false)
+  private String courseName;
 
-  @Column(name = "score", nullable = false)
-  private Integer score;
+  @Column(nullable = false, updatable = false)
+  private String teeName;
+
+  @Column(nullable = false, updatable = false)
+  private int score;
+
+  @Column(nullable = false, updatable = false)
+  private int par;
+
+  @Column(nullable = false, updatable = false)
+  private double rating;
+
+  @Column(nullable = false, updatable = false)
+  private double slope;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, updatable = false)
+  private ScorecardType scorecardType;
+
+  @Column(nullable = false, updatable = false)
+  private double differential;
+
+  @Column(nullable = false, updatable = false)
+  private boolean indexEstablished;
 
   public ScorecardEntity() {
   }
 
-  public ScorecardEntity(String scorecardId, LocalDate scoreDate, Long courseId, Integer score) {
+  public ScorecardEntity(
+      String scorecardId,
+      LocalDate scoreDate,
+      String courseName,
+      String teeName,
+      Integer score,
+      Integer par,
+      Double rating,
+      Double slope,
+      ScorecardType scorecardType,
+      double differential,
+      boolean indexEstablished) {
     this.scorecardId = scorecardId;
     this.scoreDate = scoreDate;
-    this.courseId = courseId;
+    this.courseName = courseName;
+    this.teeName = teeName;
     this.score = score;
+    this.par = par;
+    this.rating = rating;
+    this.slope = slope;
+    this.scorecardType = scorecardType;
+    this.differential = differential;
+    this.indexEstablished = indexEstablished;
   }
 
   public String getScorecardId() {
@@ -84,22 +109,6 @@ public class ScorecardEntity {
     this.createdBy = createdBy;
   }
 
-  public Instant getLastModifiedAt() {
-    return lastModifiedAt;
-  }
-
-  public void setLastModifiedAt(Instant lastModifiedAt) {
-    this.lastModifiedAt = lastModifiedAt;
-  }
-
-  public String getLastModifiedBy() {
-    return lastModifiedBy;
-  }
-
-  public void setLastModifiedBy(String lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
-
   public LocalDate getScoreDate() {
     return scoreDate;
   }
@@ -108,20 +117,76 @@ public class ScorecardEntity {
     this.scoreDate = scoreDate;
   }
 
-  public Long getCourseId() {
-    return courseId;
+  public String getCourseName() {
+    return courseName;
   }
 
-  public void setCourseId(Long courseId) {
-    this.courseId = courseId;
+  public void setCourseName(String courseName) {
+    this.courseName = courseName;
   }
 
-  public Integer getScore() {
+  public String getTeeName() {
+    return teeName;
+  }
+
+  public void setTeeName(String teeName) {
+    this.teeName = teeName;
+  }
+
+  public int getScore() {
     return score;
   }
 
-  public void setScore(Integer score) {
+  public void setScore(int score) {
     this.score = score;
+  }
+
+  public int getPar() {
+    return par;
+  }
+
+  public void setPar(int par) {
+    this.par = par;
+  }
+
+  public double getRating() {
+    return rating;
+  }
+
+  public void setRating(double rating) {
+    this.rating = rating;
+  }
+
+  public double getSlope() {
+    return slope;
+  }
+
+  public void setSlope(double slope) {
+    this.slope = slope;
+  }
+
+  public ScorecardType getScorecardType() {
+    return scorecardType;
+  }
+
+  public void setScorecardType(ScorecardType scorecardType) {
+    this.scorecardType = scorecardType;
+  }
+
+  public double getDifferential() {
+    return differential;
+  }
+
+  public void setDifferential(double differential) {
+    this.differential = differential;
+  }
+
+  public boolean isIndexEstablished() {
+    return indexEstablished;
+  }
+
+  public void setIndexEstablished(boolean indexEstablished) {
+    this.indexEstablished = indexEstablished;
   }
 
   @Override
@@ -136,20 +201,16 @@ public class ScorecardEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(scorecardId);
-  }
-
-  @Override
-  public String toString() {
-    return "ScorecardEntity{" +
-        "scorecardId='" + scorecardId + '\'' +
-        ", createdAt=" + createdAt +
-        ", createdBy='" + createdBy + '\'' +
-        ", lastModifiedAt=" + lastModifiedAt +
-        ", lastModifiedBy='" + lastModifiedBy + '\'' +
-        ", scoreDate=" + scoreDate +
-        ", courseId=" + courseId +
-        ", score=" + score +
-        '}';
+    return Objects.hash(
+        scorecardId,
+        createdAt,
+        createdBy,
+        scoreDate,
+        courseName,
+        score,
+        par,
+        rating,
+        slope,
+        scorecardType);
   }
 }

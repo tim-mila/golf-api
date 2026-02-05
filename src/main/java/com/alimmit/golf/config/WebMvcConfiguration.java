@@ -1,4 +1,4 @@
-package com.alimmit.golf.security;
+package com.alimmit.golf.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
