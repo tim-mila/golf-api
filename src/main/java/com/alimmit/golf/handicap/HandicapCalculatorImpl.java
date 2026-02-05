@@ -98,9 +98,9 @@ class HandicapCalculatorImpl implements HandicapCalculator {
   /**
    * Get adjustment value based on holes played (applied before multiplier).
    */
-  private double getAdjustment(int holesPlayed) {
-    if (holesPlayed >= 54 && holesPlayed < 72) return -2.0;
-    if (holesPlayed >= 72 && holesPlayed <= 108) return -1.0;
+  private double getAdjustment(int totalRounds) {
+    if (totalRounds == 3) return 2.0;
+    if (totalRounds == 4 || totalRounds == 6) return 1.0;
     return 0.0;
   }
 }
