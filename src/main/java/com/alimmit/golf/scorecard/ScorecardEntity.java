@@ -96,96 +96,48 @@ class ScorecardEntity {
     return createdAt;
   }
 
-  public void setCreatedAt(Instant createdAt) {
-    this.createdAt = createdAt;
-  }
-
   public String getCreatedBy() {
     return createdBy;
-  }
-
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
   }
 
   public LocalDate getScoreDate() {
     return scoreDate;
   }
 
-  public void setScoreDate(LocalDate scoreDate) {
-    this.scoreDate = scoreDate;
-  }
-
   public String getCourseName() {
     return courseName;
-  }
-
-  public void setCourseName(String courseName) {
-    this.courseName = courseName;
   }
 
   public String getTeeName() {
     return teeName;
   }
 
-  public void setTeeName(String teeName) {
-    this.teeName = teeName;
-  }
-
   public int getScore() {
     return score;
-  }
-
-  public void setScore(int score) {
-    this.score = score;
   }
 
   public int getPar() {
     return par;
   }
 
-  public void setPar(int par) {
-    this.par = par;
-  }
-
   public double getRating() {
     return rating;
-  }
-
-  public void setRating(double rating) {
-    this.rating = rating;
   }
 
   public double getSlope() {
     return slope;
   }
 
-  public void setSlope(double slope) {
-    this.slope = slope;
-  }
-
   public ScorecardType getScorecardType() {
     return scorecardType;
-  }
-
-  public void setScorecardType(ScorecardType scorecardType) {
-    this.scorecardType = scorecardType;
   }
 
   public double getDifferential() {
     return differential;
   }
 
-  public void setDifferential(double differential) {
-    this.differential = differential;
-  }
-
   public boolean isIndexEstablished() {
     return indexEstablished;
-  }
-
-  public void setIndexEstablished(boolean indexEstablished) {
-    this.indexEstablished = indexEstablished;
   }
 
   @Override

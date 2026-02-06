@@ -64,6 +64,7 @@ class DifferentialCalculatorImplTest {
                     UUID.fromString("10000000-0000-0000-0000-000000000000"),
                     "auth0|123",
                     Instant.now(),
+                    Instant.now(),
                     14.1,
                     8,
                     20)));
@@ -128,6 +129,7 @@ class DifferentialCalculatorImplTest {
                 new HandicapDto(
                     UUID.fromString("10000000-0000-0000-0000-000000000000"),
                     "auth0|123",
+                    Instant.now(),
                     Instant.now(),
                     10.2,
                     8,

@@ -47,6 +47,18 @@ class HandicapEntity {
   @Column(name = "total_rounds", nullable = false)
   private Integer totalRounds;
 
+  public void setHandicapIndex(Double handicapIndex) {
+    this.handicapIndex = handicapIndex;
+  }
+
+  public void setRoundsUsed(Integer roundsUsed) {
+    this.roundsUsed = roundsUsed;
+  }
+
+  public void setTotalRounds(Integer totalRounds) {
+    this.totalRounds = totalRounds;
+  }
+
   /** Default JPA constructor */
   public HandicapEntity() {}
 
@@ -69,56 +81,28 @@ class HandicapEntity {
     return handicapId;
   }
 
-  public void setHandicapId(UUID handicapId) {
-    this.handicapId = handicapId;
-  }
-
   public Instant getCreatedAt() {
     return createdAt;
-  }
-
-  public void setCreatedAt(Instant createdAt) {
-    this.createdAt = createdAt;
   }
 
   public Instant getLastModifiedAt() {
     return lastModifiedAt;
   }
 
-  public void setLastModifiedAt(Instant lastModifiedAt) {
-    this.lastModifiedAt = lastModifiedAt;
-  }
-
   public String getGolferId() {
     return golferId;
-  }
-
-  public void setGolferId(String golferId) {
-    this.golferId = golferId;
   }
 
   public Double getHandicapIndex() {
     return handicapIndex;
   }
 
-  public void setHandicapIndex(Double handicapIndex) {
-    this.handicapIndex = handicapIndex;
-  }
-
   public Integer getRoundsUsed() {
     return roundsUsed;
   }
 
-  public void setRoundsUsed(Integer roundsUsed) {
-    this.roundsUsed = roundsUsed;
-  }
-
   public Integer getTotalRounds() {
     return totalRounds;
-  }
-
-  public void setTotalRounds(Integer totalRounds) {
-    this.totalRounds = totalRounds;
   }
 
   @Override

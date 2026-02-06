@@ -43,6 +43,7 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
                     UUID.fromString("10000000-0000-0000-0000-000000000000"),
                     JwtPersona.GARY_GOLFER.sub(),
                     Instant.now(),
+                    Instant.now(),
                     10.2,
                     8,
                     20)));
@@ -72,6 +73,7 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
                 new HandicapRevisionDto(
                     UUID.fromString("10000000-0000-0000-0000-000000000000"),
                     JwtPersona.GARY_GOLFER.sub(),
+                    Instant.now(),
                     Instant.now(),
                     10.2,
                     8,

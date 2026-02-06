@@ -8,6 +8,7 @@ public record HandicapRevisionDto(
     UUID handicapId,
     String golferId,
     Instant createdAt,
+    Instant lastModifiedAt,
     Double handicapIndex,
     Integer roundsUsed,
     Integer totalRounds,

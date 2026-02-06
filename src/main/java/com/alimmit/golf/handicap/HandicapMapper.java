@@ -27,6 +27,7 @@ class HandicapMapper {
         entity.getHandicapId(),
         entity.getGolferId(),
         entity.getCreatedAt(),
+        entity.getLastModifiedAt(),
         entity.getHandicapIndex(),
         entity.getRoundsUsed(),
         entity.getTotalRounds());
@@ -38,6 +39,7 @@ class HandicapMapper {
         entity.getHandicapId(),
         entity.getGolferId(),
         entity.getCreatedAt(),
+        entity.getLastModifiedAt(),
         entity.getHandicapIndex(),
         entity.getRoundsUsed(),
         entity.getTotalRounds(),
