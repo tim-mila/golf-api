@@ -8,11 +8,7 @@ import org.springframework.stereotype.Component;
 class HandicapMapper {
 
   HandicapEntity toEntity(HandicapCalculation dto, String golferId) {
-    return new HandicapEntity(
-        golferId,
-        dto.handicapIndex(),
-        dto.roundsUsed(),
-        dto.totalRounds());
+    return new HandicapEntity(golferId, dto.handicapIndex(), dto.roundsUsed(), dto.totalRounds());
   }
 
   HandicapEntity updateEntity(HandicapEntity existing, HandicapCalculation dto) {

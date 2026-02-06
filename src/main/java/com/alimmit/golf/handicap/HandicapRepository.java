@@ -1,26 +1,25 @@
 package com.alimmit.golf.handicap;
 
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-import java.util.UUID;
-
 @Repository
-interface HandicapRepository extends
-    JpaRepository<HandicapEntity, UUID>,
-    RevisionRepository<HandicapEntity, UUID, Integer> {
+interface HandicapRepository
+    extends JpaRepository<HandicapEntity, UUID>, RevisionRepository<HandicapEntity, UUID, Integer> {
 
   /**
-   * Find calculated handicap for the currently authenticated user.
-   * Uses SpEL to automatically inject the user ID from SecurityContext.
+   * Find calculated handicap for the currently authenticated user. Uses SpEL to automatically
+   * inject the user ID from SecurityContext.
    *
    * @return optional, calculated handicap
    */
-  @Query("SELECT h FROM HandicapEntity h WHERE h.golferId = ?#{authentication.name} ORDER BY h.createdAt DESC LIMIT 1")
+  @Query(
+      "SELECT h FROM HandicapEntity h WHERE h.golferId = ?#{authentication.name} ORDER BY h.createdAt DESC LIMIT 1")
   Optional<HandicapEntity> findHandicapForCurrentUser();
 
   /**

@@ -32,7 +32,9 @@ class HandicapControllerIT extends AbstractHandicapControllerMockMvc {
     getMyHandicap(JwtPersona::forGaryGolfer)
         .andExpect(status().isOk())
         .andExpectAll(
-            jsonPath("$.handicapId").value(MatchesPattern.matchesPattern("[0-9]{8}-[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{12}")),
+            jsonPath("$.handicapId")
+                .value(
+                    MatchesPattern.matchesPattern("[0-9]{8}-[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{12}")),
             jsonPath("$.golferId").value(JwtPersona.GARY_GOLFER.sub()),
             jsonPath("$.handicapIndex").value(6.1),
             jsonPath("$.roundsUsed").value(4),

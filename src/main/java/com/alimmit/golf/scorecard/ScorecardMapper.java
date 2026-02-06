@@ -1,19 +1,13 @@
 package com.alimmit.golf.scorecard;
 
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
-/**
- * Maps between ScorecardEntity (persistence layer) and ScorecardDto (API
- * layer).
- */
+/** Maps between ScorecardEntity (persistence layer) and ScorecardDto (API layer). */
 @Component
 class ScorecardMapper {
 
-  /**
-   * Convert entity to DTO for API responses.
-   */
+  /** Convert entity to DTO for API responses. */
   ScorecardDto toDto(ScorecardEntity entity) {
     return new ScorecardDto(
         entity.getScorecardId(),
@@ -36,11 +30,11 @@ class ScorecardMapper {
   }
 
   /**
-   * Convert request DTO to entity for persistence.
-   * Audit fields will be populated automatically by JPA.
-   * Course rating and slope rating are resolved by the service layer.
+   * Convert request DTO to entity for persistence. Audit fields will be populated automatically by
+   * JPA. Course rating and slope rating are resolved by the service layer.
    */
-  ScorecardEntity toEntity(ScorecardRequestDto request, double differential, boolean indexEstablished1) {
+  ScorecardEntity toEntity(
+      ScorecardRequestDto request, double differential, boolean indexEstablished1) {
     return new ScorecardEntity(
         request.scoreDate(),
         request.courseName(),
