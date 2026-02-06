@@ -1,9 +1,10 @@
 package com.alimmit.golf.handicap;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record HandicapDto(
-    String handicapId,
+    UUID handicapId,
     String golferId,
     Instant createdAt,
     Double handicapIndex,

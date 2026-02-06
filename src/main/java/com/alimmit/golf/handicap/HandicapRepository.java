@@ -7,11 +7,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 interface HandicapRepository extends
-    JpaRepository<HandicapEntity, String>,
-    RevisionRepository<HandicapEntity, String, Integer> {
+    JpaRepository<HandicapEntity, UUID>,
+    RevisionRepository<HandicapEntity, UUID, Integer> {
 
   /**
    * Find calculated handicap for the currently authenticated user.

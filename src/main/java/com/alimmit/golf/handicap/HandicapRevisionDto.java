@@ -3,9 +3,10 @@ package com.alimmit.golf.handicap;
 import org.springframework.data.history.RevisionMetadata;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record HandicapRevisionDto(
-    String handicapId,
+    UUID handicapId,
     String golferId,
     Instant createdAt,
     Double handicapIndex,

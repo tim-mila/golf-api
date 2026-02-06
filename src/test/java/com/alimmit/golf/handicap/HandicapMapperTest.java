@@ -9,7 +9,7 @@ import java.util.Optional;
 
 class HandicapMapperTest {
 
-  private final HandicapMapper mapper = new HandicapMapper(new HandicapIdGenerator());
+  private final HandicapMapper mapper = new HandicapMapper();
 
   @Test
   void fromCalculationToEntity() {
@@ -35,14 +35,13 @@ class HandicapMapperTest {
   void fromEntityToDto() {
 
     HandicapEntity entity = new HandicapEntity(
-        "hdcp-2345",
         "Test",
         7.5,
         9,
         10
     );
     Assertions.assertThat(mapper.toDto(entity))
-        .hasFieldOrPropertyWithValue("handicapId", "hdcp-2345")
+        .hasFieldOrProperty("handicapId")
         .hasFieldOrPropertyWithValue("golferId", "Test")
         .hasFieldOrPropertyWithValue("handicapIndex", 7.5)
         .hasFieldOrPropertyWithValue("roundsUsed", 9)
@@ -53,7 +52,6 @@ class HandicapMapperTest {
   void fromOptionalEntityToDto() {
 
     Optional<HandicapEntity> entity = Optional.of(new HandicapEntity(
-        "hdcp-2345",
         "Test",
         7.5,
         9,
@@ -62,7 +60,7 @@ class HandicapMapperTest {
     Assertions.assertThat(mapper.toOptionalDto(entity))
         .isPresent()
         .get()
-        .hasFieldOrPropertyWithValue("handicapId", "hdcp-2345")
+        .hasFieldOrProperty("handicapId")
         .hasFieldOrPropertyWithValue("golferId", "Test")
         .hasFieldOrPropertyWithValue("handicapIndex", 7.5)
         .hasFieldOrPropertyWithValue("roundsUsed", 9)

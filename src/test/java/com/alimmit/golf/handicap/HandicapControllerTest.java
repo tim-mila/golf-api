@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,7 +43,7 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
     when(handicapService.getHandicap())
         .thenReturn(Optional.of(
                 new HandicapDto(
-                    "hdcp-123",
+                    UUID.fromString("10000000-0000-0000-0000-000000000000"),
                     JwtPersona.GARY_GOLFER.sub(),
                     Instant.now(),
                     10.2,
@@ -51,7 +52,7 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
     super.getMyHandicap(JwtPersona::forGaryGolfer)
         .andExpect(status().isOk())
         .andExpectAll(
-            jsonPath("handicapId").value("hdcp-123"),
+            jsonPath("handicapId").value("10000000-0000-0000-0000-000000000000"),
             jsonPath("handicapIndex").value(10.2),
             jsonPath("roundsUsed").value(8),
             jsonPath("totalRounds").value(20),
@@ -73,7 +74,7 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
     when(handicapService.getHistory())
         .thenReturn(List.of(
             new HandicapRevisionDto(
-                "hdcp-123",
+                UUID.fromString("10000000-0000-0000-0000-000000000000"),
                 JwtPersona.GARY_GOLFER.sub(),
                 Instant.now(),
                 10.2,
