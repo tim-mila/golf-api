@@ -4,4 +4,4 @@
 docker-compose -f .local/docker-compose.yaml down
 
 # Remove postgres data volume
-docker volume rm local_pg_data
+docker volume rm local_postgres

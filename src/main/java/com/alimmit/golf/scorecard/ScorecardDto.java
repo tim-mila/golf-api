@@ -2,9 +2,10 @@ package com.alimmit.golf.scorecard;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record ScorecardDto(
-    String scorecardId,
+    UUID scorecardId,
     Instant createdAt,
     String createdBy,
     LocalDate scoreDate,

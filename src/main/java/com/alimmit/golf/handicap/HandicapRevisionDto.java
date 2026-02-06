@@ -1,10 +1,12 @@
 package com.alimmit.golf.handicap;
 
-import java.time.Instant;
 import org.springframework.data.history.RevisionMetadata;
 
+import java.time.Instant;
+import java.util.UUID;
+
 public record HandicapRevisionDto(
-    String handicapId,
+    UUID handicapId,
     String golferId,
     Instant createdAt,
     Double handicapIndex,
@@ -12,4 +14,5 @@ public record HandicapRevisionDto(
     Integer totalRounds,
     Integer revision,
     RevisionMetadata.RevisionType revisionType,
-    Instant revisionTimestamp) {}
+    Instant revisionTimestamp
+) {}

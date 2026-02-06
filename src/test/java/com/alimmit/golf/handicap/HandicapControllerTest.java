@@ -1,15 +1,8 @@
 package com.alimmit.golf.handicap;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import com.alimmit.golf.scorecard.ScorecardService;
 import com.alimmit.golf.utils.JwtPersona;
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,15 +11,27 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @ActiveProfiles("test")
 @WebMvcTest(HandicapController.class)
 class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
 
-  @MockitoBean private GolfCourseApiClient golfCourseApiClient;
+  @MockitoBean
+  private GolfCourseApiClient golfCourseApiClient;
 
-  @MockitoBean private ScorecardService scorecardService;
+  @MockitoBean
+  private ScorecardService scorecardService;
 
-  @MockitoBean private HandicapService handicapService;
+  @MockitoBean
+  private HandicapService handicapService;
 
   @Autowired
   HandicapControllerTest(MockMvc mockMvc) {
@@ -36,44 +41,50 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
   @Test
   void getMyHandicap() throws Exception {
     when(handicapService.getHandicap())
-        .thenReturn(
-            Optional.of(
+        .thenReturn(Optional.of(
                 new HandicapDto(
-                    "hdcp-123", JwtPersona.GARY_GOLFER.sub(), Instant.now(), 10.2, 8, 20)));
+                    UUID.fromString("10000000-0000-0000-0000-000000000000"),
+                    JwtPersona.GARY_GOLFER.sub(),
+                    Instant.now(),
+                    10.2,
+                    8,
+                    20)));
     super.getMyHandicap(JwtPersona::forGaryGolfer)
         .andExpect(status().isOk())
         .andExpectAll(
-            jsonPath("handicapId").value("hdcp-123"),
+            jsonPath("handicapId").value("10000000-0000-0000-0000-000000000000"),
             jsonPath("handicapIndex").value(10.2),
             jsonPath("roundsUsed").value(8),
             jsonPath("totalRounds").value(20),
             jsonPath("golferId").value(JwtPersona.GARY_GOLFER.sub()),
-            jsonPath("createdAt").exists());
+            jsonPath("createdAt").exists()
+        );
   }
 
   @Test
   void getMyHandicap_ExpectMissing() throws Exception {
     when(handicapService.getHandicap()).thenReturn(Optional.empty());
-    super.getMyHandicap(JwtPersona::forGaryGolfer).andExpect(status().isNotFound());
+    super.getMyHandicap(JwtPersona::forGaryGolfer)
+        .andExpect(status().isNotFound());
   }
 
   @Test
   void getMyHandicapHistory() throws Exception {
 
     when(handicapService.getHistory())
-        .thenReturn(
-            List.of(
-                new HandicapRevisionDto(
-                    "hdcp-123",
-                    JwtPersona.GARY_GOLFER.sub(),
-                    Instant.now(),
-                    10.2,
-                    8,
-                    20,
-                    1,
-                    RevisionMetadata.RevisionType.INSERT,
-                    Instant.now())));
+        .thenReturn(List.of(
+            new HandicapRevisionDto(
+                UUID.fromString("10000000-0000-0000-0000-000000000000"),
+                JwtPersona.GARY_GOLFER.sub(),
+                Instant.now(),
+                10.2,
+                8,
+                20,
+                1,
+                RevisionMetadata.RevisionType.INSERT,
+                Instant.now())));
 
-    super.getMyHandicapHistory(JwtPersona::forGaryGolfer).andExpect(status().isOk());
+    super.getMyHandicapHistory(JwtPersona::forGaryGolfer)
+        .andExpect(status().isOk());
   }
 }

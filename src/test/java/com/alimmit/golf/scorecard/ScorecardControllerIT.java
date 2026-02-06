@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.alimmit.golf.courses.client.GolfCourseApiClient;
-import com.alimmit.golf.utils.JwtPersona;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import java.util.function.Function;
+
+import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -23,6 +23,9 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import com.alimmit.golf.utils.JwtPersona;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -30,9 +33,11 @@ import org.springframework.test.web.servlet.ResultActions;
 @Sql(scripts = "classpath:cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
-  @MockitoBean private GolfCourseApiClient golfCourseApiClient;
+  @MockitoBean
+  private GolfCourseApiClient golfCourseApiClient;
 
-  @MockitoBean private ScorecardEventPublisher scorecardEventPublisher;
+  @MockitoBean
+  private ScorecardEventPublisher scorecardEventPublisher;
 
   @Autowired
   ScorecardControllerIT(MockMvc mockMvc) {
@@ -40,8 +45,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
   }
 
   // , "rating": 72.1, "slope": 125
-  private static final String REQUEST_BODY =
-      """
+  private static final String REQUEST_BODY = """
       {"scoreDate": "2025-09-21", "courseName": "Test Course", "teeName": "Blue", "score": 88, "par": 72, "rating": 72.1, "slope": 125.0, "scorecardType": "EIGHTEEN"}
       """;
 
@@ -49,8 +53,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
   void addScorecard() throws Exception {
     createAndAssertScorecard(JwtPersona::forGaryGolfer);
 
-    Mockito.verify(scorecardEventPublisher, Mockito.times(1))
-        .publishCreated(Mockito.any(ScorecardDto.class));
+    Mockito.verify(scorecardEventPublisher, Mockito.times(1)).publishCreated(Mockito.any(ScorecardDto.class));
   }
 
   @Test
@@ -61,24 +64,23 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
     // Fetch scorecards for Gary Golfer and expect one result
     listScorecards(JwtPersona::forGaryGolfer, status().isOk())
-        .andExpectAll(jsonPath("$.length()").value(1));
+        .andExpectAll(
+            jsonPath("$.length()").value(1));
 
     // Fetch scorecards for Pat Putter and expect empty result
     listScorecards(JwtPersona::forPatPutter, status().isOk())
-        .andExpectAll(jsonPath("$.length()").value(0));
+        .andExpectAll(
+            jsonPath("$.length()").value(0));
   }
 
   @Test
   void canOnlyFetchMyScorecards() throws Exception {
     // Create scorecard for Gary Golfer and get response body to parse scorecardId
-    String responseBody =
-        createAndAssertScorecard(JwtPersona::forGaryGolfer)
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+    String responseBody = createAndAssertScorecard(JwtPersona::forGaryGolfer)
+        .andReturn().getResponse().getContentAsString();
 
-    String scorecardId = new ObjectMapper().readTree(responseBody).at("/scorecardId").asText();
-    assertThat(scorecardId).isNotBlank();
+    UUID scorecardId = UUID.fromString(new ObjectMapper().readTree(responseBody).at("/scorecardId").asText());
+    assertThat(scorecardId).isNotNull();
 
     // Fetch scorecards for Gary Golfer and expect ok
     getScorecard(JwtPersona::forGaryGolfer, scorecardId, status().isOk());
@@ -90,14 +92,11 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
   @Test
   void canOnlyDeleteMyScorecards() throws Exception {
     // Create scorecard for Gary Golfer
-    String responseBody =
-        createAndAssertScorecard(JwtPersona::forGaryGolfer)
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+    String responseBody = createAndAssertScorecard(JwtPersona::forGaryGolfer)
+        .andReturn().getResponse().getContentAsString();
 
-    String scorecardId = new ObjectMapper().readTree(responseBody).at("/scorecardId").asText();
-    assertThat(scorecardId).isNotBlank();
+    UUID scorecardId = UUID.fromString(new ObjectMapper().readTree(responseBody).at("/scorecardId").asText());
+    assertThat(scorecardId).isNotNull();
 
     // Delete scorecards as Pat Putter and expect not found
     deleteScorecard(JwtPersona::forPatPutter, scorecardId, status().isNotFound());
@@ -113,8 +112,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
       throws Exception {
     return createScorecard(fn, REQUEST_BODY, status().isOk())
         .andExpectAll(
-            jsonPath("$.scorecardId")
-                .value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
+            jsonPath("$.scorecardId").value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
             jsonPath("$.courseName").value("Test Course"),
             jsonPath("$.teeName").value("Blue"),
             jsonPath("$.score").value(88),

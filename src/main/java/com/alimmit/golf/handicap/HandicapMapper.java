@@ -7,15 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 class HandicapMapper {
 
-  private final HandicapIdGenerator handicapIdGenerator;
-
-  HandicapMapper(HandicapIdGenerator handicapIdGenerator) {
-    this.handicapIdGenerator = handicapIdGenerator;
-  }
-
   HandicapEntity toEntity(HandicapCalculation dto, String golferId) {
     return new HandicapEntity(
-        handicapIdGenerator.generate(),
         golferId,
         dto.handicapIndex(),
         dto.roundsUsed(),
