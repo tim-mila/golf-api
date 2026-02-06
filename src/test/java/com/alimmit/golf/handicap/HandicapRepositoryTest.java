@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({HandicapRepositoryTest.TestConfig.class, HandicapIdGenerator.class})
+@Import({HandicapRepositoryTest.TestConfig.class})
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Sql(scripts = "classpath:cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class HandicapRepositoryTest {
@@ -59,12 +59,10 @@ class HandicapRepositoryTest {
   }
 
   private final HandicapRepository handicapRepository;
-  private final HandicapIdGenerator handicapIdGenerator;
 
   @Autowired
-  HandicapRepositoryTest(HandicapRepository handicapRepository, HandicapIdGenerator handicapIdGenerator) {
+  HandicapRepositoryTest(HandicapRepository handicapRepository) {
     this.handicapRepository = handicapRepository;
-    this.handicapIdGenerator = handicapIdGenerator;
   }
 
   @Test
@@ -75,13 +73,10 @@ class HandicapRepositoryTest {
   @Test
   @WithMockUser(username = "123") // Gary Golfer's sub
   void shouldSaveHandicapWithAuditFields() {
-    // Given: Gary Golfer is authenticated
-
-    String id = handicapIdGenerator.generate();
+    // Given: Gary Golfer is authenticated (based on @WithMockUser)
 
     // When: Creating a new handicap
     HandicapEntity entity = new HandicapEntity(
-        id,
         "123",
         15.1,
         5,
@@ -90,7 +85,7 @@ class HandicapRepositoryTest {
 
     // Then: Audit fields should be populated automatically
     assertThat(saved)
-        .hasFieldOrPropertyWithValue("handicapId", id)
+        .hasFieldOrProperty("handicapId")
         .hasFieldOrPropertyWithValue("golferId", JwtPersona.GARY_GOLFER.sub())
         .hasFieldOrProperty("createdAt")
         .hasFieldOrProperty("lastModifiedAt")
@@ -161,7 +156,6 @@ class HandicapRepositoryTest {
         })
         .orElse(
             new HandicapEntity(
-                handicapIdGenerator.generate(),
                 golferId,
                 index,
                 roundsUsed,

@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.alimmit.golf.utils.JwtPersona;
+import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -31,7 +32,7 @@ class HandicapControllerIT extends AbstractHandicapControllerMockMvc {
     getMyHandicap(JwtPersona::forGaryGolfer)
         .andExpect(status().isOk())
         .andExpectAll(
-            jsonPath("$.handicapId").value("hdcp-5678"),
+            jsonPath("$.handicapId").value(MatchesPattern.matchesPattern("[0-9]{8}-[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{12}")),
             jsonPath("$.golferId").value(JwtPersona.GARY_GOLFER.sub()),
             jsonPath("$.handicapIndex").value(6.1),
             jsonPath("$.roundsUsed").value(4),

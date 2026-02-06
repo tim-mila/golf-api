@@ -1,6 +1,7 @@
 package com.alimmit.golf.handicap;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Generated;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.springframework.data.annotation.CreatedDate;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "handicap")
@@ -17,8 +19,9 @@ import java.util.Objects;
 class HandicapEntity {
 
   @Id
-  @Column(name = "handicap_id", nullable = false, updatable = false, length = 37)
-  private String handicapId;
+  @Generated(sql = "uuidv7()", writable = true)
+  @Column(name = "handicap_id", nullable = false, updatable = false, columnDefinition = "UUID DEFAULT uuidv7()")
+  private UUID handicapId;
 
   @CreatedDate
   @NotAudited
@@ -50,25 +53,23 @@ class HandicapEntity {
   /**
    * Convenience constructor for creating new entities
    *
-   * @param handicapId    Handicap record identifier
    * @param golferId      Golfer identifier
    * @param handicapIndex Calculated handicap handicapIndex
    * @param roundsUsed    Number of rounds used to calculate handicap handicapIndex
    * @param totalRounds   Total number of rounds considered
    */
-  HandicapEntity(String handicapId, String golferId, Double handicapIndex, Integer roundsUsed, Integer totalRounds) {
-    this.handicapId = handicapId;
+  HandicapEntity(String golferId, Double handicapIndex, Integer roundsUsed, Integer totalRounds) {
     this.golferId = golferId;
     this.handicapIndex = handicapIndex;
     this.roundsUsed = roundsUsed;
     this.totalRounds = totalRounds;
   }
 
-  public String getHandicapId() {
+  public UUID getHandicapId() {
     return handicapId;
   }
 
-  public void setHandicapId(String handicapId) {
+  public void setHandicapId(UUID handicapId) {
     this.handicapId = handicapId;
   }
 

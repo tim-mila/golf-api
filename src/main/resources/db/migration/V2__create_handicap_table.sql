@@ -2,7 +2,7 @@
 -- Create handicap table with audit fields
 CREATE TABLE handicap
 (
-    handicap_id      VARCHAR(37) PRIMARY KEY,
+    handicap_id      UUID PRIMARY KEY DEFAULT uuidv7(),
     created_at       TIMESTAMP        NOT NULL,
     last_modified_at TIMESTAMP        NOT NULL,
     golfer_id        VARCHAR(255)     NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE handicap_aud
     rev              INTEGER          NOT NULL REFERENCES revinfo(rev),
     revtype          INTEGER          NOT NULL,
     revend           INTEGER,
-    handicap_id      VARCHAR(37),
+    handicap_id      UUID             NOT NULL,
     last_modified_at TIMESTAMP        NOT NULL,
     golfer_id        VARCHAR(255)     NOT NULL,
     handicap_index   DOUBLE PRECISION NOT NULL,

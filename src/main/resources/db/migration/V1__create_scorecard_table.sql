@@ -1,6 +1,6 @@
 -- Create scorecard table with audit fields
 CREATE TABLE scorecard (
-    scorecard_id VARCHAR(36) PRIMARY KEY,
+    scorecard_id UUID PRIMARY KEY DEFAULT uuidv7(),
     created_at TIMESTAMP NOT NULL,
     created_by VARCHAR(255) NOT NULL,
     last_modified_at TIMESTAMP,

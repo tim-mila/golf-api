@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -58,7 +59,7 @@ class DifferentialCalculatorImplTest {
 
     // GIVEN: existing handicap index of 14.1
     when(handicapService.getHandicap()).thenReturn(Optional.of(new HandicapDto(
-        "hdcp-123",
+        UUID.fromString("10000000-0000-0000-0000-000000000000"),
         "auth0|123",
         Instant.now(),
         14.1,
@@ -119,7 +120,7 @@ class DifferentialCalculatorImplTest {
 
     // GIVEN: existing handicap index of 14.1
     when(handicapService.getHandicap()).thenReturn(Optional.of(new HandicapDto(
-        "hdcp-123",
+        UUID.fromString("10000000-0000-0000-0000-000000000000"),
         "auth0|123",
         Instant.now(),
         10.2,

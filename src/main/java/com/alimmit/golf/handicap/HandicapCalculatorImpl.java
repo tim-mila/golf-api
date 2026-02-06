@@ -45,10 +45,11 @@ class HandicapCalculatorImpl implements HandicapCalculator {
         .toList();
 
     // Determine how many differentials to use and any adjustment
-    int differentialsToUse = getDifferentialsToUse(holesPlayed);
-    logger.debug("calculate handicap | based on {} holes played using {} differentials", holesPlayed, differentialsToUse);
-    double adjustment = getAdjustment(holesPlayed);
-    logger.debug("calculate handicap | based on {} holes played using {} adjustment", holesPlayed, adjustment);
+    int totalRounds = allDifferentials.size();
+    int differentialsToUse = getDifferentialsToUse(totalRounds);
+    logger.debug("calculate handicap | based on {} rounds played using {} differentials", holesPlayed, differentialsToUse);
+    double adjustment = getAdjustment(totalRounds);
+    logger.debug("calculate handicap | based on {} rounds played using {} adjustment", holesPlayed, adjustment);
 
     // Get the best (lowest) differentials
     List<Double> bestDifferentials = allDifferentials.stream()

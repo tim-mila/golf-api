@@ -11,12 +11,6 @@ import java.util.Optional;
 @Component
 class ScorecardMapper {
 
-  private final ScorecardIdGenerator scorecardIdGenerator;
-
-  ScorecardMapper(ScorecardIdGenerator scorecardIdGenerator) {
-    this.scorecardIdGenerator = scorecardIdGenerator;
-  }
-
   /**
    * Convert entity to DTO for API responses.
    */
@@ -48,7 +42,6 @@ class ScorecardMapper {
    */
   ScorecardEntity toEntity(ScorecardRequestDto request, double differential, boolean indexEstablished1) {
     return new ScorecardEntity(
-        scorecardIdGenerator.generate(),
         request.scoreDate(),
         request.courseName(),
         request.teeName(),

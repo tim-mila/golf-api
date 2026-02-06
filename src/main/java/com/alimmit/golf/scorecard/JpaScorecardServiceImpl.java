@@ -2,6 +2,7 @@ package com.alimmit.golf.scorecard;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.alimmit.golf.differential.Differential;
 import com.alimmit.golf.differential.DifferentialCalculator;
@@ -71,7 +72,7 @@ class JpaScorecardServiceImpl implements ScorecardService {
    */
   @Transactional(readOnly = true)
   @Override
-  public Optional<ScorecardDto> getById(String id) {
+  public Optional<ScorecardDto> getById(UUID id) {
     return scorecardRepository
             .findByIdForCurrentUser(id)
             .flatMap(scorecardMapper::toOptionalDto);
@@ -81,7 +82,7 @@ class JpaScorecardServiceImpl implements ScorecardService {
    * Delete a scorecard by ID for the current authenticated user.
    */
   @Override
-  public int deleteById(String id) {
+  public int deleteById(UUID id) {
     return scorecardRepository.deleteByIdForCurrentUser(id);
   }
 }

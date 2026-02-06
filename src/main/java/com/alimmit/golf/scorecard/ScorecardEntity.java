@@ -1,6 +1,7 @@
 package com.alimmit.golf.scorecard;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Generated;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "scorecard")
@@ -15,8 +17,9 @@ import java.util.Objects;
 class ScorecardEntity {
 
   @Id
-  @Column(nullable = false, length = 36)
-  private String scorecardId;
+  @Generated(sql = "uuidv7()", writable = true)
+  @Column(updatable = false, nullable = false, columnDefinition = "UUID DEFAULT uuidv7()")
+  private UUID scorecardId;
 
   @CreatedDate
   @Column(nullable = false, updatable = false)
@@ -61,7 +64,6 @@ class ScorecardEntity {
   }
 
   public ScorecardEntity(
-      String scorecardId,
       LocalDate scoreDate,
       String courseName,
       String teeName,
@@ -72,7 +74,6 @@ class ScorecardEntity {
       ScorecardType scorecardType,
       double differential,
       boolean indexEstablished) {
-    this.scorecardId = scorecardId;
     this.scoreDate = scoreDate;
     this.courseName = courseName;
     this.teeName = teeName;
@@ -85,11 +86,11 @@ class ScorecardEntity {
     this.indexEstablished = indexEstablished;
   }
 
-  public String getScorecardId() {
+  public UUID getScorecardId() {
     return scorecardId;
   }
 
-  public void setScorecardId(String scorecardId) {
+  public void setScorecardId(UUID scorecardId) {
     this.scorecardId = scorecardId;
   }
 
