@@ -1,6 +1,7 @@
 package com.alimmit.golf.scorecard;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Generated;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,8 +17,8 @@ import java.util.UUID;
 class ScorecardEntity {
 
   @Id
-  @GeneratedValue
-  @Column(nullable = false, length = 36)
+  @Generated(sql = "uuidv7()", writable = true)
+  @Column(updatable = false, nullable = false, columnDefinition = "UUID DEFAULT uuidv7()")
   private UUID scorecardId;
 
   @CreatedDate
