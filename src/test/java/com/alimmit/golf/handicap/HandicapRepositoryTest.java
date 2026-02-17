@@ -1,6 +1,10 @@
 package com.alimmit.golf.handicap;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.alimmit.golf.utils.JwtPersona;
+import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +27,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -76,11 +75,7 @@ class HandicapRepositoryTest {
     // Given: Gary Golfer is authenticated (based on @WithMockUser)
 
     // When: Creating a new handicap
-    HandicapEntity entity = new HandicapEntity(
-        "123",
-        15.1,
-        5,
-        5);
+    HandicapEntity entity = new HandicapEntity("123", 15.1, 5, 5);
     HandicapEntity saved = handicapRepository.save(entity);
 
     // Then: Audit fields should be populated automatically
@@ -119,7 +114,8 @@ class HandicapRepositoryTest {
     Optional<HandicapEntity> patResults = handicapRepository.findHandicapForCurrentUser();
 
     // Then: Only Pat's scorecard should be returned
-    assertThat(patResults).isPresent()
+    assertThat(patResults)
+        .isPresent()
         .get()
         .hasFieldOrPropertyWithValue("golferId", JwtPersona.PAT_PUTTER.sub())
         .hasFieldOrPropertyWithValue("handicapIndex", 5.6)
@@ -134,38 +130,37 @@ class HandicapRepositoryTest {
     // Given: Multiple handicaps for Gary Golfer
     handicapRepository.save(createHandicap(JwtPersona.GARY_GOLFER.sub(), 15.1, 5, 5));
     handicapRepository.save(createHandicap(JwtPersona.GARY_GOLFER.sub(), 15.0, 6, 6));
-    HandicapEntity handicap = handicapRepository.save(createHandicap(JwtPersona.GARY_GOLFER.sub(), 14.3, 7, 7));
+    HandicapEntity handicap =
+        handicapRepository.save(createHandicap(JwtPersona.GARY_GOLFER.sub(), 14.3, 7, 7));
 
     // WHEN: fetching handicap revision history
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    Revisions<Integer, HandicapEntity> revisions = handicapRepository.findRevisions(handicap.getHandicapId());
+    Revisions<Integer, HandicapEntity> revisions =
+        handicapRepository.findRevisions(handicap.getHandicapId());
 
     // THEN: the history contains three handicaps
     assertThat(revisions).hasSize(3);
   }
 
-  private HandicapEntity createHandicap(String golferId, Double index, Integer roundsUsed, Integer totalRounds) {
+  private HandicapEntity createHandicap(
+      String golferId, Double index, Integer roundsUsed, Integer totalRounds) {
 
     return handicapRepository
         .findHandicapForUser(golferId)
-        .map(h -> {
-          h.setHandicapIndex(index);
-          h.setTotalRounds(totalRounds);
-          h.setRoundsUsed(roundsUsed);
-          return h;
-        })
-        .orElse(
-            new HandicapEntity(
-                golferId,
-                index,
-                roundsUsed,
-                totalRounds));
+        .map(
+            h -> {
+              h.setHandicapIndex(index);
+              h.setTotalRounds(totalRounds);
+              h.setRoundsUsed(roundsUsed);
+              return h;
+            })
+        .orElse(new HandicapEntity(golferId, index, roundsUsed, totalRounds));
   }
 
   private void setSecurityContext(String username) {
     SecurityContext context = SecurityContextHolder.createEmptyContext();
-    Authentication authentication = new UsernamePasswordAuthenticationToken(
-        username, null, List.of());
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken(username, null, List.of());
     context.setAuthentication(authentication);
     SecurityContextHolder.setContext(context);
   }

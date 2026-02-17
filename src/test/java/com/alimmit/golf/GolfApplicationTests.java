@@ -10,8 +10,6 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 class GolfApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+  @Test
+  void contextLoads() {}
 }

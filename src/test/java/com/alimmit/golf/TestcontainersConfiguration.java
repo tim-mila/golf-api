@@ -10,13 +10,12 @@ import org.testcontainers.utility.DockerImageName;
 @TestConfiguration(proxyBeanMethods = false)
 class TestcontainersConfiguration {
 
-	// Suppress warnings is ok here, container closed by Ryuk
-	@SuppressWarnings("resource")
-	@Bean
-	@ServiceConnection
-	PostgreSQLContainer<?> postgresContainer() {
-		return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
-				.waitingFor(new HostPortWaitStrategy());
-	}
-
+  // Suppress warnings is ok here, container closed by Ryuk
+  @SuppressWarnings("resource")
+  @Bean
+  @ServiceConnection
+  PostgreSQLContainer<?> postgresContainer() {
+    return new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+        .waitingFor(new HostPortWaitStrategy());
+  }
 }

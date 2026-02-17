@@ -1,19 +1,14 @@
 package com.alimmit.golf.handicap;
 
+import java.util.Optional;
 import org.springframework.data.history.Revision;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 class HandicapMapper {
 
   HandicapEntity toEntity(HandicapCalculation dto, String golferId) {
-    return new HandicapEntity(
-        golferId,
-        dto.handicapIndex(),
-        dto.roundsUsed(),
-        dto.totalRounds());
+    return new HandicapEntity(golferId, dto.handicapIndex(), dto.roundsUsed(), dto.totalRounds());
   }
 
   HandicapEntity updateEntity(HandicapEntity existing, HandicapCalculation dto) {
@@ -32,10 +27,10 @@ class HandicapMapper {
         entity.getHandicapId(),
         entity.getGolferId(),
         entity.getCreatedAt(),
+        entity.getLastModifiedAt(),
         entity.getHandicapIndex(),
         entity.getRoundsUsed(),
-        entity.getTotalRounds()
-    );
+        entity.getTotalRounds());
   }
 
   HandicapRevisionDto toRevision(Revision<Integer, HandicapEntity> revision) {
@@ -44,6 +39,7 @@ class HandicapMapper {
         entity.getHandicapId(),
         entity.getGolferId(),
         entity.getCreatedAt(),
+        entity.getLastModifiedAt(),
         entity.getHandicapIndex(),
         entity.getRoundsUsed(),
         entity.getTotalRounds(),

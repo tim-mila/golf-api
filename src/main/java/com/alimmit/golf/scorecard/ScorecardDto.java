@@ -17,5 +17,4 @@ public record ScorecardDto(
     Double slopeRating,
     ScorecardType scorecardType,
     Double differential,
-    Boolean indexEstablished) {
-}
+    Boolean indexEstablished) {}

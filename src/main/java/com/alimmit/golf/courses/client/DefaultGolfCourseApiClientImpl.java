@@ -1,5 +1,6 @@
 package com.alimmit.golf.courses.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -11,19 +12,16 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-/**
- * Default GolfCourseApiClient implementation
- */
+/** Default GolfCourseApiClient implementation */
 class DefaultGolfCourseApiClientImpl implements GolfCourseApiClient {
 
   private enum Path {
-    SEARCH("/v1/search?search_query="), FETCH("/v1/courses/");
+    SEARCH("/v1/search?search_query="),
+    FETCH("/v1/courses/");
 
     private final String value;
 
-    private Path(String value) {
+    Path(String value) {
       this.value = value;
     }
   }

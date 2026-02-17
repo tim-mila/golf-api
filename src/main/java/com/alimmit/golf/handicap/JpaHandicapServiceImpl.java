@@ -2,12 +2,11 @@ package com.alimmit.golf.handicap;
 
 import com.alimmit.golf.errors.NotFoundException;
 import com.alimmit.golf.scorecard.ScorecardDto;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.history.Revisions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 class JpaHandicapServiceImpl implements HandicapService {
@@ -30,15 +29,18 @@ class JpaHandicapServiceImpl implements HandicapService {
   public void calculate(List<ScorecardDto> scorecards, String golferId) {
 
     // handicap may not be calculated based on number of holes played
-    handicapCalculator.calculate(scorecards)
-        .ifPresent(handicapDto -> {
-          // Update existing or create new handicap
-          HandicapEntity handicap = handicapRepository
-              .findHandicapForUser(golferId)
-              .map(entity -> handicapMapper.updateEntity(entity, handicapDto))
-              .orElse(handicapMapper.toEntity(handicapDto, golferId));
-          handicapRepository.save(handicap);
-        });
+    handicapCalculator
+        .calculate(scorecards)
+        .ifPresent(
+            handicapDto -> {
+              // Update existing or create new handicap
+              HandicapEntity handicap =
+                  handicapRepository
+                      .findHandicapForUser(golferId)
+                      .map(entity -> handicapMapper.updateEntity(entity, handicapDto))
+                      .orElse(handicapMapper.toEntity(handicapDto, golferId));
+              handicapRepository.save(handicap);
+            });
   }
 
   @Override
@@ -49,10 +51,10 @@ class JpaHandicapServiceImpl implements HandicapService {
 
   @Override
   public List<HandicapRevisionDto> getHistory() {
-    HandicapEntity handicap = handicapRepository
-        .findHandicapForCurrentUser()
-        .orElseThrow(NotFoundException::new);
-    Revisions<Integer, HandicapEntity> revisions = handicapRepository.findRevisions(handicap.getHandicapId());
+    HandicapEntity handicap =
+        handicapRepository.findHandicapForCurrentUser().orElseThrow(NotFoundException::new);
+    Revisions<Integer, HandicapEntity> revisions =
+        handicapRepository.findRevisions(handicap.getHandicapId());
     return revisions.stream().map(handicapMapper::toRevision).toList();
   }
 }

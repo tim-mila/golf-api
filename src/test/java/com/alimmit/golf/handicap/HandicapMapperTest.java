@@ -1,11 +1,10 @@
 package com.alimmit.golf.handicap;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 class HandicapMapperTest {
 
@@ -14,15 +13,9 @@ class HandicapMapperTest {
   @Test
   void fromCalculationToEntity() {
 
-    HandicapEntity entity = mapper.toEntity(
-        new HandicapCalculation(
-            11.3,
-            3,
-            5,
-            Collections.emptyList(),
-            Instant.now()),
-        "Test"
-    );
+    HandicapEntity entity =
+        mapper.toEntity(
+            new HandicapCalculation(11.3, 3, 5, Collections.emptyList(), Instant.now()), "Test");
 
     Assertions.assertThat(entity)
         .hasFieldOrPropertyWithValue("golferId", "Test")
@@ -34,12 +27,7 @@ class HandicapMapperTest {
   @Test
   void fromEntityToDto() {
 
-    HandicapEntity entity = new HandicapEntity(
-        "Test",
-        7.5,
-        9,
-        10
-    );
+    HandicapEntity entity = new HandicapEntity("Test", 7.5, 9, 10);
     Assertions.assertThat(mapper.toDto(entity))
         .hasFieldOrProperty("handicapId")
         .hasFieldOrPropertyWithValue("golferId", "Test")
@@ -51,12 +39,7 @@ class HandicapMapperTest {
   @Test
   void fromOptionalEntityToDto() {
 
-    Optional<HandicapEntity> entity = Optional.of(new HandicapEntity(
-        "Test",
-        7.5,
-        9,
-        10
-    ));
+    Optional<HandicapEntity> entity = Optional.of(new HandicapEntity("Test", 7.5, 9, 10));
     Assertions.assertThat(mapper.toOptionalDto(entity))
         .isPresent()
         .get()
