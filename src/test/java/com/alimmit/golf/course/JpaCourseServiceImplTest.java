@@ -1,110 +1,152 @@
 package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.Disabled;
+import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ActiveProfiles("test")
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({JpaCourseServiceImplTest.TestConfig.class, JpaCourseServiceImpl.class, CourseMapper.class})
-@TestPropertySource(locations = "classpath:application-test.properties")
-@Sql(scripts = "classpath:cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-@Disabled
+@ExtendWith(MockitoExtension.class)
 class JpaCourseServiceImplTest {
 
-  @TestConfiguration
-  @EnableJpaAuditing
-  static class TestConfig {
+  @Mock private CourseRepository courseRepository;
+  @Mock private CourseMapper courseMapper;
 
-    @Bean
-    AuditorAware<String> auditorAware() {
-      return () -> {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-          return Optional.empty();
-        }
-        return Optional.of(authentication.getName());
-      };
-    }
+  private JpaCourseServiceImpl courseService;
 
-    @Bean
-    SecurityEvaluationContextExtension securityEvaluationContextExtension() {
-      return new SecurityEvaluationContextExtension();
-    }
-  }
-
-  private final CourseService courseService;
-
-  @Autowired
-  JpaCourseServiceImplTest(CourseService courseService) {
-    this.courseService = courseService;
+  @BeforeEach
+  void setUp() {
+    courseService = new JpaCourseServiceImpl(courseRepository, courseMapper);
   }
 
   @Test
-  void contextLoads() {
-    assertThat(courseService).isNotNull();
+  void list() {
+    CourseEntity entity1 = createEntity(UUID.randomUUID(), "Club A", "Course A");
+    CourseEntity entity2 = createEntity(UUID.randomUUID(), "Club B", "Course B");
+    CourseDto dto1 = createDto(entity1);
+    CourseDto dto2 = createDto(entity2);
+
+    when(courseRepository.findAll()).thenReturn(List.of(entity1, entity2));
+    when(courseMapper.map(entity1)).thenReturn(dto1);
+    when(courseMapper.map(entity2)).thenReturn(dto2);
+
+    List<CourseDto> result = courseService.list();
+
+    assertThat(result).containsExactly(dto1, dto2);
   }
 
   @Test
-  @WithMockUser("123")
-  @Transactional(propagation = Propagation.NEVER)
+  void get() {
+    UUID courseId = UUID.randomUUID();
+    CourseEntity entity = createEntity(courseId, "Test Club", "Test Course");
+    CourseDto dto = createDto(entity);
+    Optional<CourseEntity> optionalEntity = Optional.of(entity);
+
+    when(courseRepository.findById(courseId)).thenReturn(optionalEntity);
+    when(courseMapper.map(optionalEntity)).thenReturn(Optional.of(dto));
+
+    Optional<CourseDto> result = courseService.get(courseId);
+
+    assertThat(result).isPresent().contains(dto);
+  }
+
+  @Test
+  void getNotFound() {
+    UUID courseId = UUID.randomUUID();
+    Optional<CourseEntity> empty = Optional.empty();
+
+    when(courseRepository.findById(courseId)).thenReturn(empty);
+    when(courseMapper.map(empty)).thenReturn(Optional.empty());
+
+    Optional<CourseDto> result = courseService.get(courseId);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  void create() {
+    CreateCourseRequest request =
+        new CreateCourseRequest("Test Club", "Test Course", "Test City", USState.WISCONSIN);
+    CourseEntity unsaved =
+        new CourseEntity("Test Club", "Test Course", "Test City", USState.WISCONSIN);
+    CourseEntity saved = createEntity(UUID.randomUUID(), "Test Club", "Test Course");
+    CourseDto dto = createDto(saved);
+
+    when(courseMapper.map(request)).thenReturn(unsaved);
+    when(courseRepository.save(unsaved)).thenReturn(saved);
+    when(courseMapper.map(saved)).thenReturn(dto);
+
+    CourseDto result = courseService.create(request);
+
+    assertThat(result).isEqualTo(dto);
+  }
+
+  @Test
   void patch() {
+    UUID courseId = UUID.randomUUID();
+    CourseEntity entity = createEntity(courseId, "Old Club", "Old Course");
+    CourseEntity savedEntity = createEntity(courseId, "New Club", "New Course");
+    CourseDto dto = createDto(savedEntity);
 
-    CourseDto created =
-        courseService.create(
-            new CreateCourseRequest(
-                "Before Club", "Before Course", "Before City", USState.WISCONSIN));
+    PatchCourseRequest request =
+        new PatchCourseRequest(
+            Optional.of("New Club"), Optional.of("New Course"), Optional.empty(), Optional.empty());
 
-    assertThat(created)
-        .hasFieldOrProperty("courseId")
-        .hasFieldOrProperty("createdAt")
-        .hasFieldOrProperty("lastModifiedAt")
-        .hasFieldOrPropertyWithValue("club", "Before Club")
-        .hasFieldOrPropertyWithValue("course", "Before Course")
-        .hasFieldOrPropertyWithValue("city", "Before City")
-        .hasFieldOrPropertyWithValue("state", USState.WISCONSIN);
+    when(courseRepository.findById(courseId)).thenReturn(Optional.of(entity));
+    when(courseRepository.save(entity)).thenReturn(savedEntity);
+    when(courseMapper.map(savedEntity)).thenReturn(dto);
 
-    Optional<CourseDto> patched =
-        courseService.patch(
-            created.courseId(),
-            new PatchCourseRequest(
-                Optional.of("After Club"),
-                Optional.of("After Course"),
-                Optional.of("After City"),
-                Optional.of(USState.RHODE_ISLAND)));
+    Optional<CourseDto> result = courseService.patch(courseId, request);
 
-    assertThat(patched)
-        .isPresent()
-        .get()
-        .hasFieldOrPropertyWithValue("courseId", created.courseId())
-        .hasFieldOrPropertyWithValue("createdAt", created.createdAt())
-        .hasFieldOrProperty("lastModifiedAt")
-        .hasFieldOrPropertyWithValue("club", "After Club")
-        .hasFieldOrPropertyWithValue("course", "After Course")
-        .hasFieldOrPropertyWithValue("city", "After City")
-        .hasFieldOrPropertyWithValue("state", USState.RHODE_ISLAND);
+    assertThat(result).isPresent().contains(dto);
+  }
 
-    Optional<CourseDto> read = courseService.get(created.courseId());
-    assertThat(read.orElseThrow().lastModifiedAt()).isAfter(created.lastModifiedAt());
+  @Test
+  void patchNotFound() {
+    UUID courseId = UUID.randomUUID();
+    PatchCourseRequest request =
+        new PatchCourseRequest(
+            Optional.of("New Club"), Optional.empty(), Optional.empty(), Optional.empty());
+
+    when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
+
+    Optional<CourseDto> result = courseService.patch(courseId, request);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  void delete() {
+    UUID courseId = UUID.randomUUID();
+
+    courseService.delete(courseId);
+
+    verify(courseRepository).deleteById(courseId);
+  }
+
+  private CourseEntity createEntity(UUID courseId, String club, String course) {
+    CourseEntity entity = new CourseEntity(club, course, "Test City", USState.WISCONSIN);
+    entity.setCourseId(courseId);
+    entity.setCreatedAt(Instant.now());
+    return entity;
+  }
+
+  private CourseDto createDto(CourseEntity entity) {
+    return new CourseDto(
+        entity.getCourseId(),
+        entity.getCreatedAt(),
+        Instant.now(),
+        entity.getClub(),
+        entity.getCourse(),
+        entity.getCity(),
+        entity.getState());
   }
 }
