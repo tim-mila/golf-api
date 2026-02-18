@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 class JpaTeeServiceImpl implements TeeService {
 
   private final TeeRepository teeRepository;
@@ -60,6 +59,7 @@ class JpaTeeServiceImpl implements TeeService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID teeId) {
     teeRepository.deleteById(teeId);
   }
