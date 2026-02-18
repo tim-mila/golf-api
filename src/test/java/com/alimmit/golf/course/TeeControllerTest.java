@@ -44,6 +44,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     Instant.now(),
                     "Blue",
+                    72,
                     6500,
                     new BigDecimal("131.0"),
                     new BigDecimal("71.2")),
@@ -53,6 +54,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     Instant.now(),
                     "White",
+                    72,
                     6100,
                     new BigDecimal("125.0"),
                     new BigDecimal("69.5"))));
@@ -94,6 +96,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     Instant.now(),
                     "Blue",
+                    72,
                     6500,
                     new BigDecimal("131.0"),
                     new BigDecimal("71.2"))));
@@ -136,13 +139,14 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     Instant.now(),
                     "Blue",
+                    72,
                     6500,
                     new BigDecimal("131.0"),
                     new BigDecimal("71.2"))));
 
     String requestBody =
         """
-        {"name": "Blue", "yardage": 6500, "slope": 131.0, "rating": 71.2}
+        {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
     createTee(courseId, requestBody, JwtPersona::forGaryGolfer)
@@ -166,7 +170,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
 
     String requestBody =
         """
-        {"name": "Blue", "yardage": 6500, "slope": 131.0, "rating": 71.2}
+        {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
     createTee(courseId, requestBody, JwtPersona::forGaryGolfer).andExpect(status().isNotFound());
@@ -175,11 +179,12 @@ class TeeControllerTest extends AbstractTeeControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "{\"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"slope\": 131.0, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"yardage\": 6500, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"yardage\": 6500, \"slope\": 131.0}",
-        "{\"name\": \"\", \"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"par\": 72, \"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"name\": \"Blue\", \"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"name\": \"Blue\", \"par\": 72, \"yardage\": 6500, \"rating\": 71.2}",
+        "{\"name\": \"Blue\", \"par\": 72, \"yardage\": 6500, \"slope\": 131.0}",
+        "{\"name\": \"\", \"par\": 72, \"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"name\": \"Blue\", \"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
       })
   void createTee_ExpectBadRequest(String requestBody) throws Exception {
     createTee(UUID.randomUUID(), requestBody, JwtPersona::forGaryGolfer)
@@ -201,13 +206,14 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     Instant.now(),
                     "White",
+                    72,
                     6100,
                     new BigDecimal("125.0"),
                     new BigDecimal("69.5"))));
 
     String requestBody =
         """
-        {"name": "White", "yardage": 6100, "slope": 125.0, "rating": 69.5}
+        {"name": "White", "par": 72, "yardage": 6100, "slope": 125.0, "rating": 69.5}
         """;
 
     patchTee(teeId, requestBody, JwtPersona::forGaryGolfer)

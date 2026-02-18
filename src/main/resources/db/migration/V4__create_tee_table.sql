@@ -7,6 +7,7 @@ CREATE TABLE tee
     last_modified_at TIMESTAMP              NOT NULL,
     last_modified_by CHARACTER VARYING(255) NOT NULL,
     name             CHARACTER VARYING(100) NOT NULL,
+    par              INTEGER                NOT NULL,
     yardage          INTEGER                NOT NULL,
     slope            NUMERIC(4, 1)          NOT NULL,
     rating           NUMERIC(4, 1)          NOT NULL
@@ -24,6 +25,7 @@ CREATE TABLE tee_aud
     last_modified_at TIMESTAMP,
     last_modified_by VARCHAR(255),
     name             CHARACTER VARYING(100),
+    par              INTEGER,
     yardage          INTEGER,
     slope            NUMERIC(4, 1),
     rating           NUMERIC(4, 1),

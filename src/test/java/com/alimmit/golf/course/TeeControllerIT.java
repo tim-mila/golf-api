@@ -45,7 +45,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
 
     String requestBody =
         """
-        {"name": "Blue", "yardage": 6500, "slope": 131.0, "rating": 71.2}
+        {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
     String responseBody =
@@ -79,7 +79,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   void createTee_courseNotFound() throws Exception {
     String requestBody =
         """
-        {"name": "Blue", "yardage": 6500, "slope": 131.0, "rating": 71.2}
+        {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
     createTee(UUID.randomUUID(), requestBody, JwtPersona::forGaryGolfer)
@@ -120,7 +120,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
 
     String createBody =
         """
-        {"name": "Blue", "yardage": 6500, "slope": 131.0, "rating": 71.2}
+        {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
     String createResponse =
@@ -134,7 +134,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
 
     String patchBody =
         """
-        {"name": "White", "yardage": 6100, "slope": 125.0, "rating": 69.5}
+        {"name": "White", "par": 72, "yardage": 6100, "slope": 125.0, "rating": 69.5}
         """;
 
     patchTee(teeId, patchBody, JwtPersona::forGaryGolfer)
@@ -165,7 +165,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
 
     String createBody =
         """
-        {"name": "Blue", "yardage": 6500, "slope": 131.0, "rating": 71.2}
+        {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
     String createResponse =
@@ -195,7 +195,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
       createTee(
           courseId,
           """
-          {"name": "%s", "yardage": 6500, "slope": 131.0, "rating": 71.2}
+          {"name": "%s", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
           """
               .formatted(name),
           JwtPersona::forGaryGolfer);

@@ -73,7 +73,7 @@ class TeeRepositoryTest {
     TeeEntity saved =
         teeRepository.save(
             new TeeEntity(
-                course, "Blue", 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+                course, "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
     assertThat(saved)
         .hasFieldOrProperty("teeId")
@@ -82,6 +82,7 @@ class TeeRepositoryTest {
         .hasFieldOrProperty("lastModifiedAt")
         .hasFieldOrPropertyWithValue("lastModifiedBy", "123")
         .hasFieldOrPropertyWithValue("name", "Blue")
+        .hasFieldOrPropertyWithValue("par", 72)
         .hasFieldOrPropertyWithValue("yardage", 6500)
         .hasFieldOrPropertyWithValue("slope", new BigDecimal("131.0"))
         .hasFieldOrPropertyWithValue("rating", new BigDecimal("71.2"));
@@ -129,14 +130,14 @@ class TeeRepositoryTest {
     TeeEntity tee1 =
         teeRepository.save(
             new TeeEntity(
-                course1, "Blue", 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+                course1, "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
     TeeEntity tee2 =
         teeRepository.save(
             new TeeEntity(
-                course1, "White", 6100, new BigDecimal("125.0"), new BigDecimal("69.5")));
+                course1, "White", 72, 6100, new BigDecimal("125.0"), new BigDecimal("69.5")));
     teeRepository.save(
         new TeeEntity(
-            course2, "Red", 5200, new BigDecimal("118.0"), new BigDecimal("66.0")));
+            course2, "Red", 72, 5200, new BigDecimal("118.0"), new BigDecimal("66.0")));
 
     List<TeeEntity> course1Tees = teeRepository.findByCourse_CourseId(course1.getCourseId());
 
