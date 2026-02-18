@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface TeeService {
+interface TeeService {
 
   /**
    * List all tees for a given course
