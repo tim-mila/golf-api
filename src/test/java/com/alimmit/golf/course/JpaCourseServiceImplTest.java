@@ -19,12 +19,13 @@ class JpaCourseServiceImplTest {
 
   @Mock private CourseRepository courseRepository;
   @Mock private CourseMapper courseMapper;
+  @Mock private TeeRepository teeRepository;
 
   private JpaCourseServiceImpl courseService;
 
   @BeforeEach
   void setUp() {
-    courseService = new JpaCourseServiceImpl(courseRepository, courseMapper);
+    courseService = new JpaCourseServiceImpl(courseRepository, courseMapper, teeRepository);
   }
 
   @Test
@@ -129,6 +130,7 @@ class JpaCourseServiceImplTest {
 
     courseService.delete(courseId);
 
+    verify(teeRepository).deleteByCourse_CourseId(courseId);
     verify(courseRepository).deleteById(courseId);
   }
 
