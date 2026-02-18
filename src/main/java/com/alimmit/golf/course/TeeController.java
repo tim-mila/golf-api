@@ -121,6 +121,15 @@ class TeeController {
     return teeService.patch(teeId, request).orElseThrow(NotFoundException::new);
   }
 
+  @Operation(
+      method = "DELETE",
+      operationId = "tee.delete",
+      summary = "Delete a tee",
+      description = "Delete a tee by identifier",
+      parameters = {
+        @Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)
+      },
+      responses = @ApiResponse(responseCode = "204"))
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
   void delete(@PathVariable("id") UUID teeId) {
