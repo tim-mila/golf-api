@@ -1,0 +1,183 @@
+package com.alimmit.golf.course;
+
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Objects;
+import java.util.UUID;
+import org.hibernate.annotations.Generated;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+@Entity
+@Audited
+@Table(name = "tee")
+@EntityListeners(AuditingEntityListener.class)
+class TeeEntity {
+
+  @Id
+  @Generated(sql = "uuidv7()", writable = true)
+  @Column(
+      unique = true,
+      updatable = false,
+      nullable = false,
+      columnDefinition = "UUID DEFAULT uuidv7()")
+  private UUID teeId;
+
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "course_id", nullable = false, updatable = false)
+  private CourseEntity course;
+
+  @CreatedDate
+  @NotAudited
+  @Column(updatable = false, nullable = false)
+  private Instant createdAt;
+
+  @CreatedBy
+  @NotAudited
+  @Column(updatable = false, nullable = false)
+  private String createdBy;
+
+  @LastModifiedDate
+  @Column(nullable = false)
+  private Instant lastModifiedAt;
+
+  @LastModifiedBy
+  @Column(nullable = false)
+  private String lastModifiedBy;
+
+  @Column(nullable = false)
+  private String name;
+
+  @Column(nullable = false)
+  private Integer par;
+
+  @Column(nullable = false)
+  private Integer yardage;
+
+  @Column(nullable = false, precision = 4, scale = 1)
+  private BigDecimal slope;
+
+  @Column(nullable = false, precision = 4, scale = 1)
+  private BigDecimal rating;
+
+  public TeeEntity() {}
+
+  TeeEntity(
+      CourseEntity course,
+      String name,
+      Integer par,
+      Integer yardage,
+      BigDecimal slope,
+      BigDecimal rating) {
+    this.course = course;
+    this.name = name;
+    this.par = par;
+    this.yardage = yardage;
+    this.slope = slope;
+    this.rating = rating;
+  }
+
+  public UUID getTeeId() {
+    return teeId;
+  }
+
+  public CourseEntity getCourse() {
+    return course;
+  }
+
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
+
+  public Instant getLastModifiedAt() {
+    return lastModifiedAt;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public Integer getPar() {
+    return par;
+  }
+
+  public Integer getYardage() {
+    return yardage;
+  }
+
+  public BigDecimal getSlope() {
+    return slope;
+  }
+
+  public BigDecimal getRating() {
+    return rating;
+  }
+
+  public void setTeeId(UUID teeId) {
+    this.teeId = teeId;
+  }
+
+  public void setCreatedAt(Instant createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setPar(Integer par) {
+    this.par = par;
+  }
+
+  public void setYardage(Integer yardage) {
+    this.yardage = yardage;
+  }
+
+  public void setSlope(BigDecimal slope) {
+    this.slope = slope;
+  }
+
+  public void setRating(BigDecimal rating) {
+    this.rating = rating;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    TeeEntity that = (TeeEntity) o;
+    return Objects.equals(teeId, that.teeId)
+        && Objects.equals(name, that.name)
+        && Objects.equals(par, that.par)
+        && Objects.equals(yardage, that.yardage)
+        && Objects.equals(slope, that.slope)
+        && Objects.equals(rating, that.rating);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(teeId, name, par, yardage, slope, rating);
+  }
+
+  @Override
+  public String toString() {
+    return "TeeEntity{"
+        + "name='"
+        + name
+        + '\''
+        + ", par="
+        + par
+        + ", yardage="
+        + yardage
+        + ", slope="
+        + slope
+        + ", rating="
+        + rating
+        + '}';
+  }
+}

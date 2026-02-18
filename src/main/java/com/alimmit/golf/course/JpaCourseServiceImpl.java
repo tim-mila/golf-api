@@ -7,15 +7,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 class JpaCourseServiceImpl implements CourseService {
 
   private final CourseRepository courseRepository;
   private final CourseMapper courseMapper;
+  private final TeeRepository teeRepository;
 
-  JpaCourseServiceImpl(CourseRepository courseRepository, CourseMapper courseMapper) {
+  JpaCourseServiceImpl(
+      CourseRepository courseRepository, CourseMapper courseMapper, TeeRepository teeRepository) {
     this.courseRepository = courseRepository;
     this.courseMapper = courseMapper;
+    this.teeRepository = teeRepository;
   }
 
   @Override
@@ -55,7 +57,9 @@ class JpaCourseServiceImpl implements CourseService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID courseId) {
+    teeRepository.deleteByCourse_CourseId(courseId);
     courseRepository.deleteById(courseId);
   }
 }
