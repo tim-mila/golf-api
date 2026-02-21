@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.alimmit.golf.config.MethodSecurityConfiguration;
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import com.alimmit.golf.errors.NotFoundException;
 import com.alimmit.golf.utils.JwtPersona;
@@ -18,12 +19,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
 @WebMvcTest(ScorecardController.class)
+@Import(MethodSecurityConfiguration.class)
 class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
   @MockitoBean private GolfCourseApiClient golfCourseApiClient;
@@ -155,6 +158,82 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
     deleteScorecard(JwtPersona::forGaryGolfer, scorecardId).andExpect(status().isNotFound());
   }
+
+  // --- Authorization tests ---
+
+  @Test
+  void createScorecardForbiddenWithReadOnlyScope() throws Exception {
+    String requestBody =
+        "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}";
+    createScorecard(JwtPersona::forGaryGolferReadOnly, requestBody)
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void listScorecardsAllowedWithReadOnlyScope() throws Exception {
+    when(scorecardService.listAll()).thenReturn(List.of());
+    listScorecards(JwtPersona::forGaryGolferReadOnly, status().isOk());
+  }
+
+  @Test
+  void getScorecardAllowedWithReadOnlyScope() throws Exception {
+    UUID scorecardId = UUID.randomUUID();
+    when(scorecardService.getById(scorecardId)).thenReturn(Optional.empty());
+    getScorecard(JwtPersona::forGaryGolferReadOnly, scorecardId)
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void deleteScorecardForbiddenWithReadOnlyScope() throws Exception {
+    deleteScorecard(JwtPersona::forGaryGolferReadOnly, UUID.randomUUID())
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void createScorecardAllowedWithManageOnlyScope() throws Exception {
+    String requestBody =
+        "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}";
+    UUID scorecardId = UUID.randomUUID();
+    ScorecardDto mockDto =
+        new ScorecardDto(
+            scorecardId,
+            Instant.now(),
+            JwtPersona.GARY_GOLFER.sub(),
+            LocalDate.of(2025, 9, 21),
+            "Test Course",
+            "blue",
+            88,
+            72,
+            72.1,
+            125.0,
+            ScorecardType.EIGHTEEN,
+            14.4,
+            true);
+    when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
+
+    createScorecard(JwtPersona::forGaryGolferManageOnly, requestBody, status().isOk());
+  }
+
+  @Test
+  void listScorecardsForbiddenWithManageOnlyScope() throws Exception {
+    listScorecards(JwtPersona::forGaryGolferManageOnly).andExpect(status().isForbidden());
+  }
+
+  @Test
+  void getScorecardForbiddenWithManageOnlyScope() throws Exception {
+    getScorecard(JwtPersona::forGaryGolferManageOnly, UUID.randomUUID())
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void deleteScorecardAllowedWithManageOnlyScope() throws Exception {
+    UUID scorecardId = UUID.randomUUID();
+    when(scorecardService.deleteById(scorecardId)).thenReturn(1);
+    deleteScorecard(JwtPersona::forGaryGolferManageOnly, scorecardId)
+        .andExpect(status().isNoContent());
+  }
+
+  // --- Validation tests ---
 
   @ParameterizedTest
   @ValueSource(

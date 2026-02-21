@@ -14,14 +14,32 @@ public interface JwtPersona {
   JwtPersona DANA_DRIVER = new JwtPersonalImpl("Dana Driver", "345");
 
   static Jwt.Builder forGaryGolfer(Jwt.Builder builder) {
-    return builder.claim("name", GARY_GOLFER.name()).claim("sub", GARY_GOLFER.sub());
+      return withDefaultScopes(builder.claim("name", GARY_GOLFER.name()).claim("sub", GARY_GOLFER.sub()));
   }
 
   static Jwt.Builder forPatPutter(Jwt.Builder builder) {
-    return builder.claim("name", PAT_PUTTER.name()).claim("sub", PAT_PUTTER.sub());
+    return withDefaultScopes(builder.claim("name", PAT_PUTTER.name()).claim("sub", PAT_PUTTER.sub()));
   }
 
   static Jwt.Builder forDanaDriver(Jwt.Builder builder) {
-    return builder.claim("name", DANA_DRIVER.name()).claim("sub", DANA_DRIVER.sub());
+    return withDefaultScopes(builder.claim("name", DANA_DRIVER.name()).claim("sub", DANA_DRIVER.sub()));
+  }
+
+  static Jwt.Builder forGaryGolferReadOnly(Jwt.Builder builder) {
+    return builder
+        .claim("name", GARY_GOLFER.name())
+        .claim("sub", GARY_GOLFER.sub())
+        .claim("scope", "scorecard:read");
+  }
+
+  static Jwt.Builder forGaryGolferManageOnly(Jwt.Builder builder) {
+    return builder
+        .claim("name", GARY_GOLFER.name())
+        .claim("sub", GARY_GOLFER.sub())
+        .claim("scope", "scorecard:manage");
+  }
+
+  private static Jwt.Builder withDefaultScopes(Jwt.Builder builder) {
+    return builder.claim("scope", "scorecard:read scorecard:manage");
   }
 }
