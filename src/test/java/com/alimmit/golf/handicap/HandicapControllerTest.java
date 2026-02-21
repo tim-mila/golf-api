@@ -4,6 +4,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.alimmit.golf.config.MethodSecurityConfiguration;
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import com.alimmit.golf.scorecard.ScorecardService;
 import com.alimmit.golf.utils.JwtPersona;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.history.RevisionMetadata;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
 @WebMvcTest(HandicapController.class)
+@Import(MethodSecurityConfiguration.class)
 class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
 
   @MockitoBean private GolfCourseApiClient golfCourseApiClient;
@@ -83,5 +86,19 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
                     Instant.now())));
 
     super.getMyHandicapHistory(JwtPersona::forGaryGolfer).andExpect(status().isOk());
+  }
+
+  // --- Authorization tests ---
+
+  @Test
+  void getHandicapForbiddenWithoutHandicapScope() throws Exception {
+    super.getMyHandicap(JwtPersona::forGaryGolferNoHandicapScope)
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void getHandicapHistoryForbiddenWithoutHandicapScope() throws Exception {
+    super.getMyHandicapHistory(JwtPersona::forGaryGolferNoHandicapScope)
+        .andExpect(status().isForbidden());
   }
 }

@@ -40,8 +40,20 @@ public interface JwtPersona {
         .claim("scope", scopeWritePermission(GlobalConstants.SCOPE_SCORECARD));
   }
 
+  static Jwt.Builder forGaryGolferNoHandicapScope(Jwt.Builder builder) {
+    return builder
+        .claim("name", GARY_GOLFER.name())
+        .claim("sub", GARY_GOLFER.sub())
+        .claim("scope", allPermissions(GlobalConstants.SCOPE_SCORECARD));
+  }
+
   private static Jwt.Builder withDefaultScopes(Jwt.Builder builder) {
-    return builder.claim("scope", allPermissions(GlobalConstants.SCOPE_SCORECARD));
+    return builder.claim(
+        "scope",
+        String.join(
+            " ",
+            allPermissions(GlobalConstants.SCOPE_SCORECARD),
+            scopeReadPermission(GlobalConstants.SCOPE_HANDICAP)));
   }
 
   private static String allPermissions(String scope) {
