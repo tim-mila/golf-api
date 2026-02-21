@@ -46,7 +46,8 @@ The `local-start` script:
 ### Package Structure
 ```
 com.alimmit.golf
-├── security/              # OAuth2/JWT config, OpenAPI security definitions
+├── config/                # Security, JPA, async, and web configuration
+├── security/              # @CanRead, @CanWrite meta-annotations for scope authorization
 ├── courses/               # Golf course lookup endpoints
 │   └── client/           # External golf course API client (golfcourseapi.com)
 ├── scorecard/            # Scorecard CRUD operations
@@ -76,6 +77,13 @@ com.alimmit.golf
 **Authorization:** User-scoped data isolation
 - Every operation filters data by `SecurityContextHolder.getContext().getAuthentication().getName()`
 - Pattern ensures users only see their own scorecards
+
+**Scope-based Access Control:** Meta-annotations in `com.alimmit.golf.security`
+- `@CanRead("scorecard")` → requires `SCOPE_read:scorecard` authority
+- `@CanWrite("scorecard")` → requires `SCOPE_write:scorecard` authority
+- Uses Spring Security's `@PreAuthorize` template placeholders (`{value}`)
+- Enabled by `MethodSecurityConfiguration` (`@EnableMethodSecurity` + `PrePostTemplateDefaults` bean)
+- `@WebMvcTest` classes must `@Import(MethodSecurityConfiguration.class)` for method security to be enforced
 
 **Public Endpoints:** `/v1/api-docs/**` (OpenAPI documentation)
 
