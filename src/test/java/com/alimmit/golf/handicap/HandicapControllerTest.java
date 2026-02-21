@@ -1,9 +1,11 @@
 package com.alimmit.golf.handicap;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.config.MethodSecurityConfiguration;
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import com.alimmit.golf.scorecard.ScorecardService;
@@ -12,9 +14,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -88,6 +93,20 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
                     Instant.now())));
 
     super.getMyHandicapHistory(JwtPersona.forGaryGolfer()).andExpect(status().isOk());
+  }
+
+  // --- Unauthenticated tests ---
+
+  @ParameterizedTest
+  @MethodSource
+  void unauthenticated_ExpectUnauthorized(MockHttpServletRequestBuilder request) throws Exception {
+    performWithoutAuth(request).andExpect(status().isUnauthorized());
+  }
+
+  static Stream<MockHttpServletRequestBuilder> unauthenticated_ExpectUnauthorized() {
+    return Stream.of(
+        get(HandicapConstants.HANDICAP_ENDPOINT),
+        get(HandicapConstants.HANDICAP_ENDPOINT + GlobalConstants.API_HISTORY_SUFFIX));
   }
 
   // --- Authorization tests ---

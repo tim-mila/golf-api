@@ -21,4 +21,9 @@ public abstract class AbstractControllerMockMvc {
       throws Exception {
     return mockMvc.perform(builder.with(jwt().jwt(fn::apply))).andExpectAll(resultMatchers);
   }
+
+  protected ResultActions performWithoutAuth(
+      MockHttpServletRequestBuilder builder, ResultMatcher... resultMatchers) throws Exception {
+    return mockMvc.perform(builder).andExpectAll(resultMatchers);
+  }
 }
