@@ -18,8 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -224,8 +224,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
         "",
       })
   void getCourseWithDisallowedScopes_ExpectForbidden(String scope) throws Exception {
-    getCourse(UUID.randomUUID(), JwtPersona.forGaryGolfer(scope))
-        .andExpect(status().isForbidden());
+    getCourse(UUID.randomUUID(), JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
   }
 
   @Test
@@ -249,7 +248,6 @@ class CourseControllerTest extends AbstractCourseControllerTest {
 
   @Test
   void deleteCourseWithDefaultScopes_ExpectForbidden() throws Exception {
-    deleteCourse(UUID.randomUUID(), JwtPersona.forGaryGolfer())
-        .andExpect(status().isForbidden());
+    deleteCourse(UUID.randomUUID(), JwtPersona.forGaryGolfer()).andExpect(status().isForbidden());
   }
 }

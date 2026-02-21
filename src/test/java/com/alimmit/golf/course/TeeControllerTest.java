@@ -18,8 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -176,8 +176,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
-    createTee(courseId, requestBody, JwtPersona.forAmyAdmin())
-        .andExpect(status().isNotFound());
+    createTee(courseId, requestBody, JwtPersona.forAmyAdmin()).andExpect(status().isNotFound());
   }
 
   @ParameterizedTest
@@ -238,8 +237,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         {"name": "White"}
         """;
 
-    patchTee(teeId, requestBody, JwtPersona.forAmyAdmin())
-        .andExpect(status().isNotFound());
+    patchTee(teeId, requestBody, JwtPersona.forAmyAdmin()).andExpect(status().isNotFound());
   }
 
   @Test
