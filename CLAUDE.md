@@ -81,6 +81,8 @@ com.alimmit.golf
 **Scope-based Access Control:** Meta-annotations in `com.alimmit.golf.security`
 - `@CanRead("scorecard")` → requires `SCOPE_read:scorecard` authority
 - `@CanWrite("scorecard")` → requires `SCOPE_write:scorecard` authority
+- `@CanRead("course")` → requires `SCOPE_read:course` authority (CourseController, TeeController)
+- `@CanWrite("course")` → requires `SCOPE_write:course` authority (CourseController, TeeController)
 - Uses Spring Security's `@PreAuthorize` template placeholders (`{value}`)
 - Enabled by `MethodSecurityConfiguration` (`@EnableMethodSecurity` + `PrePostTemplateDefaults` bean)
 - `@WebMvcTest` classes must `@Import(MethodSecurityConfiguration.class)` for method security to be enforced
@@ -139,7 +141,8 @@ GOLF_COURSE_API_KEY=your-api-key
 ### Test Personas
 Use `JwtPersona` utility for consistent test identities:
 ```java
-// Available personas: GARY_GOLFER (sub: "123"), PAT_PUTTER (sub: "234"), DANA_DRIVER (sub: "345")
+// Available personas: GARY_GOLFER (sub: "123"), PAT_PUTTER (sub: "234"), DANA_DRIVER (sub: "345"), AMY_ADMIN (sub: "456")
+// AMY_ADMIN defaults to ALL_SCOPES; other personas default to DEFAULT_SCOPES (read-only for course)
 mockMvc.perform(post("/v1/scorecard")
     .with(jwt().jwt(JwtPersona::forGaryGolfer))
     .content(requestBody))
