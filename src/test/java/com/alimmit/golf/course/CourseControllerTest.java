@@ -46,7 +46,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
                     "Anytown",
                     USState.WISCONSIN)));
 
-    listCourses(JwtPersona::forGaryGolfer)
+    listCourses(JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(1))
         .andExpectAll(
@@ -71,7 +71,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
                     "Anytown",
                     USState.WISCONSIN)));
 
-    getCourse(courseId, JwtPersona::forGaryGolfer)
+    getCourse(courseId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.club").value("Club 1"),
@@ -84,7 +84,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
   void getCourse_ExpectNotFound() throws Exception {
     UUID courseId = UUID.randomUUID();
     when(courseService.get(courseId)).thenReturn(Optional.empty());
-    getCourse(courseId, JwtPersona::forGaryGolfer).andExpect(status().isNotFound());
+    getCourse(courseId, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
   @Test
@@ -116,7 +116,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
         }
         """;
 
-    createCourse(requestBody, JwtPersona::forGaryGolfer)
+    createCourse(requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isCreated())
         .andExpectAll(
             jsonPath("$.club").value("Acme Club"),
@@ -160,14 +160,14 @@ class CourseControllerTest extends AbstractCourseControllerTest {
           "state": "MI"
         }
         """;
-    patchCourse(courseId, requestBody, JwtPersona::forGaryGolfer).andExpect(status().isOk());
+    patchCourse(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isOk());
   }
 
   @Test
   void deleteCourse_ExpectNoContent() throws Exception {
     UUID courseId = UUID.randomUUID();
     doNothing().when(courseService).delete(courseId);
-    deleteCourse(courseId, JwtPersona::forGaryGolfer).andExpect(status().isNoContent());
+    deleteCourse(courseId, JwtPersona.forGaryGolfer()).andExpect(status().isNoContent());
   }
 
   @ParameterizedTest
@@ -183,7 +183,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
         "{\"club\": \"Acme Club\", \"course\": \"Acme Course\", \"city\": \"\", \"state\": \"WI\"}", // Blank city
       })
   void createCourse_ExpectBadRequest_MissingOrNullFields(String requestBody) throws Exception {
-    createCourse(requestBody, JwtPersona::forGaryGolfer)
+    createCourse(requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isBadRequest())
         .andExpect(content().string(Matchers.matchesPattern("^Field cannot be (null|blank).*")));
   }
@@ -195,7 +195,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
         "{\"club\": \"Acme Club\", \"course\": \"Acme Course\", \"city\": \"New Town\", \"state\": \"\"}", // Blank state
       })
   void createCourse_ExpectBadRequest_UnsupportedState(String requestBody) throws Exception {
-    createCourse(requestBody, JwtPersona::forGaryGolfer)
+    createCourse(requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isBadRequest())
         .andExpect(content().string(Matchers.matchesPattern("^Invalid state abbreviation:.*")));
   }

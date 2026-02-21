@@ -2,6 +2,7 @@ package com.alimmit.golf.handicap;
 
 import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.errors.NotFoundException;
+import com.alimmit.golf.security.CanRead;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -25,6 +26,7 @@ class HandicapController {
       operationId = "handicap.get",
       summary = "Get handicap index",
       description = "Get the most recent handicap index for the currently logged in user")
+  @CanRead(GlobalConstants.SCOPE_HANDICAP)
   @GetMapping
   HandicapDto getHandicap() {
     return handicapService.getHandicap().orElseThrow(NotFoundException::new);
@@ -35,6 +37,7 @@ class HandicapController {
       operationId = "handicap.get.history",
       summary = "Get handicap index history",
       description = "Get the history of handicap indexes for the currently logged in user")
+  @CanRead(GlobalConstants.SCOPE_HANDICAP)
   @GetMapping(path = GlobalConstants.API_HISTORY_SUFFIX)
   List<HandicapRevisionDto> history() {
     return handicapService.getHistory();

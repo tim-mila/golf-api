@@ -15,4 +15,6 @@ public final class GlobalConstants {
   public static final String SCOPE_PERMISSION_WRITE = "write";
 
   public static final String SCOPE_SCORECARD = "scorecard";
+
+  public static final String SCOPE_HANDICAP = "handicap";
 }

@@ -1,6 +1,5 @@
 package com.alimmit.golf.course;
 
-import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.errors.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,10 +32,7 @@ class TeeController {
       summary = "List tees for a course",
       description = "Get all tees for a given golf course",
       parameters = {
-        @Parameter(
-            name = "id",
-            description = "Golf course identifier",
-            in = ParameterIn.PATH)
+        @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
       },
       responses =
           @ApiResponse(
@@ -55,9 +51,7 @@ class TeeController {
       operationId = "tee.get",
       summary = "Get a tee",
       description = "Get a tee by identifier",
-      parameters = {
-        @Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)
-      },
+      parameters = {@Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)},
       responses =
           @ApiResponse(
               responseCode = "200",
@@ -76,10 +70,7 @@ class TeeController {
       summary = "Add a new tee to a course",
       description = "Add a new tee to a golf course",
       parameters = {
-        @Parameter(
-            name = "id",
-            description = "Golf course identifier",
-            in = ParameterIn.PATH)
+        @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
       },
       requestBody =
           @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -96,8 +87,7 @@ class TeeController {
                       schema = @Schema(implementation = TeeDto.class))))
   @ResponseStatus(code = HttpStatus.CREATED)
   @PostMapping(path = TeeConstants.TEE_ENDPOINT)
-  TeeDto create(
-      @PathVariable("id") UUID courseId, @Valid @RequestBody CreateTeeRequest request) {
+  TeeDto create(@PathVariable("id") UUID courseId, @Valid @RequestBody CreateTeeRequest request) {
     return teeService.create(courseId, request).orElseThrow(NotFoundException::new);
   }
 
@@ -106,9 +96,7 @@ class TeeController {
       operationId = "tee.patch",
       summary = "Partially update a tee",
       description = "Update the tee with the provided fields",
-      parameters = {
-        @Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)
-      },
+      parameters = {@Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)},
       requestBody =
           @io.swagger.v3.oas.annotations.parameters.RequestBody(
               content =
@@ -116,8 +104,7 @@ class TeeController {
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = PatchTeeRequest.class))))
   @PatchMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
-  TeeDto patch(
-      @Valid @RequestBody PatchTeeRequest request, @PathVariable("id") UUID teeId) {
+  TeeDto patch(@Valid @RequestBody PatchTeeRequest request, @PathVariable("id") UUID teeId) {
     return teeService.patch(teeId, request).orElseThrow(NotFoundException::new);
   }
 
@@ -126,9 +113,7 @@ class TeeController {
       operationId = "tee.delete",
       summary = "Delete a tee",
       description = "Delete a tee by identifier",
-      parameters = {
-        @Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)
-      },
+      parameters = {@Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)},
       responses = @ApiResponse(responseCode = "204"))
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)

@@ -9,5 +9,6 @@ final class TeeConstants {
   static final String TEE_ENDPOINT =
       CourseConstants.COURSE_ENDPOINT + GlobalConstants.API_RECORD_SUFFIX + "/tee";
 
-  static final String TEE_BY_ID_ENDPOINT = GlobalConstants.API_V1_PREFIX + "/tee" + GlobalConstants.API_RECORD_SUFFIX;
+  static final String TEE_BY_ID_ENDPOINT =
+      GlobalConstants.API_V1_PREFIX + "/tee" + GlobalConstants.API_RECORD_SUFFIX;
 }

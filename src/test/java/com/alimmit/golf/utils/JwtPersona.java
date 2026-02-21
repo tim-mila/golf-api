@@ -1,7 +1,6 @@
 package com.alimmit.golf.utils;
 
 import com.alimmit.golf.GlobalConstants;
-import org.springframework.security.oauth2.jwt.Jwt;
 
 /** Build some standard personas to use in MockMvc tests */
 public interface JwtPersona {
@@ -10,49 +9,40 @@ public interface JwtPersona {
 
   String sub();
 
-  JwtPersona GARY_GOLFER = new JwtPersonalImpl("Gary Golfer", "123");
-  JwtPersona PAT_PUTTER = new JwtPersonalImpl("Pat Putter", "234");
-  JwtPersona DANA_DRIVER = new JwtPersonalImpl("Dana Driver", "345");
+  JwtPersona GARY_GOLFER = new JwtPersonaImpl("Gary Golfer", "123");
+  JwtPersona PAT_PUTTER = new JwtPersonaImpl("Pat Putter", "234");
+  JwtPersona DANA_DRIVER = new JwtPersonaImpl("Dana Driver", "345");
 
-  static Jwt.Builder forGaryGolfer(Jwt.Builder builder) {
-      return withDefaultScopes(builder.claim("name", GARY_GOLFER.name()).claim("sub", GARY_GOLFER.sub()));
+  static JwtClaimApplier forGaryGolfer() {
+    return forGaryGolfer(DEFAULT_SCOPES);
   }
 
-  static Jwt.Builder forPatPutter(Jwt.Builder builder) {
-    return withDefaultScopes(builder.claim("name", PAT_PUTTER.name()).claim("sub", PAT_PUTTER.sub()));
+  static JwtClaimApplier forPatPutter() {
+    return forPatPutter(DEFAULT_SCOPES);
   }
 
-  static Jwt.Builder forDanaDriver(Jwt.Builder builder) {
-    return withDefaultScopes(builder.claim("name", DANA_DRIVER.name()).claim("sub", DANA_DRIVER.sub()));
+  static JwtClaimApplier forDanaDriver() {
+    return forDanaDriver(DEFAULT_SCOPES);
   }
 
-  static Jwt.Builder forGaryGolferReadOnly(Jwt.Builder builder) {
-    return builder
-        .claim("name", GARY_GOLFER.name())
-        .claim("sub", GARY_GOLFER.sub())
-        .claim("scope", scopeReadPermission(GlobalConstants.SCOPE_SCORECARD));
+  static JwtClaimApplier forGaryGolfer(String... scopes) {
+    return new JwtClaimApplierImpl(GARY_GOLFER.name(), GARY_GOLFER.sub(), scopes);
   }
 
-  static Jwt.Builder forGaryGolferWriteOnly(Jwt.Builder builder) {
-    return builder
-        .claim("name", GARY_GOLFER.name())
-        .claim("sub", GARY_GOLFER.sub())
-        .claim("scope", scopeWritePermission(GlobalConstants.SCOPE_SCORECARD));
+  static JwtClaimApplier forPatPutter(String... scopes) {
+    return new JwtClaimApplierImpl(PAT_PUTTER.name(), PAT_PUTTER.sub(), scopes);
   }
 
-  private static Jwt.Builder withDefaultScopes(Jwt.Builder builder) {
-    return builder.claim("scope", allPermissions(GlobalConstants.SCOPE_SCORECARD));
+  static JwtClaimApplier forDanaDriver(String... scopes) {
+    return new JwtClaimApplierImpl(DANA_DRIVER.name(), DANA_DRIVER.sub(), scopes);
   }
 
-  private static String allPermissions(String scope) {
-    return String.join(" ", scopeReadPermission(scope), scopeWritePermission(scope));
-  }
+  String SCOPE_READ_SCORECARD =
+      GlobalConstants.SCOPE_PERMISSION_READ + ":" + GlobalConstants.SCOPE_SCORECARD;
+  String SCOPE_WRITE_SCORECARD =
+      GlobalConstants.SCOPE_PERMISSION_WRITE + ":" + GlobalConstants.SCOPE_SCORECARD;
+  String SCOPE_READ_HANDICAP =
+      GlobalConstants.SCOPE_PERMISSION_READ + ":" + GlobalConstants.SCOPE_HANDICAP;
 
-  private static String scopeReadPermission(String scope) {
-    return GlobalConstants.SCOPE_PERMISSION_READ + ":" + scope;
-  }
-
-  private static String scopeWritePermission(String scope) {
-    return GlobalConstants.SCOPE_PERMISSION_WRITE + ":" + scope;
-  }
+  String[] DEFAULT_SCOPES = {SCOPE_READ_SCORECARD, SCOPE_WRITE_SCORECARD, SCOPE_READ_HANDICAP};
 }
