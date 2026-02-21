@@ -212,8 +212,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
             true);
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
-    createScorecard(
-        JwtPersona.forGaryGolfer(JwtPersona.SCOPE_WRITE_SCORECARD), requestBody, status().isCreated());
+    createScorecard(JwtPersona.forGaryGolfer(), requestBody, status().isCreated());
   }
 
   @Test

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.alimmit.golf.config.MethodSecurityConfiguration;
 import com.alimmit.golf.utils.JwtPersona;
 import java.time.Instant;
 import java.util.List;
@@ -17,12 +18,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
 @WebMvcTest(CourseController.class)
+@Import(MethodSecurityConfiguration.class)
 class CourseControllerTest extends AbstractCourseControllerTest {
 
   @MockitoBean private CourseService courseService;
@@ -46,7 +49,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
                     "Anytown",
                     USState.WISCONSIN)));
 
-    listCourses(JwtPersona.forGaryGolfer())
+    listCourses(JwtPersona.forAmyAdmin())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(1))
         .andExpectAll(
@@ -71,7 +74,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
                     "Anytown",
                     USState.WISCONSIN)));
 
-    getCourse(courseId, JwtPersona.forGaryGolfer())
+    getCourse(courseId, JwtPersona.forAmyAdmin())
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.club").value("Club 1"),
@@ -84,7 +87,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
   void getCourse_ExpectNotFound() throws Exception {
     UUID courseId = UUID.randomUUID();
     when(courseService.get(courseId)).thenReturn(Optional.empty());
-    getCourse(courseId, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
+    getCourse(courseId, JwtPersona.forAmyAdmin()).andExpect(status().isNotFound());
   }
 
   @Test
@@ -116,7 +119,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
         }
         """;
 
-    createCourse(requestBody, JwtPersona.forGaryGolfer())
+    createCourse(requestBody, JwtPersona.forAmyAdmin())
         .andExpect(status().isCreated())
         .andExpectAll(
             jsonPath("$.club").value("Acme Club"),
@@ -160,14 +163,14 @@ class CourseControllerTest extends AbstractCourseControllerTest {
           "state": "MI"
         }
         """;
-    patchCourse(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isOk());
+    patchCourse(courseId, requestBody, JwtPersona.forAmyAdmin()).andExpect(status().isOk());
   }
 
   @Test
   void deleteCourse_ExpectNoContent() throws Exception {
     UUID courseId = UUID.randomUUID();
     doNothing().when(courseService).delete(courseId);
-    deleteCourse(courseId, JwtPersona.forGaryGolfer()).andExpect(status().isNoContent());
+    deleteCourse(courseId, JwtPersona.forAmyAdmin()).andExpect(status().isNoContent());
   }
 
   @ParameterizedTest
@@ -183,7 +186,7 @@ class CourseControllerTest extends AbstractCourseControllerTest {
         "{\"club\": \"Acme Club\", \"course\": \"Acme Course\", \"city\": \"\", \"state\": \"WI\"}", // Blank city
       })
   void createCourse_ExpectBadRequest_MissingOrNullFields(String requestBody) throws Exception {
-    createCourse(requestBody, JwtPersona.forGaryGolfer())
+    createCourse(requestBody, JwtPersona.forAmyAdmin())
         .andExpect(status().isBadRequest())
         .andExpect(content().string(Matchers.matchesPattern("^Field cannot be (null|blank).*")));
   }
@@ -195,8 +198,56 @@ class CourseControllerTest extends AbstractCourseControllerTest {
         "{\"club\": \"Acme Club\", \"course\": \"Acme Course\", \"city\": \"New Town\", \"state\": \"\"}", // Blank state
       })
   void createCourse_ExpectBadRequest_UnsupportedState(String requestBody) throws Exception {
-    createCourse(requestBody, JwtPersona.forGaryGolfer())
+    createCourse(requestBody, JwtPersona.forAmyAdmin())
         .andExpect(status().isBadRequest())
         .andExpect(content().string(Matchers.matchesPattern("^Invalid state abbreviation:.*")));
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        JwtPersona.SCOPE_READ_SCORECARD,
+        JwtPersona.SCOPE_WRITE_SCORECARD,
+        JwtPersona.SCOPE_READ_HANDICAP,
+        "",
+      })
+  void listCoursesWithDisallowedScopes_ExpectForbidden(String scope) throws Exception {
+    listCourses(JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        JwtPersona.SCOPE_READ_SCORECARD,
+        JwtPersona.SCOPE_WRITE_SCORECARD,
+        JwtPersona.SCOPE_READ_HANDICAP,
+        "",
+      })
+  void getCourseWithDisallowedScopes_ExpectForbidden(String scope) throws Exception {
+    getCourse(UUID.randomUUID(), JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
+  }
+
+  @Test
+  void createCourseWithDefaultScopes_ExpectForbidden() throws Exception {
+    String requestBody =
+        """
+        {"club": "Acme Club", "course": "Acme Course", "city": "Someplace", "state": "MI"}
+        """;
+    createCourse(requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isForbidden());
+  }
+
+  @Test
+  void patchCourseWithDefaultScopes_ExpectForbidden() throws Exception {
+    String requestBody =
+        """
+        {"club": "Acme Club"}
+        """;
+    patchCourse(UUID.randomUUID(), requestBody, JwtPersona.forGaryGolfer())
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void deleteCourseWithDefaultScopes_ExpectForbidden() throws Exception {
+    deleteCourse(UUID.randomUUID(), JwtPersona.forGaryGolfer()).andExpect(status().isForbidden());
   }
 }
