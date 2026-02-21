@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import com.alimmit.golf.security.CanWrite;
+import com.alimmit.golf.security.CanRead;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,6 +51,7 @@ class ScorecardController {
                           @Schema(
                               implementation = ScorecardRequestDto.class,
                               contentMediaType = "application/json"))))
+  @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @PostMapping
   ScorecardDto create(@RequestBody @Valid ScorecardRequestDto request) {
     ScorecardDto created = scorecardService.create(request);
@@ -61,6 +64,7 @@ class ScorecardController {
       operationId = "scorecard.list",
       summary = "List your scorecards",
       description = "Get a list of your scorecards")
+  @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping
   List<ScorecardDto> list() {
     return scorecardService.listAll();
@@ -71,6 +75,7 @@ class ScorecardController {
       operationId = "scorecard.get",
       summary = "Get scorecard",
       description = "Get one of your scorecards")
+  @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   ScorecardDto get(@PathVariable UUID id) {
     return scorecardService.getById(id).orElseThrow(NotFoundException::new);
@@ -81,6 +86,7 @@ class ScorecardController {
       operationId = "scorecard.delete",
       summary = "Delete a scorecard",
       description = "Delete one of your scorecards")
+  @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   void delete(@PathVariable UUID id) {
