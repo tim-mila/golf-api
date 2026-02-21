@@ -1,6 +1,9 @@
 package com.alimmit.golf.course;
 
+import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.errors.NotFoundException;
+import com.alimmit.golf.security.CanRead;
+import com.alimmit.golf.security.CanWrite;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -41,6 +44,7 @@ class TeeController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       array = @ArraySchema(schema = @Schema(implementation = TeeDto.class)))))
+  @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping(path = TeeConstants.TEE_ENDPOINT)
   List<TeeDto> listByCourse(@PathVariable("id") UUID courseId) {
     return teeService.listByCourse(courseId);
@@ -59,6 +63,7 @@ class TeeController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = TeeDto.class))))
+  @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
   TeeDto get(@PathVariable("id") UUID teeId) {
     return teeService.get(teeId).orElseThrow(NotFoundException::new);
@@ -85,6 +90,7 @@ class TeeController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = TeeDto.class))))
+  @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.CREATED)
   @PostMapping(path = TeeConstants.TEE_ENDPOINT)
   TeeDto create(@PathVariable("id") UUID courseId, @Valid @RequestBody CreateTeeRequest request) {
@@ -103,6 +109,7 @@ class TeeController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = PatchTeeRequest.class))))
+  @CanWrite(GlobalConstants.SCOPE_COURSE)
   @PatchMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
   TeeDto patch(@Valid @RequestBody PatchTeeRequest request, @PathVariable("id") UUID teeId) {
     return teeService.patch(teeId, request).orElseThrow(NotFoundException::new);
@@ -115,6 +122,7 @@ class TeeController {
       description = "Delete a tee by identifier",
       parameters = {@Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)},
       responses = @ApiResponse(responseCode = "204"))
+  @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
   void delete(@PathVariable("id") UUID teeId) {

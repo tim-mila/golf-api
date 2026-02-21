@@ -2,6 +2,8 @@ package com.alimmit.golf.course;
 
 import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.errors.NotFoundException;
+import com.alimmit.golf.security.CanRead;
+import com.alimmit.golf.security.CanWrite;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -40,6 +42,7 @@ class CourseController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       array = @ArraySchema(schema = @Schema(implementation = CourseDto.class)))))
+  @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping
   List<CourseDto> list() {
     return courseService.list();
@@ -60,6 +63,7 @@ class CourseController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = CourseDto.class))))
+  @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   CourseDto get(@PathVariable("id") UUID courseId) {
     return courseService.get(courseId).orElseThrow(NotFoundException::new);
@@ -83,6 +87,7 @@ class CourseController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = CourseDto.class))))
+  @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.CREATED)
   @PostMapping
   CourseDto create(@Valid @RequestBody CreateCourseRequest request) {
@@ -100,12 +105,14 @@ class CourseController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = PatchCourseRequest.class))))
+  @CanWrite(GlobalConstants.SCOPE_COURSE)
   @PatchMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   CourseDto patch(
       @Valid @RequestBody PatchCourseRequest request, @PathVariable("id") UUID courseId) {
     return courseService.patch(courseId, request).orElseThrow(NotFoundException::new);
   }
 
+  @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   void delete(@PathVariable("id") UUID courseId) {
