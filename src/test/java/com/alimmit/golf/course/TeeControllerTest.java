@@ -4,6 +4,11 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.alimmit.golf.config.MethodSecurityConfiguration;
@@ -13,9 +18,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -177,6 +185,25 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         """;
 
     createTee(courseId, requestBody, JwtPersona.forAmyAdmin()).andExpect(status().isNotFound());
+  }
+
+  // --- Unauthenticated tests ---
+
+  @ParameterizedTest
+  @MethodSource
+  void unauthenticated_ExpectUnauthorized(MockHttpServletRequestBuilder request) throws Exception {
+    performWithoutAuth(request).andExpect(status().isUnauthorized());
+  }
+
+  static Stream<MockHttpServletRequestBuilder> unauthenticated_ExpectUnauthorized() {
+    UUID courseId = UUID.randomUUID();
+    UUID teeId = UUID.randomUUID();
+    return Stream.of(
+        get(TeeConstants.TEE_ENDPOINT, courseId),
+        get(TeeConstants.TEE_BY_ID_ENDPOINT, teeId),
+        post(TeeConstants.TEE_ENDPOINT, courseId).with(csrf()),
+        patch(TeeConstants.TEE_BY_ID_ENDPOINT, teeId).with(csrf()),
+        delete(TeeConstants.TEE_BY_ID_ENDPOINT, teeId).with(csrf()));
   }
 
   @ParameterizedTest

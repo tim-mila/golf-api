@@ -2,6 +2,10 @@ package com.alimmit.golf.scorecard;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -14,9 +18,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -221,6 +228,25 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     when(scorecardService.deleteById(scorecardId)).thenReturn(1);
     deleteScorecard(JwtPersona.forGaryGolfer(JwtPersona.SCOPE_WRITE_SCORECARD), scorecardId)
         .andExpect(status().isNoContent());
+  }
+
+  // --- Validation tests ---
+
+  // --- Unauthenticated tests ---
+
+  @ParameterizedTest
+  @MethodSource
+  void unauthenticated_ExpectUnauthorized(MockHttpServletRequestBuilder request) throws Exception {
+    performWithoutAuth(request).andExpect(status().isUnauthorized());
+  }
+
+  static Stream<MockHttpServletRequestBuilder> unauthenticated_ExpectUnauthorized() {
+    UUID id = UUID.randomUUID();
+    return Stream.of(
+        post(ScorecardConstants.SCORECARD_ENDPOINT).with(csrf()),
+        get(ScorecardConstants.SCORECARD_ENDPOINT),
+        get(ScorecardConstants.SCORECARD_ENDPOINT + "/{id}", id),
+        delete(ScorecardConstants.SCORECARD_ENDPOINT + "/{id}", id).with(csrf()));
   }
 
   // --- Validation tests ---

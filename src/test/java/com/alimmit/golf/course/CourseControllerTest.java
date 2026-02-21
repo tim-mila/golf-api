@@ -4,6 +4,11 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.alimmit.golf.config.MethodSecurityConfiguration;
@@ -12,10 +17,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -171,6 +179,24 @@ class CourseControllerTest extends AbstractCourseControllerTest {
     UUID courseId = UUID.randomUUID();
     doNothing().when(courseService).delete(courseId);
     deleteCourse(courseId, JwtPersona.forAmyAdmin()).andExpect(status().isNoContent());
+  }
+
+  // --- Unauthenticated tests ---
+
+  @ParameterizedTest
+  @MethodSource
+  void unauthenticated_ExpectUnauthorized(MockHttpServletRequestBuilder request) throws Exception {
+    performWithoutAuth(request).andExpect(status().isUnauthorized());
+  }
+
+  static Stream<MockHttpServletRequestBuilder> unauthenticated_ExpectUnauthorized() {
+    UUID id = UUID.randomUUID();
+    return Stream.of(
+        get(CourseConstants.COURSE_ENDPOINT),
+        get(CourseConstants.COURSE_ENDPOINT + "/{id}", id),
+        post(CourseConstants.COURSE_ENDPOINT).with(csrf()),
+        patch(CourseConstants.COURSE_ENDPOINT + "/{id}", id).with(csrf()),
+        delete(CourseConstants.COURSE_ENDPOINT + "/{id}", id).with(csrf()));
   }
 
   @ParameterizedTest
