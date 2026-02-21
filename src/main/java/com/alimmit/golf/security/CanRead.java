@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('SCOPE_{value}:read')")
+@PreAuthorize("hasAuthority('SCOPE_read:{value}')")
 public @interface CanRead {
   String value();
 }

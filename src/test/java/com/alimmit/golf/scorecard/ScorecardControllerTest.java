@@ -211,17 +211,17 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
             true);
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
-    createScorecard(JwtPersona::forGaryGolferManageOnly, requestBody, status().isOk());
+    createScorecard(JwtPersona::forGaryGolferWriteOnly, requestBody, status().isOk());
   }
 
   @Test
   void listScorecardsForbiddenWithManageOnlyScope() throws Exception {
-    listScorecards(JwtPersona::forGaryGolferManageOnly).andExpect(status().isForbidden());
+    listScorecards(JwtPersona::forGaryGolferWriteOnly).andExpect(status().isForbidden());
   }
 
   @Test
   void getScorecardForbiddenWithManageOnlyScope() throws Exception {
-    getScorecard(JwtPersona::forGaryGolferManageOnly, UUID.randomUUID())
+    getScorecard(JwtPersona::forGaryGolferWriteOnly, UUID.randomUUID())
         .andExpect(status().isForbidden());
   }
 
@@ -229,7 +229,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
   void deleteScorecardAllowedWithManageOnlyScope() throws Exception {
     UUID scorecardId = UUID.randomUUID();
     when(scorecardService.deleteById(scorecardId)).thenReturn(1);
-    deleteScorecard(JwtPersona::forGaryGolferManageOnly, scorecardId)
+    deleteScorecard(JwtPersona::forGaryGolferWriteOnly, scorecardId)
         .andExpect(status().isNoContent());
   }
 

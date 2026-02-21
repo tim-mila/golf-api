@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('SCOPE_{value}:manage')")
-public @interface CanManage {
+@PreAuthorize("hasAuthority('SCOPE_write:{value}')")
+public @interface CanWrite {
   String value();
 }

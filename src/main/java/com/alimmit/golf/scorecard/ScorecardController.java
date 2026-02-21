@@ -12,7 +12,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
-import com.alimmit.golf.security.CanManage;
+import com.alimmit.golf.security.CanWrite;
 import com.alimmit.golf.security.CanRead;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,7 +51,7 @@ class ScorecardController {
                           @Schema(
                               implementation = ScorecardRequestDto.class,
                               contentMediaType = "application/json"))))
-  @CanManage(GlobalConstants.SCOPE_SCORECARD)
+  @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @PostMapping
   ScorecardDto create(@RequestBody @Valid ScorecardRequestDto request) {
     ScorecardDto created = scorecardService.create(request);
@@ -86,7 +86,7 @@ class ScorecardController {
       operationId = "scorecard.delete",
       summary = "Delete a scorecard",
       description = "Delete one of your scorecards")
-  @CanManage(GlobalConstants.SCOPE_SCORECARD)
+  @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   void delete(@PathVariable UUID id) {

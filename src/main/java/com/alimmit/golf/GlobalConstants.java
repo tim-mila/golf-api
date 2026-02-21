@@ -12,7 +12,7 @@ public final class GlobalConstants {
 
   public static final String SCOPE_PERMISSION_READ = "read";
 
-  public static final String SCOPE_PERMISSION_MANAGE = "manage";
+  public static final String SCOPE_PERMISSION_WRITE = "write";
 
   public static final String SCOPE_SCORECARD = "scorecard";
 }

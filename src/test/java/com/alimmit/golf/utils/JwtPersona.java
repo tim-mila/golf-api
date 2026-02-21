@@ -33,11 +33,11 @@ public interface JwtPersona {
         .claim("scope", scopeReadPermission(GlobalConstants.SCOPE_SCORECARD));
   }
 
-  static Jwt.Builder forGaryGolferManageOnly(Jwt.Builder builder) {
+  static Jwt.Builder forGaryGolferWriteOnly(Jwt.Builder builder) {
     return builder
         .claim("name", GARY_GOLFER.name())
         .claim("sub", GARY_GOLFER.sub())
-        .claim("scope", scopeManagePermission(GlobalConstants.SCOPE_SCORECARD));
+        .claim("scope", scopeWritePermission(GlobalConstants.SCOPE_SCORECARD));
   }
 
   private static Jwt.Builder withDefaultScopes(Jwt.Builder builder) {
@@ -45,14 +45,14 @@ public interface JwtPersona {
   }
 
   private static String allPermissions(String scope) {
-    return String.join(" ", scopeReadPermission(scope), scopeManagePermission(scope));
+    return String.join(" ", scopeReadPermission(scope), scopeWritePermission(scope));
   }
 
   private static String scopeReadPermission(String scope) {
-    return scope + ":" + GlobalConstants.SCOPE_PERMISSION_READ;
+    return GlobalConstants.SCOPE_PERMISSION_READ + ":" + scope;
   }
 
-  private static String scopeManagePermission(String scope) {
-    return scope + ":" + GlobalConstants.SCOPE_PERMISSION_MANAGE;
+  private static String scopeWritePermission(String scope) {
+    return GlobalConstants.SCOPE_PERMISSION_WRITE + ":" + scope;
   }
 }
