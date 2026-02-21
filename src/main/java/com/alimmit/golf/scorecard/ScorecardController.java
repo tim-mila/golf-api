@@ -51,7 +51,7 @@ class ScorecardController {
                           @Schema(
                               implementation = ScorecardRequestDto.class,
                               contentMediaType = "application/json"))))
-  @CanManage("scorecard")
+  @CanManage(GlobalConstants.SCOPE_SCORECARD)
   @PostMapping
   ScorecardDto create(@RequestBody @Valid ScorecardRequestDto request) {
     ScorecardDto created = scorecardService.create(request);
@@ -64,7 +64,7 @@ class ScorecardController {
       operationId = "scorecard.list",
       summary = "List your scorecards",
       description = "Get a list of your scorecards")
-  @CanRead("scorecard")
+  @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping
   List<ScorecardDto> list() {
     return scorecardService.listAll();
@@ -75,7 +75,7 @@ class ScorecardController {
       operationId = "scorecard.get",
       summary = "Get scorecard",
       description = "Get one of your scorecards")
-  @CanRead("scorecard")
+  @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   ScorecardDto get(@PathVariable UUID id) {
     return scorecardService.getById(id).orElseThrow(NotFoundException::new);
@@ -86,7 +86,7 @@ class ScorecardController {
       operationId = "scorecard.delete",
       summary = "Delete a scorecard",
       description = "Delete one of your scorecards")
-  @CanManage("scorecard")
+  @CanManage(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   void delete(@PathVariable UUID id) {

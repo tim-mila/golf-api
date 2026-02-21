@@ -1,5 +1,6 @@
 package com.alimmit.golf.utils;
 
+import com.alimmit.golf.GlobalConstants;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 /** Build some standard personas to use in MockMvc tests */
@@ -29,17 +30,29 @@ public interface JwtPersona {
     return builder
         .claim("name", GARY_GOLFER.name())
         .claim("sub", GARY_GOLFER.sub())
-        .claim("scope", "scorecard:read");
+        .claim("scope", scopeReadPermission(GlobalConstants.SCOPE_SCORECARD));
   }
 
   static Jwt.Builder forGaryGolferManageOnly(Jwt.Builder builder) {
     return builder
         .claim("name", GARY_GOLFER.name())
         .claim("sub", GARY_GOLFER.sub())
-        .claim("scope", "scorecard:manage");
+        .claim("scope", scopeManagePermission(GlobalConstants.SCOPE_SCORECARD));
   }
 
   private static Jwt.Builder withDefaultScopes(Jwt.Builder builder) {
-    return builder.claim("scope", "scorecard:read scorecard:manage");
+    return builder.claim("scope", allPermissions(GlobalConstants.SCOPE_SCORECARD));
+  }
+
+  private static String allPermissions(String scope) {
+    return String.join(" ", scopeReadPermission(scope), scopeManagePermission(scope));
+  }
+
+  private static String scopeReadPermission(String scope) {
+    return scope + ":" + GlobalConstants.SCOPE_PERMISSION_READ;
+  }
+
+  private static String scopeManagePermission(String scope) {
+    return scope + ":" + GlobalConstants.SCOPE_PERMISSION_MANAGE;
   }
 }

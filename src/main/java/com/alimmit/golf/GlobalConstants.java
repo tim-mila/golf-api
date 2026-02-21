@@ -9,4 +9,10 @@ public final class GlobalConstants {
   public static final String API_RECORD_SUFFIX = "/{id}";
 
   public static final String API_HISTORY_SUFFIX = "/history";
+
+  public static final String SCOPE_PERMISSION_READ = "read";
+
+  public static final String SCOPE_PERMISSION_MANAGE = "manage";
+
+  public static final String SCOPE_SCORECARD = "scorecard";
 }
