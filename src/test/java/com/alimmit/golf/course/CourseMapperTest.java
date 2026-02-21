@@ -34,7 +34,9 @@ class CourseMapperTest {
     CourseDto result = courseMapper.map(entity);
 
     assertThat(result)
-        .isEqualTo(new CourseDto(courseId, createdAt, null, "Test Club", "Test Course", "Test City", USState.OHIO));
+        .isEqualTo(
+            new CourseDto(
+                courseId, createdAt, null, "Test Club", "Test Course", "Test City", USState.OHIO));
   }
 
   @Test
@@ -53,7 +55,12 @@ class CourseMapperTest {
         .isPresent()
         .contains(
             new CourseDto(
-                courseId, createdAt, null, "Test Club", "Test Course", "Test City",
+                courseId,
+                createdAt,
+                null,
+                "Test Club",
+                "Test Course",
+                "Test City",
                 USState.WISCONSIN));
   }
 

@@ -1,5 +1,8 @@
 package com.alimmit.golf;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+
+import com.alimmit.golf.utils.JwtClaimApplier;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -14,7 +17,8 @@ public abstract class AbstractControllerMockMvc {
   }
 
   protected ResultActions performMockMvc(
-      MockHttpServletRequestBuilder builder, ResultMatcher... resultMatchers) throws Exception {
-    return mockMvc.perform(builder).andExpectAll(resultMatchers);
+      JwtClaimApplier fn, MockHttpServletRequestBuilder builder, ResultMatcher... resultMatchers)
+      throws Exception {
+    return mockMvc.perform(builder.with(jwt().jwt(fn::apply))).andExpectAll(resultMatchers);
   }
 }

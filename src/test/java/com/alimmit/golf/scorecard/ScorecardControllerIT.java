@@ -5,10 +5,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.alimmit.golf.courses.client.GolfCourseApiClient;
+import com.alimmit.golf.utils.JwtClaimApplier;
 import com.alimmit.golf.utils.JwtPersona;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
-import java.util.function.Function;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
@@ -48,7 +47,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
   @Test
   void addScorecard() throws Exception {
-    createAndAssertScorecard(JwtPersona::forGaryGolfer);
+    createAndAssertScorecard(JwtPersona.forGaryGolfer());
 
     Mockito.verify(scorecardEventPublisher, Mockito.times(1))
         .publishCreated(Mockito.any(ScorecardDto.class));
@@ -58,14 +57,14 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
   void canOnlyListMyScorecards() throws Exception {
 
     // Create scorecard for Gary Golfer
-    createAndAssertScorecard(JwtPersona::forGaryGolfer);
+    createAndAssertScorecard(JwtPersona.forGaryGolfer());
 
     // Fetch scorecards for Gary Golfer and expect one result
-    listScorecards(JwtPersona::forGaryGolfer, status().isOk())
+    listScorecards(JwtPersona.forGaryGolfer(), status().isOk())
         .andExpectAll(jsonPath("$.length()").value(1));
 
     // Fetch scorecards for Pat Putter and expect empty result
-    listScorecards(JwtPersona::forPatPutter, status().isOk())
+    listScorecards(JwtPersona.forPatPutter(), status().isOk())
         .andExpectAll(jsonPath("$.length()").value(0));
   }
 
@@ -73,7 +72,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
   void canOnlyFetchMyScorecards() throws Exception {
     // Create scorecard for Gary Golfer and get response body to parse scorecardId
     String responseBody =
-        createAndAssertScorecard(JwtPersona::forGaryGolfer)
+        createAndAssertScorecard(JwtPersona.forGaryGolfer())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -83,17 +82,17 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
     assertThat(scorecardId).isNotNull();
 
     // Fetch scorecards for Gary Golfer and expect ok
-    getScorecard(JwtPersona::forGaryGolfer, scorecardId, status().isOk());
+    getScorecard(JwtPersona.forGaryGolfer(), scorecardId, status().isOk());
 
     // Fetch scorecards for Pat Putter and expect not found
-    getScorecard(JwtPersona::forPatPutter, scorecardId, status().isNotFound());
+    getScorecard(JwtPersona.forPatPutter(), scorecardId, status().isNotFound());
   }
 
   @Test
   void canOnlyDeleteMyScorecards() throws Exception {
     // Create scorecard for Gary Golfer
     String responseBody =
-        createAndAssertScorecard(JwtPersona::forGaryGolfer)
+        createAndAssertScorecard(JwtPersona.forGaryGolfer())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -103,21 +102,21 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
     assertThat(scorecardId).isNotNull();
 
     // Delete scorecards as Pat Putter and expect not found
-    deleteScorecard(JwtPersona::forPatPutter, scorecardId, status().isNotFound());
+    deleteScorecard(JwtPersona.forPatPutter(), scorecardId, status().isNotFound());
 
     // Delete scorecard as Gary Golfer and expect ok
-    deleteScorecard(JwtPersona::forGaryGolfer, scorecardId, status().isNoContent());
+    deleteScorecard(JwtPersona.forGaryGolfer(), scorecardId, status().isNoContent());
 
     // Delete scorecard as Gary Golfer again and expect not found
-    deleteScorecard(JwtPersona::forGaryGolfer, scorecardId, status().isNotFound());
+    deleteScorecard(JwtPersona.forGaryGolfer(), scorecardId, status().isNotFound());
   }
 
-  private ResultActions createAndAssertScorecard(Function<Jwt.Builder, Jwt.Builder> fn)
-      throws Exception {
-    return createScorecard(fn, REQUEST_BODY, status().isOk())
+  private ResultActions createAndAssertScorecard(JwtClaimApplier fn) throws Exception {
+    return createScorecard(fn, REQUEST_BODY, status().isCreated())
         .andExpectAll(
             jsonPath("$.scorecardId")
-                .value(MatchesPattern.matchesPattern("^(scr-)[a-zA-Z0-9]{32}$")),
+                .value(
+                    MatchesPattern.matchesPattern("[0-9]{8}-[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{12}")),
             jsonPath("$.courseName").value("Test Course"),
             jsonPath("$.teeName").value("Blue"),
             jsonPath("$.score").value(88),

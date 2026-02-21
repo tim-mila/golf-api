@@ -121,11 +121,9 @@ class TeeRepositoryTest {
   @Transactional(propagation = Propagation.NEVER)
   void findByCourseId() {
     CourseEntity course1 =
-        courseRepository.save(
-            new CourseEntity("Club A", "Course A", "City A", USState.WISCONSIN));
+        courseRepository.save(new CourseEntity("Club A", "Course A", "City A", USState.WISCONSIN));
     CourseEntity course2 =
-        courseRepository.save(
-            new CourseEntity("Club B", "Course B", "City B", USState.OHIO));
+        courseRepository.save(new CourseEntity("Club B", "Course B", "City B", USState.OHIO));
 
     TeeEntity tee1 =
         teeRepository.save(
@@ -136,8 +134,7 @@ class TeeRepositoryTest {
             new TeeEntity(
                 course1, "White", 72, 6100, new BigDecimal("125.0"), new BigDecimal("69.5")));
     teeRepository.save(
-        new TeeEntity(
-            course2, "Red", 72, 5200, new BigDecimal("118.0"), new BigDecimal("66.0")));
+        new TeeEntity(course2, "Red", 72, 5200, new BigDecimal("118.0"), new BigDecimal("66.0")));
 
     List<TeeEntity> course1Tees = teeRepository.findByCourse_CourseId(course1.getCourseId());
 
@@ -148,10 +145,7 @@ class TeeRepositoryTest {
 
     List<TeeEntity> course2Tees = teeRepository.findByCourse_CourseId(course2.getCourseId());
 
-    assertThat(course2Tees)
-        .hasSize(1)
-        .extracting(TeeEntity::getName)
-        .containsExactly("Red");
+    assertThat(course2Tees).hasSize(1).extracting(TeeEntity::getName).containsExactly("Red");
   }
 
   @Test

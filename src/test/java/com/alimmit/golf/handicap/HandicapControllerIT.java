@@ -29,12 +29,13 @@ class HandicapControllerIT extends AbstractHandicapControllerMockMvc {
 
   @Test
   void testGetHandicap() throws Exception {
-    getMyHandicap(JwtPersona::forGaryGolfer)
+    getMyHandicap(JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.handicapId")
                 .value(
-                    MatchesPattern.matchesPattern("[0-9]{8}-[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{12}")),
+                    MatchesPattern.matchesPattern(
+                        "[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}")),
             jsonPath("$.golferId").value(JwtPersona.GARY_GOLFER.sub()),
             jsonPath("$.handicapIndex").value(6.1),
             jsonPath("$.roundsUsed").value(4),
@@ -44,6 +45,6 @@ class HandicapControllerIT extends AbstractHandicapControllerMockMvc {
 
   @Test
   void testGetHandicap_ExpectMissing() throws Exception {
-    getMyHandicap(JwtPersona::forPatPutter).andExpect(status().isNotFound());
+    getMyHandicap(JwtPersona.forPatPutter()).andExpect(status().isNotFound());
   }
 }

@@ -4,6 +4,8 @@ import static com.alimmit.golf.scorecard.ScorecardConstants.SCORECARD_ENDPOINT;
 
 import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.errors.NotFoundException;
+import com.alimmit.golf.security.CanRead;
+import com.alimmit.golf.security.CanWrite;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,8 +14,6 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
-import com.alimmit.golf.security.CanWrite;
-import com.alimmit.golf.security.CanRead;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,6 +52,7 @@ class ScorecardController {
                               implementation = ScorecardRequestDto.class,
                               contentMediaType = "application/json"))))
   @CanWrite(GlobalConstants.SCOPE_SCORECARD)
+  @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   ScorecardDto create(@RequestBody @Valid ScorecardRequestDto request) {
     ScorecardDto created = scorecardService.create(request);

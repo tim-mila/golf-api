@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -50,7 +52,7 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
                     10.2,
                     8,
                     20)));
-    super.getMyHandicap(JwtPersona::forGaryGolfer)
+    super.getMyHandicap(JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("handicapId").value("10000000-0000-0000-0000-000000000000"),
@@ -64,7 +66,7 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
   @Test
   void getMyHandicap_ExpectMissing() throws Exception {
     when(handicapService.getHandicap()).thenReturn(Optional.empty());
-    super.getMyHandicap(JwtPersona::forGaryGolfer).andExpect(status().isNotFound());
+    super.getMyHandicap(JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
   @Test
@@ -85,20 +87,30 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
                     RevisionMetadata.RevisionType.INSERT,
                     Instant.now())));
 
-    super.getMyHandicapHistory(JwtPersona::forGaryGolfer).andExpect(status().isOk());
+    super.getMyHandicapHistory(JwtPersona.forGaryGolfer()).andExpect(status().isOk());
   }
 
   // --- Authorization tests ---
 
-  @Test
-  void getHandicapForbiddenWithoutHandicapScope() throws Exception {
-    super.getMyHandicap(JwtPersona::forGaryGolferNoHandicapScope)
-        .andExpect(status().isForbidden());
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        JwtPersona.SCOPE_READ_SCORECARD,
+        JwtPersona.SCOPE_WRITE_SCORECARD,
+        "",
+      })
+  void getHandicapWithDisallowedScopes_ExpectForbidden(String scope) throws Exception {
+    super.getMyHandicap(JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
   }
 
-  @Test
-  void getHandicapHistoryForbiddenWithoutHandicapScope() throws Exception {
-    super.getMyHandicapHistory(JwtPersona::forGaryGolferNoHandicapScope)
-        .andExpect(status().isForbidden());
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        JwtPersona.SCOPE_READ_SCORECARD,
+        JwtPersona.SCOPE_WRITE_SCORECARD,
+        "",
+      })
+  void getHandicapHistoryWithDisallowedScopes_ExpectForbidden(String scope) throws Exception {
+    super.getMyHandicapHistory(JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
   }
 }

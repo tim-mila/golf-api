@@ -85,7 +85,8 @@ class JpaTeeServiceImplIT {
     Optional<TeeDto> created =
         teeService.create(
             course.courseId(),
-            new CreateTeeRequest("Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new CreateTeeRequest(
+                "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
     assertThat(created)
         .isPresent()
@@ -111,7 +112,8 @@ class JpaTeeServiceImplIT {
     Optional<TeeDto> result =
         teeService.create(
             UUID.randomUUID(),
-            new CreateTeeRequest("Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new CreateTeeRequest(
+                "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
     assertThat(result).isEmpty();
   }
@@ -175,10 +177,7 @@ class JpaTeeServiceImplIT {
 
     List<TeeDto> tees = teeService.listByCourse(course.courseId());
 
-    assertThat(tees)
-        .hasSize(2)
-        .extracting(TeeDto::name)
-        .containsExactlyInAnyOrder("Blue", "White");
+    assertThat(tees).hasSize(2).extracting(TeeDto::name).containsExactlyInAnyOrder("Blue", "White");
   }
 
   @Test

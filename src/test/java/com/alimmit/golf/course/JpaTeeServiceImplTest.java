@@ -119,7 +119,11 @@ class JpaTeeServiceImplTest {
 
     PatchTeeRequest request =
         new PatchTeeRequest(
-            Optional.of("White"), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.of("White"),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
 
     when(teeRepository.findById(teeId)).thenReturn(Optional.of(entity));
     when(teeRepository.save(entity)).thenReturn(savedEntity);
@@ -135,7 +139,11 @@ class JpaTeeServiceImplTest {
     UUID teeId = UUID.randomUUID();
     PatchTeeRequest request =
         new PatchTeeRequest(
-            Optional.of("White"), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+            Optional.of("White"),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty(),
+            Optional.empty());
 
     when(teeRepository.findById(teeId)).thenReturn(Optional.empty());
 

@@ -8,7 +8,12 @@ class TeeMapper {
 
   TeeEntity map(CourseEntity course, CreateTeeRequest request) {
     return new TeeEntity(
-        course, request.name(), request.par(), request.yardage(), request.slope(), request.rating());
+        course,
+        request.name(),
+        request.par(),
+        request.yardage(),
+        request.slope(),
+        request.rating());
   }
 
   Optional<TeeDto> map(Optional<TeeEntity> entity) {

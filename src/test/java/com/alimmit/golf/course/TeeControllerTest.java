@@ -59,7 +59,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     new BigDecimal("125.0"),
                     new BigDecimal("69.5"))));
 
-    listTeesByCourse(courseId, JwtPersona::forGaryGolfer)
+    listTeesByCourse(courseId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(2))
         .andExpectAll(
@@ -78,7 +78,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
     UUID courseId = UUID.randomUUID();
     when(teeService.listByCourse(courseId)).thenReturn(List.of());
 
-    listTeesByCourse(courseId, JwtPersona::forGaryGolfer)
+    listTeesByCourse(courseId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(0));
   }
@@ -101,7 +101,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     new BigDecimal("131.0"),
                     new BigDecimal("71.2"))));
 
-    getTee(teeId, JwtPersona::forGaryGolfer)
+    getTee(teeId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.teeId").value(teeId.toString()),
@@ -117,7 +117,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
     UUID teeId = UUID.randomUUID();
     when(teeService.get(teeId)).thenReturn(Optional.empty());
 
-    getTee(teeId, JwtPersona::forGaryGolfer).andExpect(status().isNotFound());
+    getTee(teeId, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
   @Test
@@ -149,7 +149,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
-    createTee(courseId, requestBody, JwtPersona::forGaryGolfer)
+    createTee(courseId, requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isCreated())
         .andExpectAll(
             jsonPath("$.name").value("Blue"),
@@ -173,7 +173,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
-    createTee(courseId, requestBody, JwtPersona::forGaryGolfer).andExpect(status().isNotFound());
+    createTee(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
   @ParameterizedTest
@@ -187,7 +187,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         "{\"name\": \"Blue\", \"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
       })
   void createTee_ExpectBadRequest(String requestBody) throws Exception {
-    createTee(UUID.randomUUID(), requestBody, JwtPersona::forGaryGolfer)
+    createTee(UUID.randomUUID(), requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isBadRequest());
   }
 
@@ -195,9 +195,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
   void patchTee_ExpectOk() throws Exception {
     UUID teeId = UUID.randomUUID();
     UUID courseId = UUID.randomUUID();
-    when(teeService.patch(
-            eq(teeId),
-            argThat(m -> m.name().orElseThrow().equals("White"))))
+    when(teeService.patch(eq(teeId), argThat(m -> m.name().orElseThrow().equals("White"))))
         .thenReturn(
             Optional.of(
                 new TeeDto(
@@ -216,7 +214,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         {"name": "White", "par": 72, "yardage": 6100, "slope": 125.0, "rating": 69.5}
         """;
 
-    patchTee(teeId, requestBody, JwtPersona::forGaryGolfer)
+    patchTee(teeId, requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.name").value("White"),
@@ -231,17 +229,18 @@ class TeeControllerTest extends AbstractTeeControllerTest {
     when(teeService.patch(eq(teeId), argThat(m -> m.name().orElseThrow().equals("White"))))
         .thenReturn(Optional.empty());
 
-    String requestBody = """
+    String requestBody =
+        """
         {"name": "White"}
         """;
 
-    patchTee(teeId, requestBody, JwtPersona::forGaryGolfer).andExpect(status().isNotFound());
+    patchTee(teeId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
   @Test
   void deleteTee_ExpectNoContent() throws Exception {
     UUID teeId = UUID.randomUUID();
     doNothing().when(teeService).delete(teeId);
-    deleteTee(teeId, JwtPersona::forGaryGolfer).andExpect(status().isNoContent());
+    deleteTee(teeId, JwtPersona.forGaryGolfer()).andExpect(status().isNoContent());
   }
 }

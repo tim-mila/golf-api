@@ -63,7 +63,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
-    createScorecard(JwtPersona::forGaryGolfer, requestBody, status().isOk())
+    createScorecard(JwtPersona.forGaryGolfer(), requestBody, status().isCreated())
         .andExpectAll(
             jsonPath("$.scorecardId").value(scorecardId.toString()),
             jsonPath("$.courseName").value("Test Course"),
@@ -99,7 +99,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
     when(scorecardService.listAll()).thenReturn(List.of(mockDto));
 
-    listScorecards(JwtPersona::forGaryGolfer, status().isOk())
+    listScorecards(JwtPersona.forGaryGolfer(), status().isOk())
         .andExpectAll(
             jsonPath("$.length()").value(1),
             jsonPath("$[0].scorecardId").value(mockDto.scorecardId().toString()));
@@ -127,7 +127,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
     when(scorecardService.getById(scorecardId)).thenReturn(Optional.of(mockDto));
 
-    getScorecard(JwtPersona::forGaryGolfer, scorecardId, status().isOk())
+    getScorecard(JwtPersona.forGaryGolfer(), scorecardId, status().isOk())
         .andExpectAll(jsonPath("$.scorecardId").value(scorecardId.toString()));
   }
 
@@ -137,7 +137,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
     when(scorecardService.getById(scorecardId)).thenThrow(new NotFoundException());
 
-    getScorecard(JwtPersona::forGaryGolfer, scorecardId).andExpect(status().isNotFound());
+    getScorecard(JwtPersona.forGaryGolfer(), scorecardId).andExpect(status().isNotFound());
   }
 
   @Test
@@ -147,7 +147,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     // doNothing() is default for void methods, so no need to mock success case
     when(scorecardService.deleteById(scorecardId)).thenReturn(1);
 
-    deleteScorecard(JwtPersona::forGaryGolfer, scorecardId).andExpect(status().isNoContent());
+    deleteScorecard(JwtPersona.forGaryGolfer(), scorecardId).andExpect(status().isNoContent());
   }
 
   @Test
@@ -156,41 +156,42 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
     when(scorecardService.deleteById(scorecardId)).thenReturn(0);
 
-    deleteScorecard(JwtPersona::forGaryGolfer, scorecardId).andExpect(status().isNotFound());
+    deleteScorecard(JwtPersona.forGaryGolfer(), scorecardId).andExpect(status().isNotFound());
   }
 
   // --- Authorization tests ---
 
-  @Test
-  void createScorecardForbiddenWithReadOnlyScope() throws Exception {
+  @ParameterizedTest
+  @ValueSource(strings = {JwtPersona.SCOPE_READ_SCORECARD, JwtPersona.SCOPE_READ_HANDICAP, ""})
+  void createScorecardWithDisallowedScope_ExpectForbidden(String scope) throws Exception {
     String requestBody =
         "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}";
-    createScorecard(JwtPersona::forGaryGolferReadOnly, requestBody)
-        .andExpect(status().isForbidden());
+    createScorecard(JwtPersona.forGaryGolfer(scope), requestBody).andExpect(status().isForbidden());
   }
 
-  @Test
-  void listScorecardsAllowedWithReadOnlyScope() throws Exception {
+  @ParameterizedTest
+  @ValueSource(strings = {JwtPersona.SCOPE_WRITE_SCORECARD, JwtPersona.SCOPE_READ_HANDICAP, ""})
+  void listScorecardsWithDisallowedScope_ExpectForbidden(String scope) throws Exception {
     when(scorecardService.listAll()).thenReturn(List.of());
-    listScorecards(JwtPersona::forGaryGolferReadOnly, status().isOk());
+    listScorecards(JwtPersona.forGaryGolfer(scope), status().isForbidden());
   }
 
-  @Test
-  void getScorecardAllowedWithReadOnlyScope() throws Exception {
-    UUID scorecardId = UUID.randomUUID();
-    when(scorecardService.getById(scorecardId)).thenReturn(Optional.empty());
-    getScorecard(JwtPersona::forGaryGolferReadOnly, scorecardId)
-        .andExpect(status().isNotFound());
+  @ParameterizedTest
+  @ValueSource(strings = {JwtPersona.SCOPE_WRITE_SCORECARD, JwtPersona.SCOPE_READ_HANDICAP, ""})
+  void getScorecardWithDisallowedScope_ExpectForbidden(String scope) throws Exception {
+    getScorecard(JwtPersona.forGaryGolfer(scope), UUID.randomUUID())
+        .andExpect(status().isForbidden());
   }
 
-  @Test
-  void deleteScorecardForbiddenWithReadOnlyScope() throws Exception {
-    deleteScorecard(JwtPersona::forGaryGolferReadOnly, UUID.randomUUID())
+  @ParameterizedTest
+  @ValueSource(strings = {JwtPersona.SCOPE_READ_SCORECARD, JwtPersona.SCOPE_READ_HANDICAP, ""})
+  void deleteScorecardWithDisallowedScope_ExpectForbidden(String scope) throws Exception {
+    deleteScorecard(JwtPersona.forGaryGolfer(scope), UUID.randomUUID())
         .andExpect(status().isForbidden());
   }
 
   @Test
-  void createScorecardAllowedWithManageOnlyScope() throws Exception {
+  void createScorecardWithAllowedScope_ExpectCreated() throws Exception {
     String requestBody =
         "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}";
     UUID scorecardId = UUID.randomUUID();
@@ -211,25 +212,15 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
             true);
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
-    createScorecard(JwtPersona::forGaryGolferWriteOnly, requestBody, status().isOk());
+    createScorecard(
+        JwtPersona.forGaryGolfer(JwtPersona.SCOPE_WRITE_SCORECARD), requestBody, status().isCreated());
   }
 
   @Test
-  void listScorecardsForbiddenWithManageOnlyScope() throws Exception {
-    listScorecards(JwtPersona::forGaryGolferWriteOnly).andExpect(status().isForbidden());
-  }
-
-  @Test
-  void getScorecardForbiddenWithManageOnlyScope() throws Exception {
-    getScorecard(JwtPersona::forGaryGolferWriteOnly, UUID.randomUUID())
-        .andExpect(status().isForbidden());
-  }
-
-  @Test
-  void deleteScorecardAllowedWithManageOnlyScope() throws Exception {
+  void deleteScorecardWithAllowedScope_ExpectNoContent() throws Exception {
     UUID scorecardId = UUID.randomUUID();
     when(scorecardService.deleteById(scorecardId)).thenReturn(1);
-    deleteScorecard(JwtPersona::forGaryGolferWriteOnly, scorecardId)
+    deleteScorecard(JwtPersona.forGaryGolfer(JwtPersona.SCOPE_WRITE_SCORECARD), scorecardId)
         .andExpect(status().isNoContent());
   }
 
@@ -250,6 +241,6 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 61.9, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}" // Rating below range
       })
   void createAndExpectBadRequest(String requestBody) throws Exception {
-    createScorecard(JwtPersona::forGaryGolfer, requestBody).andExpect(status().isBadRequest());
+    createScorecard(JwtPersona.forGaryGolfer(), requestBody).andExpect(status().isBadRequest());
   }
 }
