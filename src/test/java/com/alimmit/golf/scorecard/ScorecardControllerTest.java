@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.alimmit.golf.config.MethodSecurityConfiguration;
-import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import com.alimmit.golf.errors.NotFoundException;
 import com.alimmit.golf.utils.JwtPersona;
 import java.time.Instant;
@@ -35,8 +34,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @WebMvcTest(ScorecardController.class)
 @Import(MethodSecurityConfiguration.class)
 class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
-
-  @MockitoBean private GolfCourseApiClient golfCourseApiClient;
 
   @MockitoBean private ScorecardService scorecardService;
 
