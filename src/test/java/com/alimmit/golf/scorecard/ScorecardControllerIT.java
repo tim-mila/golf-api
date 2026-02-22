@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import com.alimmit.golf.utils.JwtClaimApplier;
 import com.alimmit.golf.utils.JwtPersona;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,8 +28,6 @@ import org.springframework.test.web.servlet.ResultActions;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = "classpath:cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
-
-  @MockitoBean private GolfCourseApiClient golfCourseApiClient;
 
   @MockitoBean private ScorecardEventPublisher scorecardEventPublisher;
 

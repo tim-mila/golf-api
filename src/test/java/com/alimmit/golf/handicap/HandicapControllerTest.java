@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.alimmit.golf.GlobalConstants;
 import com.alimmit.golf.config.MethodSecurityConfiguration;
-import com.alimmit.golf.courses.client.GolfCourseApiClient;
 import com.alimmit.golf.scorecard.ScorecardService;
 import com.alimmit.golf.utils.JwtPersona;
 import java.time.Instant;
@@ -32,8 +31,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @WebMvcTest(HandicapController.class)
 @Import(MethodSecurityConfiguration.class)
 class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
-
-  @MockitoBean private GolfCourseApiClient golfCourseApiClient;
 
   @MockitoBean private ScorecardService scorecardService;
 
