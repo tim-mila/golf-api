@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,7 +54,14 @@ class ScorecardController {
                       schema =
                           @Schema(
                               implementation = ScorecardRequestDto.class,
-                              contentMediaType = "application/json"))))
+                              contentMediaType = "application/json"))),
+      responses =
+          @ApiResponse(
+              responseCode = "201",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      schema = @Schema(implementation = ScorecardDto.class))))
   @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
