@@ -99,6 +99,9 @@ class CourseController {
       operationId = "course.patch",
       summary = "Partially update a golf course",
       description = "Update the golf course with the provided fields",
+      parameters = {
+        @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
+      },
       requestBody =
           @io.swagger.v3.oas.annotations.parameters.RequestBody(
               content =
