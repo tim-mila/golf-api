@@ -9,6 +9,7 @@ import com.alimmit.golf.security.CanWrite;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -51,10 +52,8 @@ class ScorecardController {
               required = true,
               content =
                   @Content(
-                      schema =
-                          @Schema(
-                              implementation = ScorecardRequestDto.class,
-                              contentMediaType = "application/json"))),
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      schema = @Schema(implementation = ScorecardRequestDto.class))),
       responses =
           @ApiResponse(
               responseCode = "201",
@@ -75,7 +74,14 @@ class ScorecardController {
       method = "GET",
       operationId = "scorecard.list",
       summary = "List your scorecards",
-      description = "Get a list of your scorecards")
+      description = "Get a list of your scorecards",
+      responses =
+          @ApiResponse(
+              responseCode = "200",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      array = @ArraySchema(schema = @Schema(implementation = ScorecardDto.class)))))
   @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping
   List<ScorecardDto> list() {
@@ -89,7 +95,14 @@ class ScorecardController {
       description = "Get one of your scorecards",
       parameters = {
         @Parameter(name = "id", description = "Scorecard identifier", in = ParameterIn.PATH)
-      })
+      },
+      responses =
+          @ApiResponse(
+              responseCode = "200",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      schema = @Schema(implementation = ScorecardDto.class))))
   @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   ScorecardDto get(@PathVariable UUID id) {
