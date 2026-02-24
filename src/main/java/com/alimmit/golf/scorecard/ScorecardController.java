@@ -7,6 +7,8 @@ import com.alimmit.golf.errors.NotFoundException;
 import com.alimmit.golf.security.CanRead;
 import com.alimmit.golf.security.CanWrite;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -75,7 +77,10 @@ class ScorecardController {
       method = "GET",
       operationId = "scorecard.get",
       summary = "Get scorecard",
-      description = "Get one of your scorecards")
+      description = "Get one of your scorecards",
+      parameters = {
+        @Parameter(name = "id", description = "Scorecard identifier", in = ParameterIn.PATH)
+      })
   @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   ScorecardDto get(@PathVariable UUID id) {
@@ -86,7 +91,10 @@ class ScorecardController {
       method = "DELETE",
       operationId = "scorecard.delete",
       summary = "Delete a scorecard",
-      description = "Delete one of your scorecards")
+      description = "Delete one of your scorecards",
+      parameters = {
+        @Parameter(name = "id", description = "Scorecard identifier", in = ParameterIn.PATH)
+      })
   @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
