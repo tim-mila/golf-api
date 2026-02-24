@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Golf API is a Spring Boot 3.5.7 REST service for tracking golf scorecards and calculating handicap indexes. It integrates with an external golf course API to fetch course ratings and hole information.
+Golf API is a Spring Boot 3.5.7 REST service for tracking golf scorecards and calculating handicap indexes.
 
 **Tech Stack:** Java 21, Spring Boot 3.5.7, PostgreSQL, OAuth2/JWT (Okta), Maven
 
@@ -48,25 +48,29 @@ The `local-start` script:
 com.alimmit.golf
 ├── config/                # Security, JPA, async, and web configuration
 ├── security/              # @CanRead, @CanWrite meta-annotations for scope authorization
-├── courses/               # Golf course lookup endpoints
-│   └── client/           # External golf course API client (golfcourseapi.com)
-├── scorecard/            # Scorecard CRUD operations
-├── errors/               # Global exception handlers (@ControllerAdvice)
-└── id/                   # ID generation (timestamp + SecureRandom mixing)
+├── course/                # Golf course and tee CRUD operations
+├── scorecard/             # Scorecard CRUD operations
+├── handicap/              # Handicap index tracking and history
+├── differential/          # Score differential calculation
+└── errors/                # Global exception handlers (@ControllerAdvice)
 ```
 
 ### Domain Model
 
 **Scorecard** - Represents a golf round score
-- ID format: `scr-{32-hex-chars}` (timestamp-based + cryptographically random)
-- Fields: `courseId`, `score`, `scoreDate`, audit fields
-- Currently stored in-memory (keyed by user ID from JWT)
-- **Planned:** JPA entity with PostgreSQL persistence
+- Fields: `teeId`, `score`, `scoreDate`, `scorecardType`, audit fields
+- JPA entity with PostgreSQL persistence
 
-**Golf Course** - External data from golfcourseapi.com
-- Includes course ratings, slope ratings, hole-by-hole data
-- Fetched on-demand (no local caching yet)
-- Client: `DefaultGolfCourseApiClientImpl` using Java `HttpClient`
+**Course** - Represents a golf course
+- Fields: `club`, `course`, `city`, `state`, audit fields
+- Has associated `Tee` entities (blue, white, red tees, etc.)
+
+**Tee** - Represents a set of tees for a course
+- Fields: `name`, `par`, `yardage`, `slope`, `rating`, audit fields
+
+**Handicap** - Tracks a golfer's current handicap index
+- Fields: `golferId`, `handicapIndex`, `roundsUsed`, `totalRounds`, audit fields
+- Full revision history via Hibernate Envers (`@Audited`)
 
 ### Security Model
 
@@ -89,19 +93,7 @@ com.alimmit.golf
 
 **Public Endpoints:** `/v1/api-docs/**` (OpenAPI documentation)
 
-### External Integrations
-
-**Golf Course API (golfcourseapi.com)**
-- Authentication: `Authorization: Key {api-key}` header
-- Endpoints:
-  - `GET /v1/search?search_query={terms}` - Search courses
-  - `GET /v1/courses/{id}` - Fetch course details
-- Client interface: `GolfCourseApiClient` (allows easy mocking)
-- Configuration properties: `golf.course-api.url`, `golf.course-api.api-key`
-
 ### Database
-
-**Current State:** Database dependencies configured but not yet used (in-memory storage only)
 
 **Migration Tool:** Flyway
 - Migrations go in: `src/main/resources/db/migration/`
@@ -128,10 +120,6 @@ DATASOURCE_PASSOWRD=password          # Note: typo in property name
 # OAuth2 (Okta/Auth0)
 AUTH0_ISSUER_URL=https://your-tenant.auth0.com/
 AUTH0_AUDIENCE=https://your-api-audience
-
-# External Golf Course API
-GOLF_COURSE_API_URL=https://api.golfcourseapi.com
-GOLF_COURSE_API_KEY=your-api-key
 ```
 
 **Local Setup:** Secrets managed via 1Password CLI (`op inject`)
@@ -150,22 +138,23 @@ mockMvc.perform(post("/v1/scorecard")
 
 ### Controller Tests
 - Use `@WebMvcTest` for lightweight testing
-- Mock external dependencies (e.g., `GolfCourseApiClient`)
 - Active profile: "test"
 - Pattern: Test multi-tenancy (users can't see each other's data)
 
 ### Integration Tests
-- Tests with `IT` suffix are integration tests
-- Example: `DefaultGolfCourseApiClientImplIT` tests real external API
-- Require environment variable: `GOLF_COURSE_API_KEY`
+- Tests with `IT` suffix are integration tests (e.g., `ScorecardControllerIT`, `TeeControllerIT`)
+- Use Testcontainers; Docker must be running
 
 ## Code Conventions
 
 ### ID Generation
-All domain IDs use the `IdGenerator` base class pattern:
-- Combines `System.currentTimeMillis()` + `SecureRandom` with XOR mixing
-- Subclasses define prefix (e.g., `ScorecardIdGenerator` → "scr-")
-- Format: `{prefix}{32-hex-chars}` (36 chars total for "scr-" prefix)
+All entity primary keys are UUIDs generated via PostgreSQL's `uuidv7()` function:
+```java
+@Id
+@Generated(sql = "uuidv7()", writable = true)
+@Column(name = "scorecard_id", updatable = false, nullable = false, columnDefinition = "UUID DEFAULT uuidv7()")
+private UUID id;
+```
 
 ### DTOs as Records
 All DTOs use Java Records for immutability:
@@ -175,36 +164,15 @@ public record ScorecardDto(String scorecardId, Long courseId, Integer score, Loc
 
 ### Constants Organization
 - `GlobalConstants`: API version paths (`/v1`, `/{id}`)
-- Domain constants: `ScorecardConstants`, `GolfCourseConstants`
+- Domain constants: `ScorecardConstants`, `CourseConstants`, `TeeConstants`, `HandicapConstants`
 - Prevents hardcoded strings in controllers
 
-### Configuration Properties
-Use `@ConfigurationProperties` with constructor binding:
-```java
-@ConfigurationProperties(prefix = "golf.course-api")
-public class GolfCourseApiConfigurationProperties {
-    private final String url;
-    private final String apiKey;
-    // ...
-}
-```
-
 ### Exception Handling
-- Custom exceptions: `NotFoundException`, `GolfCourseApiException`
+- Custom exceptions: `NotFoundException`
 - Global handler: `GlobalControllerErrorHandler` with `@ControllerAdvice`
 - Maps exceptions to HTTP status codes (404, 500, etc.)
 
 ## Known Issues & Future Work
-
-**Database Migration Needed:**
-The comment in `ScorecardController.java:87` indicates:
-```java
-throw new IllegalStateException("This won't happen once there's a DB");
-```
-Scorecards are currently in-memory. Planned work includes:
-- Create JPA entities for `Scorecard`
-- Write Flyway migrations
-- Implement repository layer
 
 **Configuration Typos:**
 `application.properties` has typos in datasource property names:
@@ -214,7 +182,6 @@ Scorecards are currently in-memory. Planned work includes:
 These match the environment variable names, so fixing requires coordinated change.
 
 **Potential Enhancements:**
-- Golf course data caching (reduce external API calls)
-- Handicap index calculation algorithms
+- Handicap index recalculation triggers (e.g., on scorecard submission)
 - User profile management
 - Course favorites/history
