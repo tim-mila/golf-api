@@ -122,7 +122,8 @@ class CourseController {
       description = "Delete a golf course and all associated tees",
       parameters = {
         @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
-      })
+      },
+      responses = @ApiResponse(responseCode = "204"))
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)

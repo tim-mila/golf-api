@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -94,7 +95,8 @@ class ScorecardController {
       description = "Delete one of your scorecards",
       parameters = {
         @Parameter(name = "id", description = "Scorecard identifier", in = ParameterIn.PATH)
-      })
+      },
+      responses = @ApiResponse(responseCode = "204"))
   @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
