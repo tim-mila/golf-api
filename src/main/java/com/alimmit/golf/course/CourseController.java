@@ -112,6 +112,14 @@ class CourseController {
     return courseService.patch(courseId, request).orElseThrow(NotFoundException::new);
   }
 
+  @Operation(
+      method = "DELETE",
+      operationId = "course.delete",
+      summary = "Delete a golf course",
+      description = "Delete a golf course and all associated tees",
+      parameters = {
+        @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
+      })
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
