@@ -23,7 +23,7 @@ class JpaTeeServiceImpl implements TeeService {
   @Override
   @Transactional(readOnly = true)
   public List<TeeDto> listByCourse(UUID courseId) {
-    return teeRepository.findByCourse_CourseId(courseId).stream().map(teeMapper::map).toList();
+    return teeRepository.findByCourse_Id(courseId).stream().map(teeMapper::map).toList();
   }
 
   @Override

@@ -24,7 +24,7 @@ class HandicapEntity {
       nullable = false,
       updatable = false,
       columnDefinition = "UUID DEFAULT uuidv7()")
-  private UUID handicapId;
+  private UUID id;
 
   @CreatedDate
   @NotAudited
@@ -77,8 +77,8 @@ class HandicapEntity {
     this.totalRounds = totalRounds;
   }
 
-  public UUID getHandicapId() {
-    return handicapId;
+  public UUID getId() {
+    return id;
   }
 
   public Instant getCreatedAt() {
@@ -109,7 +109,7 @@ class HandicapEntity {
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) return false;
     HandicapEntity entity = (HandicapEntity) o;
-    return Objects.equals(handicapId, entity.handicapId)
+    return Objects.equals(id, entity.id)
         && Objects.equals(createdAt, entity.createdAt)
         && Objects.equals(lastModifiedAt, entity.lastModifiedAt)
         && Objects.equals(golferId, entity.golferId)
@@ -121,14 +121,14 @@ class HandicapEntity {
   @Override
   public int hashCode() {
     return Objects.hash(
-        handicapId, createdAt, lastModifiedAt, golferId, handicapIndex, roundsUsed, totalRounds);
+        id, createdAt, lastModifiedAt, golferId, handicapIndex, roundsUsed, totalRounds);
   }
 
   @Override
   public String toString() {
     return "HandicapEntity{"
-        + "handicapId='"
-        + handicapId
+        + "id='"
+        + id
         + '\''
         + ", golferId='"
         + golferId

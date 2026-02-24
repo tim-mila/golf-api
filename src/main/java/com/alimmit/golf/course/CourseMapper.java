@@ -16,7 +16,7 @@ class CourseMapper {
 
   CourseDto map(CourseEntity entity) {
     return new CourseDto(
-        entity.getCourseId(),
+        entity.getId(),
         entity.getCreatedAt(),
         entity.getLastModifiedAt(),
         entity.getClub(),

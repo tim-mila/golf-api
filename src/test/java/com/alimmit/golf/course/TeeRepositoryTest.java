@@ -76,7 +76,7 @@ class TeeRepositoryTest {
                 course, "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
     assertThat(saved)
-        .hasFieldOrProperty("teeId")
+        .hasFieldOrProperty("id")
         .hasFieldOrProperty("createdAt")
         .hasFieldOrPropertyWithValue("createdBy", "123")
         .hasFieldOrProperty("lastModifiedAt")
@@ -87,11 +87,11 @@ class TeeRepositoryTest {
         .hasFieldOrPropertyWithValue("slope", new BigDecimal("131.0"))
         .hasFieldOrPropertyWithValue("rating", new BigDecimal("71.2"));
 
-    Optional<TeeEntity> read = teeRepository.findById(saved.getTeeId());
+    Optional<TeeEntity> read = teeRepository.findById(saved.getId());
     assertThat(read)
         .isPresent()
         .get()
-        .hasFieldOrPropertyWithValue("teeId", saved.getTeeId())
+        .hasFieldOrPropertyWithValue("id", saved.getId())
         .hasFieldOrPropertyWithValue("name", "Blue")
         .hasFieldOrPropertyWithValue("yardage", 6500);
 
@@ -103,7 +103,7 @@ class TeeRepositoryTest {
 
     TeeEntity updated = teeRepository.save(toUpdate);
     assertThat(updated)
-        .hasFieldOrPropertyWithValue("teeId", saved.getTeeId())
+        .hasFieldOrPropertyWithValue("id", saved.getId())
         .hasFieldOrPropertyWithValue("name", "White")
         .hasFieldOrPropertyWithValue("yardage", 6100)
         .hasFieldOrPropertyWithValue("slope", new BigDecimal("125.0"))
@@ -113,7 +113,7 @@ class TeeRepositoryTest {
 
     teeRepository.delete(updated);
 
-    assertThat(teeRepository.findById(saved.getTeeId())).isEmpty();
+    assertThat(teeRepository.findById(saved.getId())).isEmpty();
   }
 
   @Test
@@ -136,14 +136,14 @@ class TeeRepositoryTest {
     teeRepository.save(
         new TeeEntity(course2, "Red", 72, 5200, new BigDecimal("118.0"), new BigDecimal("66.0")));
 
-    List<TeeEntity> course1Tees = teeRepository.findByCourse_CourseId(course1.getCourseId());
+    List<TeeEntity> course1Tees = teeRepository.findByCourse_Id(course1.getId());
 
     assertThat(course1Tees)
         .hasSize(2)
         .extracting(TeeEntity::getName)
         .containsExactlyInAnyOrder("Blue", "White");
 
-    List<TeeEntity> course2Tees = teeRepository.findByCourse_CourseId(course2.getCourseId());
+    List<TeeEntity> course2Tees = teeRepository.findByCourse_Id(course2.getId());
 
     assertThat(course2Tees).hasSize(1).extracting(TeeEntity::getName).containsExactly("Red");
   }
@@ -152,7 +152,7 @@ class TeeRepositoryTest {
   @WithMockUser("123")
   @Transactional(propagation = Propagation.NEVER)
   void findByCourseIdEmpty() {
-    List<TeeEntity> result = teeRepository.findByCourse_CourseId(java.util.UUID.randomUUID());
+    List<TeeEntity> result = teeRepository.findByCourse_Id(java.util.UUID.randomUUID());
 
     assertThat(result).isEmpty();
   }

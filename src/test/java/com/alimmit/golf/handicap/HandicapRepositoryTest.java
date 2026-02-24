@@ -80,7 +80,7 @@ class HandicapRepositoryTest {
 
     // Then: Audit fields should be populated automatically
     assertThat(saved)
-        .hasFieldOrProperty("handicapId")
+        .hasFieldOrProperty("id")
         .hasFieldOrPropertyWithValue("golferId", JwtPersona.GARY_GOLFER.sub())
         .hasFieldOrProperty("createdAt")
         .hasFieldOrProperty("lastModifiedAt")
@@ -136,7 +136,7 @@ class HandicapRepositoryTest {
     // WHEN: fetching handicap revision history
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
     Revisions<Integer, HandicapEntity> revisions =
-        handicapRepository.findRevisions(handicap.getHandicapId());
+        handicapRepository.findRevisions(handicap.getId());
 
     // THEN: the history contains three handicaps
     assertThat(revisions).hasSize(3);

@@ -10,7 +10,7 @@ class ScorecardMapper {
   /** Convert entity to DTO for API responses. */
   ScorecardDto toDto(ScorecardEntity entity) {
     return new ScorecardDto(
-        entity.getScorecardId(),
+        entity.getId(),
         entity.getCreatedAt(),
         entity.getCreatedBy(),
         entity.getScoreDate(),

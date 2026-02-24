@@ -59,7 +59,7 @@ class JpaCourseServiceImpl implements CourseService {
   @Override
   @Transactional
   public void delete(UUID courseId) {
-    teeRepository.deleteByCourse_CourseId(courseId);
+    teeRepository.deleteByCourse_Id(courseId);
     courseRepository.deleteById(courseId);
   }
 }

@@ -23,11 +23,12 @@ class TeeEntity {
   @Id
   @Generated(sql = "uuidv7()", writable = true)
   @Column(
+      name = "tee_id",
       unique = true,
       updatable = false,
       nullable = false,
       columnDefinition = "UUID DEFAULT uuidv7()")
-  private UUID teeId;
+  private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "course_id", nullable = false, updatable = false)
@@ -83,8 +84,8 @@ class TeeEntity {
     this.rating = rating;
   }
 
-  public UUID getTeeId() {
-    return teeId;
+  public UUID getId() {
+    return id;
   }
 
   public CourseEntity getCourse() {
@@ -119,8 +120,8 @@ class TeeEntity {
     return rating;
   }
 
-  public void setTeeId(UUID teeId) {
-    this.teeId = teeId;
+  public void setId(UUID id) {
+    this.id = id;
   }
 
   public void setCreatedAt(Instant createdAt) {
@@ -151,7 +152,7 @@ class TeeEntity {
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) return false;
     TeeEntity that = (TeeEntity) o;
-    return Objects.equals(teeId, that.teeId)
+    return Objects.equals(id, that.id)
         && Objects.equals(name, that.name)
         && Objects.equals(par, that.par)
         && Objects.equals(yardage, that.yardage)
@@ -161,7 +162,7 @@ class TeeEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hash(teeId, name, par, yardage, slope, rating);
+    return Objects.hash(id, name, par, yardage, slope, rating);
   }
 
   @Override

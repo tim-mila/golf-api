@@ -22,8 +22,8 @@ class TeeMapper {
 
   TeeDto map(TeeEntity entity) {
     return new TeeDto(
-        entity.getTeeId(),
-        entity.getCourse().getCourseId(),
+        entity.getId(),
+        entity.getCourse().getId(),
         entity.getCreatedAt(),
         entity.getLastModifiedAt(),
         entity.getName(),

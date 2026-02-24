@@ -28,7 +28,7 @@ class CourseMapperTest {
     Instant createdAt = Instant.parse("2026-01-01T00:00:00Z");
 
     CourseEntity entity = new CourseEntity("Test Club", "Test Course", "Test City", USState.OHIO);
-    entity.setCourseId(courseId);
+    entity.setId(courseId);
     entity.setCreatedAt(createdAt);
 
     CourseDto result = courseMapper.map(entity);
@@ -46,7 +46,7 @@ class CourseMapperTest {
 
     CourseEntity entity =
         new CourseEntity("Test Club", "Test Course", "Test City", USState.WISCONSIN);
-    entity.setCourseId(courseId);
+    entity.setId(courseId);
     entity.setCreatedAt(createdAt);
 
     Optional<CourseDto> result = courseMapper.map(Optional.of(entity));
