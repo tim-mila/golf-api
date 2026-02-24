@@ -107,7 +107,14 @@ class CourseController {
               content =
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = PatchCourseRequest.class))))
+                      schema = @Schema(implementation = PatchCourseRequest.class))),
+      responses =
+          @ApiResponse(
+              responseCode = "200",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      schema = @Schema(implementation = CourseDto.class))))
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @PatchMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   CourseDto patch(
