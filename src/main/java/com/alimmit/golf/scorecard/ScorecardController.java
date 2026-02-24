@@ -7,13 +7,18 @@ import com.alimmit.golf.errors.NotFoundException;
 import com.alimmit.golf.security.CanRead;
 import com.alimmit.golf.security.CanWrite;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,10 +52,15 @@ class ScorecardController {
               required = true,
               content =
                   @Content(
-                      schema =
-                          @Schema(
-                              implementation = ScorecardRequestDto.class,
-                              contentMediaType = "application/json"))))
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      schema = @Schema(implementation = ScorecardRequestDto.class))),
+      responses =
+          @ApiResponse(
+              responseCode = "201",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      schema = @Schema(implementation = ScorecardDto.class))))
   @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
@@ -64,7 +74,14 @@ class ScorecardController {
       method = "GET",
       operationId = "scorecard.list",
       summary = "List your scorecards",
-      description = "Get a list of your scorecards")
+      description = "Get a list of your scorecards",
+      responses =
+          @ApiResponse(
+              responseCode = "200",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      array = @ArraySchema(schema = @Schema(implementation = ScorecardDto.class)))))
   @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping
   List<ScorecardDto> list() {
@@ -75,7 +92,17 @@ class ScorecardController {
       method = "GET",
       operationId = "scorecard.get",
       summary = "Get scorecard",
-      description = "Get one of your scorecards")
+      description = "Get one of your scorecards",
+      parameters = {
+        @Parameter(name = "id", description = "Scorecard identifier", in = ParameterIn.PATH)
+      },
+      responses =
+          @ApiResponse(
+              responseCode = "200",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      schema = @Schema(implementation = ScorecardDto.class))))
   @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   ScorecardDto get(@PathVariable UUID id) {
@@ -86,7 +113,11 @@ class ScorecardController {
       method = "DELETE",
       operationId = "scorecard.delete",
       summary = "Delete a scorecard",
-      description = "Delete one of your scorecards")
+      description = "Delete one of your scorecards",
+      parameters = {
+        @Parameter(name = "id", description = "Scorecard identifier", in = ParameterIn.PATH)
+      },
+      responses = @ApiResponse(responseCode = "204"))
   @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)

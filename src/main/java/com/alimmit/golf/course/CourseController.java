@@ -99,12 +99,22 @@ class CourseController {
       operationId = "course.patch",
       summary = "Partially update a golf course",
       description = "Update the golf course with the provided fields",
+      parameters = {
+        @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
+      },
       requestBody =
           @io.swagger.v3.oas.annotations.parameters.RequestBody(
               content =
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = PatchCourseRequest.class))))
+                      schema = @Schema(implementation = PatchCourseRequest.class))),
+      responses =
+          @ApiResponse(
+              responseCode = "200",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      schema = @Schema(implementation = CourseDto.class))))
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @PatchMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   CourseDto patch(
@@ -112,6 +122,15 @@ class CourseController {
     return courseService.patch(courseId, request).orElseThrow(NotFoundException::new);
   }
 
+  @Operation(
+      method = "DELETE",
+      operationId = "course.delete",
+      summary = "Delete a golf course",
+      description = "Delete a golf course and all associated tees",
+      parameters = {
+        @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
+      },
+      responses = @ApiResponse(responseCode = "204"))
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)

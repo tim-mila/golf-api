@@ -108,7 +108,14 @@ class TeeController {
               content =
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = PatchTeeRequest.class))))
+                      schema = @Schema(implementation = PatchTeeRequest.class))),
+      responses =
+          @ApiResponse(
+              responseCode = "200",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      schema = @Schema(implementation = TeeDto.class))))
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @PatchMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
   TeeDto patch(@Valid @RequestBody PatchTeeRequest request, @PathVariable("id") UUID teeId) {
