@@ -37,7 +37,7 @@ class JpaTeeServiceImplTest {
     TeeDto dto1 = createDto(entity1);
     TeeDto dto2 = createDto(entity2);
 
-    when(teeRepository.findByCourse_CourseId(courseId)).thenReturn(List.of(entity1, entity2));
+    when(teeRepository.findByCourse_Id(courseId)).thenReturn(List.of(entity1, entity2));
     when(teeMapper.map(entity1)).thenReturn(dto1);
     when(teeMapper.map(entity2)).thenReturn(dto2);
 
@@ -78,7 +78,7 @@ class JpaTeeServiceImplTest {
   void create() {
     UUID courseId = UUID.randomUUID();
     CourseEntity course = new CourseEntity("Test Club", "Test Course", "Test City", USState.OHIO);
-    course.setCourseId(courseId);
+    course.setId(courseId);
 
     CreateTeeRequest request =
         new CreateTeeRequest("Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
@@ -163,19 +163,19 @@ class JpaTeeServiceImplTest {
 
   private TeeEntity createEntity(UUID teeId, String name) {
     CourseEntity course = new CourseEntity("Test Club", "Test Course", "Test City", USState.OHIO);
-    course.setCourseId(UUID.randomUUID());
+    course.setId(UUID.randomUUID());
 
     TeeEntity entity =
         new TeeEntity(course, name, 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
-    entity.setTeeId(teeId);
+    entity.setId(teeId);
     entity.setCreatedAt(Instant.now());
     return entity;
   }
 
   private TeeDto createDto(TeeEntity entity) {
     return new TeeDto(
-        entity.getTeeId(),
-        entity.getCourse().getCourseId(),
+        entity.getId(),
+        entity.getCourse().getId(),
         entity.getCreatedAt(),
         Instant.now(),
         entity.getName(),

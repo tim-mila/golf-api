@@ -79,11 +79,11 @@ class CourseRepositoryTest {
         .hasFieldOrPropertyWithValue("city", "Somewhere")
         .hasFieldOrPropertyWithValue("state", USState.WISCONSIN);
 
-    Optional<CourseEntity> read = courseRepository.findById(saved.getCourseId());
+    Optional<CourseEntity> read = courseRepository.findById(saved.getId());
     assertThat(read)
         .isPresent()
         .get()
-        .hasFieldOrPropertyWithValue("courseId", saved.getCourseId())
+        .hasFieldOrPropertyWithValue("id", saved.getId())
         .hasFieldOrProperty("createdAt")
         .hasFieldOrPropertyWithValue("createdBy", "123")
         .hasFieldOrProperty("lastModifiedAt")
@@ -101,7 +101,7 @@ class CourseRepositoryTest {
 
     CourseEntity updated = courseRepository.save(toUpdate);
     assertThat(updated)
-        .hasFieldOrPropertyWithValue("courseId", saved.getCourseId())
+        .hasFieldOrPropertyWithValue("id", saved.getId())
         .hasFieldOrProperty("createdAt")
         .hasFieldOrPropertyWithValue("createdBy", "123")
         .hasFieldOrProperty("lastModifiedAt")
@@ -115,6 +115,6 @@ class CourseRepositoryTest {
 
     courseRepository.delete(updated);
 
-    assertThat(courseRepository.findById(saved.getCourseId())).isEmpty();
+    assertThat(courseRepository.findById(saved.getId())).isEmpty();
   }
 }

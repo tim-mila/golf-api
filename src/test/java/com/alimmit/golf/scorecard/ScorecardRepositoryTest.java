@@ -85,7 +85,7 @@ class ScorecardRepositoryTest {
 
     // Then: Audit fields should be populated automatically
     Assertions.assertThat(saved)
-        .hasFieldOrProperty("scorecardId")
+        .hasFieldOrProperty("id")
         .hasFieldOrPropertyWithValue("createdBy", JwtPersona.GARY_GOLFER.sub())
         .hasFieldOrProperty("createdAt")
         .hasFieldOrPropertyWithValue("courseName", "Test Course")
@@ -134,16 +134,15 @@ class ScorecardRepositoryTest {
 
     // When: Gary looks up his own scorecard
     Optional<ScorecardEntity> garyResult =
-        scorecardRepository.findByIdForCurrentUser(saved.getScorecardId());
+        scorecardRepository.findByIdForCurrentUser(saved.getId());
 
     // Then: Scorecard should be found
     assertThat(garyResult).isPresent();
-    assertThat(garyResult.get().getScorecardId()).isEqualTo(saved.getScorecardId());
+    assertThat(garyResult.get().getId()).isEqualTo(saved.getId());
 
     // When: Pat tries to access Gary's scorecard
     setSecurityContext(JwtPersona.PAT_PUTTER.sub());
-    Optional<ScorecardEntity> patResult =
-        scorecardRepository.findByIdForCurrentUser(saved.getScorecardId());
+    Optional<ScorecardEntity> patResult = scorecardRepository.findByIdForCurrentUser(saved.getId());
 
     // Then: Scorecard should not be found (authorization check)
     assertThat(patResult).isEmpty();
@@ -157,21 +156,21 @@ class ScorecardRepositoryTest {
 
     // When: Pat tries to delete Gary's scorecard
     setSecurityContext(JwtPersona.PAT_PUTTER.sub());
-    int patDeleteCount = scorecardRepository.deleteByIdForCurrentUser(saved.getScorecardId());
+    int patDeleteCount = scorecardRepository.deleteByIdForCurrentUser(saved.getId());
 
     // Then: Nothing should be deleted (authorization check)
     assertThat(patDeleteCount).isZero();
 
     // Verify scorecard still exists
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    assertThat(scorecardRepository.findByIdForCurrentUser(saved.getScorecardId())).isPresent();
+    assertThat(scorecardRepository.findByIdForCurrentUser(saved.getId())).isPresent();
 
     // When: Gary deletes his own scorecard
-    int garyDeleteCount = scorecardRepository.deleteByIdForCurrentUser(saved.getScorecardId());
+    int garyDeleteCount = scorecardRepository.deleteByIdForCurrentUser(saved.getId());
 
     // Then: Scorecard should be deleted
     assertThat(garyDeleteCount).isEqualTo(1);
-    assertThat(scorecardRepository.findByIdForCurrentUser(saved.getScorecardId())).isEmpty();
+    assertThat(scorecardRepository.findByIdForCurrentUser(saved.getId())).isEmpty();
   }
 
   private ScorecardEntity createScorecard(Integer score) {

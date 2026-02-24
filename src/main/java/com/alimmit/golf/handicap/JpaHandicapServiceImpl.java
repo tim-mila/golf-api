@@ -54,7 +54,7 @@ class JpaHandicapServiceImpl implements HandicapService {
     HandicapEntity handicap =
         handicapRepository.findHandicapForCurrentUser().orElseThrow(NotFoundException::new);
     Revisions<Integer, HandicapEntity> revisions =
-        handicapRepository.findRevisions(handicap.getHandicapId());
+        handicapRepository.findRevisions(handicap.getId());
     return revisions.stream().map(handicapMapper::toRevision).toList();
   }
 }

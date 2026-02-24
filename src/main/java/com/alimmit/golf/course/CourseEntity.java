@@ -22,11 +22,12 @@ class CourseEntity {
   @Id
   @Generated(sql = "uuidv7()", writable = true)
   @Column(
+      name = "course_id",
       unique = true,
       updatable = false,
       nullable = false,
       columnDefinition = "UUID DEFAULT uuidv7()")
-  private UUID courseId;
+  private UUID id;
 
   @CreatedDate
   @NotAudited
@@ -68,8 +69,8 @@ class CourseEntity {
     this.state = state;
   }
 
-  public UUID getCourseId() {
-    return courseId;
+  public UUID getId() {
+    return id;
   }
 
   public Instant getCreatedAt() {
@@ -112,8 +113,8 @@ class CourseEntity {
     this.state = state;
   }
 
-  public void setCourseId(UUID courseId) {
-    this.courseId = courseId;
+  public void setId(UUID id) {
+    this.id = id;
   }
 
   public void setCreatedAt(Instant createdAt) {
@@ -124,7 +125,7 @@ class CourseEntity {
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) return false;
     CourseEntity that = (CourseEntity) o;
-    return Objects.equals(courseId, that.courseId)
+    return Objects.equals(id, that.id)
         && Objects.equals(club, that.club)
         && Objects.equals(course, that.course)
         && Objects.equals(city, that.city)
@@ -133,7 +134,7 @@ class CourseEntity {
 
   @Override
   public int hashCode() {
-    return Objects.hash(courseId, club, course, city, state);
+    return Objects.hash(id, club, course, city, state);
   }
 
   @Override

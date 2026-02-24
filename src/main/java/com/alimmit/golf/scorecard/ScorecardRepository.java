@@ -42,7 +42,7 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, String> {
    * @return the scorecard if found and belongs to current user
    */
   @Query(
-      "SELECT s FROM ScorecardEntity s WHERE s.scorecardId = :scorecardId AND s.createdBy = ?#{authentication.name}")
+      "SELECT s FROM ScorecardEntity s WHERE s.id = :scorecardId AND s.createdBy = ?#{authentication.name}")
   Optional<ScorecardEntity> findByIdForCurrentUser(@Param("scorecardId") UUID scorecardId);
 
   /**
@@ -55,6 +55,6 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, String> {
    */
   @Modifying
   @Query(
-      "DELETE FROM ScorecardEntity s WHERE s.scorecardId = :scorecardId AND s.createdBy = ?#{authentication.name}")
+      "DELETE FROM ScorecardEntity s WHERE s.id = :scorecardId AND s.createdBy = ?#{authentication.name}")
   int deleteByIdForCurrentUser(@Param("scorecardId") UUID scorecardId);
 }

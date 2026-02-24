@@ -24,7 +24,7 @@ class HandicapMapper {
 
   HandicapDto toDto(HandicapEntity entity) {
     return new HandicapDto(
-        entity.getHandicapId(),
+        entity.getId(),
         entity.getGolferId(),
         entity.getCreatedAt(),
         entity.getLastModifiedAt(),
@@ -36,7 +36,7 @@ class HandicapMapper {
   HandicapRevisionDto toRevision(Revision<Integer, HandicapEntity> revision) {
     HandicapEntity entity = revision.getEntity();
     return new HandicapRevisionDto(
-        entity.getHandicapId(),
+        entity.getId(),
         entity.getGolferId(),
         entity.getCreatedAt(),
         entity.getLastModifiedAt(),

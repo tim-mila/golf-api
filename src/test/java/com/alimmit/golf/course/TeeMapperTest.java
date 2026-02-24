@@ -33,11 +33,11 @@ class TeeMapperTest {
     Instant createdAt = Instant.parse("2026-01-01T00:00:00Z");
 
     CourseEntity course = new CourseEntity("Test Club", "Test Course", "Test City", USState.OHIO);
-    course.setCourseId(courseId);
+    course.setId(courseId);
 
     TeeEntity entity =
         new TeeEntity(course, "White", 72, 6100, new BigDecimal("125.0"), new BigDecimal("69.5"));
-    entity.setTeeId(teeId);
+    entity.setId(teeId);
     entity.setCreatedAt(createdAt);
 
     TeeDto result = teeMapper.map(entity);
@@ -63,11 +63,11 @@ class TeeMapperTest {
     Instant createdAt = Instant.parse("2026-01-01T00:00:00Z");
 
     CourseEntity course = new CourseEntity("Test Club", "Test Course", "Test City", USState.OHIO);
-    course.setCourseId(courseId);
+    course.setId(courseId);
 
     TeeEntity entity =
         new TeeEntity(course, "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
-    entity.setTeeId(teeId);
+    entity.setId(teeId);
     entity.setCreatedAt(createdAt);
 
     Optional<TeeDto> result = teeMapper.map(Optional.of(entity));

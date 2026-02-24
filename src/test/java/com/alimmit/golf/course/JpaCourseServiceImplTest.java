@@ -130,20 +130,20 @@ class JpaCourseServiceImplTest {
 
     courseService.delete(courseId);
 
-    verify(teeRepository).deleteByCourse_CourseId(courseId);
+    verify(teeRepository).deleteByCourse_Id(courseId);
     verify(courseRepository).deleteById(courseId);
   }
 
   private CourseEntity createEntity(UUID courseId, String club, String course) {
     CourseEntity entity = new CourseEntity(club, course, "Test City", USState.WISCONSIN);
-    entity.setCourseId(courseId);
+    entity.setId(courseId);
     entity.setCreatedAt(Instant.now());
     return entity;
   }
 
   private CourseDto createDto(CourseEntity entity) {
     return new CourseDto(
-        entity.getCourseId(),
+        entity.getId(),
         entity.getCreatedAt(),
         Instant.now(),
         entity.getClub(),

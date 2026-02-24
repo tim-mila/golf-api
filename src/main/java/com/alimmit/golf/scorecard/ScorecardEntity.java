@@ -17,8 +17,12 @@ class ScorecardEntity {
 
   @Id
   @Generated(sql = "uuidv7()", writable = true)
-  @Column(updatable = false, nullable = false, columnDefinition = "UUID DEFAULT uuidv7()")
-  private UUID scorecardId;
+  @Column(
+      name = "scorecard_id",
+      updatable = false,
+      nullable = false,
+      columnDefinition = "UUID DEFAULT uuidv7()")
+  private UUID id;
 
   @CreatedDate
   @Column(nullable = false, updatable = false)
@@ -84,12 +88,12 @@ class ScorecardEntity {
     this.indexEstablished = indexEstablished;
   }
 
-  public UUID getScorecardId() {
-    return scorecardId;
+  public UUID getId() {
+    return id;
   }
 
-  public void setScorecardId(UUID scorecardId) {
-    this.scorecardId = scorecardId;
+  public void setId(UUID id) {
+    this.id = id;
   }
 
   public Instant getCreatedAt() {
@@ -145,21 +149,12 @@ class ScorecardEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ScorecardEntity that = (ScorecardEntity) o;
-    return Objects.equals(scorecardId, that.scorecardId);
+    return Objects.equals(id, that.id);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-        scorecardId,
-        createdAt,
-        createdBy,
-        scoreDate,
-        courseName,
-        score,
-        par,
-        rating,
-        slope,
-        scorecardType);
+        id, createdAt, createdBy, scoreDate, courseName, score, par, rating, slope, scorecardType);
   }
 }
