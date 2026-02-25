@@ -1,8 +1,10 @@
 package com.alimmit.golf.course;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.alimmit.golf.utils.JwtClaimApplier;
 import com.alimmit.golf.utils.JwtPersona;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
@@ -16,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -23,6 +26,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = "classpath:cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class TeeControllerIT extends AbstractTeeControllerTest {
+
+  private static final String TEE_REQUEST_BODY =
+      """
+      {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
+      """;
 
   private final CourseService courseService;
   private final ObjectMapper objectMapper;
@@ -32,6 +40,71 @@ class TeeControllerIT extends AbstractTeeControllerTest {
     super(mockMvc);
     this.courseService = courseService;
     this.objectMapper = objectMapper;
+  }
+
+  @Test
+  @WithMockUser("123")
+  void addTee() throws Exception {
+    UUID courseId = createCourse();
+    createAndAssertTee(courseId, JwtPersona.forGaryGolfer());
+  }
+
+  @Test
+  @WithMockUser("123")
+  void canOnlyListMyTees() throws Exception {
+    UUID courseId = createCourse();
+    createTeeViaService(courseId, "Blue");
+
+    // Gary sees his tee
+    listTeesByCourse(courseId, JwtPersona.forGaryGolfer(), status().isOk())
+        .andExpect(jsonPath("$.length()").value(1));
+
+    // Pat sees nothing — course not owned by Pat
+    listTeesByCourse(courseId, JwtPersona.forPatPutter(), status().isOk())
+        .andExpect(jsonPath("$.length()").value(0));
+  }
+
+  @Test
+  @WithMockUser("123")
+  void canOnlyFetchMyTees() throws Exception {
+    UUID courseId = createCourse();
+    String responseBody =
+        createAndAssertTee(courseId, JwtPersona.forGaryGolfer())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    UUID teeId = UUID.fromString(objectMapper.readTree(responseBody).at("/teeId").asText());
+    assertThat(teeId).isNotNull();
+
+    // Gary can fetch his tee
+    getTee(teeId, JwtPersona.forGaryGolfer(), status().isOk());
+
+    // Pat gets not found
+    getTee(teeId, JwtPersona.forPatPutter(), status().isNotFound());
+  }
+
+  @Test
+  @WithMockUser("123")
+  void canOnlyDeleteMyTees() throws Exception {
+    UUID courseId = createCourse();
+    String responseBody =
+        createAndAssertTee(courseId, JwtPersona.forGaryGolfer())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    UUID teeId = UUID.fromString(objectMapper.readTree(responseBody).at("/teeId").asText());
+    assertThat(teeId).isNotNull();
+
+    // Pat cannot delete Gary's tee
+    deleteTee(teeId, JwtPersona.forPatPutter(), status().isNotFound());
+
+    // Gary can delete his own tee
+    deleteTee(teeId, JwtPersona.forGaryGolfer(), status().isNoContent());
+
+    // Gary gets not found on second attempt
+    deleteTee(teeId, JwtPersona.forGaryGolfer(), status().isNotFound());
   }
 
   @Test
@@ -179,6 +252,19 @@ class TeeControllerIT extends AbstractTeeControllerTest {
     getTee(teeId, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
+  private ResultActions createAndAssertTee(UUID courseId, JwtClaimApplier fn) throws Exception {
+    return createTee(courseId, TEE_REQUEST_BODY, fn, status().isCreated())
+        .andExpectAll(
+            jsonPath("$.teeId").exists(),
+            jsonPath("$.courseId").value(courseId.toString()),
+            jsonPath("$.name").value("Blue"),
+            jsonPath("$.yardage").value(6500),
+            jsonPath("$.slope").value(131.0),
+            jsonPath("$.rating").value(71.2),
+            jsonPath("$.createdAt").isString(),
+            jsonPath("$.lastModifiedAt").isString());
+  }
+
   private UUID createCourse() {
     return courseService
         .create(new CreateCourseRequest("Test Club", "Test Course", "Test City", USState.WISCONSIN))
@@ -186,8 +272,6 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   }
 
   private void createTeeViaService(UUID courseId, String name) {
-    courseService.get(courseId).orElseThrow();
-    // Use the controller's create endpoint for consistency
     try {
       createTee(
           courseId,
