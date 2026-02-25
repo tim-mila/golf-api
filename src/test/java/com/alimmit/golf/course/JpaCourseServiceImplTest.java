@@ -1,9 +1,11 @@
 package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.alimmit.golf.errors.NotFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +37,7 @@ class JpaCourseServiceImplTest {
     CourseDto dto1 = createDto(entity1);
     CourseDto dto2 = createDto(entity2);
 
-    when(courseRepository.findAll()).thenReturn(List.of(entity1, entity2));
+    when(courseRepository.findAllForCurrentUser()).thenReturn(List.of(entity1, entity2));
     when(courseMapper.map(entity1)).thenReturn(dto1);
     when(courseMapper.map(entity2)).thenReturn(dto2);
 
@@ -51,7 +53,7 @@ class JpaCourseServiceImplTest {
     CourseDto dto = createDto(entity);
     Optional<CourseEntity> optionalEntity = Optional.of(entity);
 
-    when(courseRepository.findById(courseId)).thenReturn(optionalEntity);
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(optionalEntity);
     when(courseMapper.map(optionalEntity)).thenReturn(Optional.of(dto));
 
     Optional<CourseDto> result = courseService.get(courseId);
@@ -64,7 +66,7 @@ class JpaCourseServiceImplTest {
     UUID courseId = UUID.randomUUID();
     Optional<CourseEntity> empty = Optional.empty();
 
-    when(courseRepository.findById(courseId)).thenReturn(empty);
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(empty);
     when(courseMapper.map(empty)).thenReturn(Optional.empty());
 
     Optional<CourseDto> result = courseService.get(courseId);
@@ -101,7 +103,7 @@ class JpaCourseServiceImplTest {
         new PatchCourseRequest(
             Optional.of("New Club"), Optional.of("New Course"), Optional.empty(), Optional.empty());
 
-    when(courseRepository.findById(courseId)).thenReturn(Optional.of(entity));
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.of(entity));
     when(courseRepository.save(entity)).thenReturn(savedEntity);
     when(courseMapper.map(savedEntity)).thenReturn(dto);
 
@@ -117,7 +119,7 @@ class JpaCourseServiceImplTest {
         new PatchCourseRequest(
             Optional.of("New Club"), Optional.empty(), Optional.empty(), Optional.empty());
 
-    when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.empty());
 
     Optional<CourseDto> result = courseService.patch(courseId, request);
 
@@ -127,11 +129,23 @@ class JpaCourseServiceImplTest {
   @Test
   void delete() {
     UUID courseId = UUID.randomUUID();
+    CourseEntity entity = createEntity(courseId, "Test Club", "Test Course");
+
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.of(entity));
 
     courseService.delete(courseId);
 
     verify(teeRepository).deleteByCourse_Id(courseId);
     verify(courseRepository).deleteById(courseId);
+  }
+
+  @Test
+  void deleteNotFound() {
+    UUID courseId = UUID.randomUUID();
+
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> courseService.delete(courseId)).isInstanceOf(NotFoundException.class);
   }
 
   private CourseEntity createEntity(UUID courseId, String club, String course) {

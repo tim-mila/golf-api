@@ -12,7 +12,6 @@ public interface JwtPersona {
   JwtPersona GARY_GOLFER = new JwtPersonaImpl("Gary Golfer", "123");
   JwtPersona PAT_PUTTER = new JwtPersonaImpl("Pat Putter", "234");
   JwtPersona DANA_DRIVER = new JwtPersonaImpl("Dana Driver", "345");
-  JwtPersona AMY_ADMIN = new JwtPersonaImpl("Amy Admin", "456");
 
   static JwtClaimApplier forGaryGolfer() {
     return forGaryGolfer(DEFAULT_SCOPES);
@@ -38,14 +37,6 @@ public interface JwtPersona {
     return new JwtClaimApplierImpl(DANA_DRIVER.name(), DANA_DRIVER.sub(), scopes);
   }
 
-  static JwtClaimApplier forAmyAdmin() {
-    return forAmyAdmin(ALL_SCOPES);
-  }
-
-  static JwtClaimApplier forAmyAdmin(String... scopes) {
-    return new JwtClaimApplierImpl(AMY_ADMIN.name(), AMY_ADMIN.sub(), scopes);
-  }
-
   String SCOPE_READ_SCORECARD =
       GlobalConstants.SCOPE_PERMISSION_READ + ":" + GlobalConstants.SCOPE_SCORECARD;
   String SCOPE_WRITE_SCORECARD =
@@ -57,15 +48,11 @@ public interface JwtPersona {
   String SCOPE_WRITE_COURSE =
       GlobalConstants.SCOPE_PERMISSION_WRITE + ":" + GlobalConstants.SCOPE_COURSE;
 
-  String[] ALL_SCOPES = {
+  String[] DEFAULT_SCOPES = {
     SCOPE_READ_SCORECARD,
     SCOPE_WRITE_SCORECARD,
     SCOPE_READ_HANDICAP,
     SCOPE_READ_COURSE,
     SCOPE_WRITE_COURSE
-  };
-
-  String[] DEFAULT_SCOPES = {
-    SCOPE_READ_SCORECARD, SCOPE_WRITE_SCORECARD, SCOPE_READ_HANDICAP, SCOPE_READ_COURSE
   };
 }

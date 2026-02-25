@@ -136,14 +136,14 @@ class TeeRepositoryTest {
     teeRepository.save(
         new TeeEntity(course2, "Red", 72, 5200, new BigDecimal("118.0"), new BigDecimal("66.0")));
 
-    List<TeeEntity> course1Tees = teeRepository.findByCourse_Id(course1.getId());
+    List<TeeEntity> course1Tees = teeRepository.findByCourseIdForCurrentUser(course1.getId());
 
     assertThat(course1Tees)
         .hasSize(2)
         .extracting(TeeEntity::getName)
         .containsExactlyInAnyOrder("Blue", "White");
 
-    List<TeeEntity> course2Tees = teeRepository.findByCourse_Id(course2.getId());
+    List<TeeEntity> course2Tees = teeRepository.findByCourseIdForCurrentUser(course2.getId());
 
     assertThat(course2Tees).hasSize(1).extracting(TeeEntity::getName).containsExactly("Red");
   }
@@ -152,7 +152,8 @@ class TeeRepositoryTest {
   @WithMockUser("123")
   @Transactional(propagation = Propagation.NEVER)
   void findByCourseIdEmpty() {
-    List<TeeEntity> result = teeRepository.findByCourse_Id(java.util.UUID.randomUUID());
+    List<TeeEntity> result =
+        teeRepository.findByCourseIdForCurrentUser(java.util.UUID.randomUUID());
 
     assertThat(result).isEmpty();
   }

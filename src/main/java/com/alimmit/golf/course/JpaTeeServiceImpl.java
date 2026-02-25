@@ -1,5 +1,6 @@
 package com.alimmit.golf.course;
 
+import com.alimmit.golf.errors.NotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,20 +24,22 @@ class JpaTeeServiceImpl implements TeeService {
   @Override
   @Transactional(readOnly = true)
   public List<TeeDto> listByCourse(UUID courseId) {
-    return teeRepository.findByCourse_Id(courseId).stream().map(teeMapper::map).toList();
+    return teeRepository.findByCourseIdForCurrentUser(courseId).stream()
+        .map(teeMapper::map)
+        .toList();
   }
 
   @Override
   @Transactional(readOnly = true)
   public Optional<TeeDto> get(UUID teeId) {
-    return teeMapper.map(teeRepository.findById(teeId));
+    return teeMapper.map(teeRepository.findByIdForCurrentUser(teeId));
   }
 
   @Override
   @Transactional
   public Optional<TeeDto> create(UUID courseId, CreateTeeRequest request) {
     return courseRepository
-        .findById(courseId)
+        .findByIdForCurrentUser(courseId)
         .map(course -> teeMapper.map(teeRepository.save(teeMapper.map(course, request))));
   }
 
@@ -45,7 +48,7 @@ class JpaTeeServiceImpl implements TeeService {
   public Optional<TeeDto> patch(UUID teeId, PatchTeeRequest request) {
     Optional<TeeEntity> toUpdate =
         teeRepository
-            .findById(teeId)
+            .findByIdForCurrentUser(teeId)
             .map(
                 t -> {
                   t.setName(request.name().orElse(t.getName()));
@@ -61,6 +64,9 @@ class JpaTeeServiceImpl implements TeeService {
   @Override
   @Transactional
   public void delete(UUID teeId) {
-    teeRepository.deleteById(teeId);
+    int deleted = teeRepository.deleteByIdForCurrentUser(teeId);
+    if (deleted == 0) {
+      throw new NotFoundException();
+    }
   }
 }

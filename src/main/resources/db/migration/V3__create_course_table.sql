@@ -11,8 +11,10 @@ CREATE TABLE course
     state            CHARACTER VARYING(14) NOT NULL
 );
 
--- There should not be multiple clubs/courses with the same name in the same city/state.  This should enforce some level uniqueness for course inputs
-CREATE UNIQUE INDEX idx_unique_club_course_location ON course (club, course, city, state);
+-- There should not be multiple clubs/courses with the same name in the same city/state for the same user.
+CREATE UNIQUE INDEX idx_unique_club_course_location ON course (created_by, club, course, city, state);
+
+CREATE INDEX idx_course_created_by ON course (created_by);
 
 CREATE TABLE course_aud
 (

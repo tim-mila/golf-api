@@ -1,5 +1,6 @@
 package com.alimmit.golf.course;
 
+import com.alimmit.golf.errors.NotFoundException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,13 +24,13 @@ class JpaCourseServiceImpl implements CourseService {
   @Override
   @Transactional(readOnly = true)
   public List<CourseDto> list() {
-    return courseRepository.findAll().stream().map(courseMapper::map).toList();
+    return courseRepository.findAllForCurrentUser().stream().map(courseMapper::map).toList();
   }
 
   @Override
   @Transactional(readOnly = true)
   public Optional<CourseDto> get(UUID courseId) {
-    return courseMapper.map(courseRepository.findById(courseId));
+    return courseMapper.map(courseRepository.findByIdForCurrentUser(courseId));
   }
 
   @Override
@@ -44,7 +45,7 @@ class JpaCourseServiceImpl implements CourseService {
 
     Optional<CourseEntity> toUpdate =
         courseRepository
-            .findById(courseId)
+            .findByIdForCurrentUser(courseId)
             .map(
                 c -> {
                   c.setClub(request.club().orElse(c.getClub()));
@@ -59,6 +60,7 @@ class JpaCourseServiceImpl implements CourseService {
   @Override
   @Transactional
   public void delete(UUID courseId) {
+    courseRepository.findByIdForCurrentUser(courseId).orElseThrow(NotFoundException::new);
     teeRepository.deleteByCourse_Id(courseId);
     courseRepository.deleteById(courseId);
   }
