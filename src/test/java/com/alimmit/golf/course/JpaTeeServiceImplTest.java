@@ -37,7 +37,8 @@ class JpaTeeServiceImplTest {
     TeeDto dto1 = createDto(entity1);
     TeeDto dto2 = createDto(entity2);
 
-    when(teeRepository.findByCourseIdForCurrentUser(courseId)).thenReturn(List.of(entity1, entity2));
+    when(teeRepository.findByCourseIdForCurrentUser(courseId))
+        .thenReturn(List.of(entity1, entity2));
     when(teeMapper.map(entity1)).thenReturn(dto1);
     when(teeMapper.map(entity2)).thenReturn(dto2);
 

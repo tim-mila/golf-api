@@ -152,7 +152,8 @@ class TeeRepositoryTest {
   @WithMockUser("123")
   @Transactional(propagation = Propagation.NEVER)
   void findByCourseIdEmpty() {
-    List<TeeEntity> result = teeRepository.findByCourseIdForCurrentUser(java.util.UUID.randomUUID());
+    List<TeeEntity> result =
+        teeRepository.findByCourseIdForCurrentUser(java.util.UUID.randomUUID());
 
     assertThat(result).isEmpty();
   }
