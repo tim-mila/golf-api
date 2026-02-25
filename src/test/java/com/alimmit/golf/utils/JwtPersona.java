@@ -39,7 +39,7 @@ public interface JwtPersona {
   }
 
   static JwtClaimApplier forAmyAdmin() {
-    return forAmyAdmin(ALL_SCOPES);
+    return forAmyAdmin(DEFAULT_SCOPES);
   }
 
   static JwtClaimApplier forAmyAdmin(String... scopes) {
@@ -56,14 +56,6 @@ public interface JwtPersona {
       GlobalConstants.SCOPE_PERMISSION_READ + ":" + GlobalConstants.SCOPE_COURSE;
   String SCOPE_WRITE_COURSE =
       GlobalConstants.SCOPE_PERMISSION_WRITE + ":" + GlobalConstants.SCOPE_COURSE;
-
-  String[] ALL_SCOPES = {
-    SCOPE_READ_SCORECARD,
-    SCOPE_WRITE_SCORECARD,
-    SCOPE_READ_HANDICAP,
-    SCOPE_READ_COURSE,
-    SCOPE_WRITE_COURSE
-  };
 
   String[] DEFAULT_SCOPES = {
     SCOPE_READ_SCORECARD,
