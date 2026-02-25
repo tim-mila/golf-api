@@ -70,7 +70,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     new BigDecimal("125.0"),
                     new BigDecimal("69.5"))));
 
-    listTeesByCourse(courseId, JwtPersona.forAmyAdmin())
+    listTeesByCourse(courseId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(2))
         .andExpectAll(
@@ -89,7 +89,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
     UUID courseId = UUID.randomUUID();
     when(teeService.listByCourse(courseId)).thenReturn(List.of());
 
-    listTeesByCourse(courseId, JwtPersona.forAmyAdmin())
+    listTeesByCourse(courseId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(0));
   }
@@ -112,7 +112,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     new BigDecimal("131.0"),
                     new BigDecimal("71.2"))));
 
-    getTee(teeId, JwtPersona.forAmyAdmin())
+    getTee(teeId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.teeId").value(teeId.toString()),
@@ -128,7 +128,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
     UUID teeId = UUID.randomUUID();
     when(teeService.get(teeId)).thenReturn(Optional.empty());
 
-    getTee(teeId, JwtPersona.forAmyAdmin()).andExpect(status().isNotFound());
+    getTee(teeId, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
   @Test
@@ -160,7 +160,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
-    createTee(courseId, requestBody, JwtPersona.forAmyAdmin())
+    createTee(courseId, requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isCreated())
         .andExpectAll(
             jsonPath("$.name").value("Blue"),
@@ -184,7 +184,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
         """;
 
-    createTee(courseId, requestBody, JwtPersona.forAmyAdmin()).andExpect(status().isNotFound());
+    createTee(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
   // --- Unauthenticated tests ---
@@ -217,7 +217,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         "{\"name\": \"Blue\", \"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
       })
   void createTee_ExpectBadRequest(String requestBody) throws Exception {
-    createTee(UUID.randomUUID(), requestBody, JwtPersona.forAmyAdmin())
+    createTee(UUID.randomUUID(), requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isBadRequest());
   }
 
@@ -244,7 +244,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         {"name": "White", "par": 72, "yardage": 6100, "slope": 125.0, "rating": 69.5}
         """;
 
-    patchTee(teeId, requestBody, JwtPersona.forAmyAdmin())
+    patchTee(teeId, requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.name").value("White"),
@@ -264,14 +264,14 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         {"name": "White"}
         """;
 
-    patchTee(teeId, requestBody, JwtPersona.forAmyAdmin()).andExpect(status().isNotFound());
+    patchTee(teeId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
   @Test
   void deleteTee_ExpectNoContent() throws Exception {
     UUID teeId = UUID.randomUUID();
     doNothing().when(teeService).delete(teeId);
-    deleteTee(teeId, JwtPersona.forAmyAdmin()).andExpect(status().isNoContent());
+    deleteTee(teeId, JwtPersona.forGaryGolfer()).andExpect(status().isNoContent());
   }
 
   @ParameterizedTest
@@ -297,30 +297,5 @@ class TeeControllerTest extends AbstractTeeControllerTest {
       })
   void getTeeWithDisallowedScopes_ExpectForbidden(String scope) throws Exception {
     getTee(UUID.randomUUID(), JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
-  }
-
-  @Test
-  void createTeeWithDefaultScopes_ExpectForbidden() throws Exception {
-    String requestBody =
-        """
-        {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
-        """;
-    createTee(UUID.randomUUID(), requestBody, JwtPersona.forGaryGolfer())
-        .andExpect(status().isForbidden());
-  }
-
-  @Test
-  void patchTeeWithDefaultScopes_ExpectForbidden() throws Exception {
-    String requestBody =
-        """
-        {"name": "White"}
-        """;
-    patchTee(UUID.randomUUID(), requestBody, JwtPersona.forGaryGolfer())
-        .andExpect(status().isForbidden());
-  }
-
-  @Test
-  void deleteTeeWithDefaultScopes_ExpectForbidden() throws Exception {
-    deleteTee(UUID.randomUUID(), JwtPersona.forGaryGolfer()).andExpect(status().isForbidden());
   }
 }

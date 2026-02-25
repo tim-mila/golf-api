@@ -37,7 +37,7 @@ class JpaTeeServiceImplTest {
     TeeDto dto1 = createDto(entity1);
     TeeDto dto2 = createDto(entity2);
 
-    when(teeRepository.findByCourse_Id(courseId)).thenReturn(List.of(entity1, entity2));
+    when(teeRepository.findByCourseIdForCurrentUser(courseId)).thenReturn(List.of(entity1, entity2));
     when(teeMapper.map(entity1)).thenReturn(dto1);
     when(teeMapper.map(entity2)).thenReturn(dto2);
 
@@ -53,7 +53,7 @@ class JpaTeeServiceImplTest {
     TeeDto dto = createDto(entity);
     Optional<TeeEntity> optionalEntity = Optional.of(entity);
 
-    when(teeRepository.findById(teeId)).thenReturn(optionalEntity);
+    when(teeRepository.findByIdForCurrentUser(teeId)).thenReturn(optionalEntity);
     when(teeMapper.map(optionalEntity)).thenReturn(Optional.of(dto));
 
     Optional<TeeDto> result = teeService.get(teeId);
@@ -66,7 +66,7 @@ class JpaTeeServiceImplTest {
     UUID teeId = UUID.randomUUID();
     Optional<TeeEntity> empty = Optional.empty();
 
-    when(teeRepository.findById(teeId)).thenReturn(empty);
+    when(teeRepository.findByIdForCurrentUser(teeId)).thenReturn(empty);
     when(teeMapper.map(empty)).thenReturn(Optional.empty());
 
     Optional<TeeDto> result = teeService.get(teeId);
@@ -87,7 +87,7 @@ class JpaTeeServiceImplTest {
     TeeEntity saved = createEntity(UUID.randomUUID(), "Blue");
     TeeDto dto = createDto(saved);
 
-    when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.of(course));
     when(teeMapper.map(course, request)).thenReturn(unsaved);
     when(teeRepository.save(unsaved)).thenReturn(saved);
     when(teeMapper.map(saved)).thenReturn(dto);
@@ -103,7 +103,7 @@ class JpaTeeServiceImplTest {
     CreateTeeRequest request =
         new CreateTeeRequest("Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
 
-    when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.empty());
 
     Optional<TeeDto> result = teeService.create(courseId, request);
 
@@ -125,7 +125,7 @@ class JpaTeeServiceImplTest {
             Optional.empty(),
             Optional.empty());
 
-    when(teeRepository.findById(teeId)).thenReturn(Optional.of(entity));
+    when(teeRepository.findByIdForCurrentUser(teeId)).thenReturn(Optional.of(entity));
     when(teeRepository.save(entity)).thenReturn(savedEntity);
     when(teeMapper.map(savedEntity)).thenReturn(dto);
 
@@ -145,7 +145,7 @@ class JpaTeeServiceImplTest {
             Optional.empty(),
             Optional.empty());
 
-    when(teeRepository.findById(teeId)).thenReturn(Optional.empty());
+    when(teeRepository.findByIdForCurrentUser(teeId)).thenReturn(Optional.empty());
 
     Optional<TeeDto> result = teeService.patch(teeId, request);
 
@@ -156,9 +156,21 @@ class JpaTeeServiceImplTest {
   void delete() {
     UUID teeId = UUID.randomUUID();
 
+    when(teeRepository.deleteByIdForCurrentUser(teeId)).thenReturn(1);
+
     teeService.delete(teeId);
 
-    verify(teeRepository).deleteById(teeId);
+    verify(teeRepository).deleteByIdForCurrentUser(teeId);
+  }
+
+  @Test
+  void deleteNotFound() {
+    UUID teeId = UUID.randomUUID();
+
+    when(teeRepository.deleteByIdForCurrentUser(teeId)).thenReturn(0);
+
+    org.junit.jupiter.api.Assertions.assertThrows(
+        com.alimmit.golf.errors.NotFoundException.class, () -> teeService.delete(teeId));
   }
 
   private TeeEntity createEntity(UUID teeId, String name) {
