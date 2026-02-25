@@ -1,9 +1,11 @@
 package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.alimmit.golf.errors.NotFoundException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -170,8 +172,7 @@ class JpaTeeServiceImplTest {
 
     when(teeRepository.deleteByIdForCurrentUser(teeId)).thenReturn(0);
 
-    org.junit.jupiter.api.Assertions.assertThrows(
-        com.alimmit.golf.errors.NotFoundException.class, () -> teeService.delete(teeId));
+    assertThatThrownBy(() -> teeService.delete(teeId)).isInstanceOf(NotFoundException.class);
   }
 
   private TeeEntity createEntity(UUID teeId, String name) {

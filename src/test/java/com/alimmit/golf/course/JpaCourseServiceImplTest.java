@@ -1,9 +1,11 @@
 package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.alimmit.golf.errors.NotFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -143,8 +145,7 @@ class JpaCourseServiceImplTest {
 
     when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.empty());
 
-    org.junit.jupiter.api.Assertions.assertThrows(
-        com.alimmit.golf.errors.NotFoundException.class, () -> courseService.delete(courseId));
+    assertThatThrownBy(() -> courseService.delete(courseId)).isInstanceOf(NotFoundException.class);
   }
 
   private CourseEntity createEntity(UUID courseId, String club, String course) {
