@@ -12,7 +12,6 @@ public interface JwtPersona {
   JwtPersona GARY_GOLFER = new JwtPersonaImpl("Gary Golfer", "123");
   JwtPersona PAT_PUTTER = new JwtPersonaImpl("Pat Putter", "234");
   JwtPersona DANA_DRIVER = new JwtPersonaImpl("Dana Driver", "345");
-  JwtPersona AMY_ADMIN = new JwtPersonaImpl("Amy Admin", "456");
 
   static JwtClaimApplier forGaryGolfer() {
     return forGaryGolfer(DEFAULT_SCOPES);
@@ -36,14 +35,6 @@ public interface JwtPersona {
 
   static JwtClaimApplier forDanaDriver(String... scopes) {
     return new JwtClaimApplierImpl(DANA_DRIVER.name(), DANA_DRIVER.sub(), scopes);
-  }
-
-  static JwtClaimApplier forAmyAdmin() {
-    return forAmyAdmin(DEFAULT_SCOPES);
-  }
-
-  static JwtClaimApplier forAmyAdmin(String... scopes) {
-    return new JwtClaimApplierImpl(AMY_ADMIN.name(), AMY_ADMIN.sub(), scopes);
   }
 
   String SCOPE_READ_SCORECARD =
