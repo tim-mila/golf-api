@@ -129,6 +129,7 @@ class ScorecardController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   void delete(@PathVariable UUID id) {
+    logger.debug("delete scorecard | id={}", id);
     int deleted = scorecardService.deleteById(id);
     if (deleted == 1) {
       scorecardEventPublisher.publishedDeleted();
