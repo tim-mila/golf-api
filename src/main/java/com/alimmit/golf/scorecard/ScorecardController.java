@@ -17,8 +17,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(SCORECARD_ENDPOINT)
 @Tag(name = "Scorecards")
 class ScorecardController {
+
+  private static final Logger logger = LoggerFactory.getLogger(ScorecardController.class);
 
   private final ScorecardService scorecardService;
   private final ScorecardEventPublisher scorecardEventPublisher;
@@ -65,6 +70,8 @@ class ScorecardController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   ScorecardDto create(@RequestBody @Valid ScorecardRequestDto request) {
+    String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    logger.debug("create scorecard | user={}", username);
     ScorecardDto created = scorecardService.create(request);
     scorecardEventPublisher.publishCreated(created);
     return created;
