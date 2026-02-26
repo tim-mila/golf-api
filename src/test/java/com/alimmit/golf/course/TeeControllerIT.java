@@ -27,11 +27,6 @@ import org.springframework.test.web.servlet.ResultActions;
 @Sql(scripts = "classpath:cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class TeeControllerIT extends AbstractTeeControllerTest {
 
-  private static final String TEE_REQUEST_BODY =
-      """
-      {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
-      """;
-
   private final CourseService courseService;
   private final ObjectMapper objectMapper;
 
@@ -46,14 +41,15 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   @WithMockUser("123")
   void addTee() throws Exception {
     UUID courseId = createCourse();
-    createAndAssertTee(courseId, JwtPersona.forGaryGolfer());
+    createAndAssertTee(
+        courseId, new TeeStub("Black", 72, 6800, 128.3, 71.9), JwtPersona.forGaryGolfer());
   }
 
   @Test
   @WithMockUser("123")
   void canOnlyListMyTees() throws Exception {
     UUID courseId = createCourse();
-    createTeeViaService(courseId, "Blue");
+    createAndAssertTee(courseId, TeeStub.defaultStub(), JwtPersona.forGaryGolfer());
 
     // Gary sees his tee
     listTeesByCourse(courseId, JwtPersona.forGaryGolfer(), status().isOk())
@@ -69,7 +65,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   void canOnlyFetchMyTees() throws Exception {
     UUID courseId = createCourse();
     String responseBody =
-        createAndAssertTee(courseId, JwtPersona.forGaryGolfer())
+        createAndAssertTee(courseId, TeeStub.defaultStub(), JwtPersona.forGaryGolfer())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -89,7 +85,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   void canOnlyDeleteMyTees() throws Exception {
     UUID courseId = createCourse();
     String responseBody =
-        createAndAssertTee(courseId, JwtPersona.forGaryGolfer())
+        createAndAssertTee(courseId, TeeStub.defaultStub(), JwtPersona.forGaryGolfer())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -159,8 +155,10 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   @WithMockUser("123")
   void listTeesByCourse() throws Exception {
     UUID courseId = createCourse();
-    createTeeViaService(courseId, "Blue");
-    createTeeViaService(courseId, "White");
+    createAndAssertTee(
+        courseId, new TeeStub("Blue", 72, 6305, 123.2, 71.5), JwtPersona.forGaryGolfer());
+    createAndAssertTee(
+        courseId, new TeeStub("White", 72, 6123, 121.2, 71.0), JwtPersona.forGaryGolfer());
 
     listTeesByCourse(courseId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
@@ -252,15 +250,18 @@ class TeeControllerIT extends AbstractTeeControllerTest {
     getTee(teeId, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
-  private ResultActions createAndAssertTee(UUID courseId, JwtClaimApplier fn) throws Exception {
-    return createTee(courseId, TEE_REQUEST_BODY, fn, status().isCreated())
+  private ResultActions createAndAssertTee(UUID courseId, TeeStub stub, JwtClaimApplier fn)
+      throws Exception {
+
+    return createTee(courseId, stub.asRequestBody(), fn, status().isCreated())
         .andExpectAll(
             jsonPath("$.teeId").exists(),
             jsonPath("$.courseId").value(courseId.toString()),
-            jsonPath("$.name").value("Blue"),
-            jsonPath("$.yardage").value(6500),
-            jsonPath("$.slope").value(131.0),
-            jsonPath("$.rating").value(71.2),
+            jsonPath("$.name").value(stub.name),
+            jsonPath("$.yardage").value(stub.yardage),
+            jsonPath("$.par").value(stub.par),
+            jsonPath("$.slope").value(stub.slope),
+            jsonPath("$.rating").value(stub.rating),
             jsonPath("$.createdAt").isString(),
             jsonPath("$.lastModifiedAt").isString());
   }
@@ -271,17 +272,17 @@ class TeeControllerIT extends AbstractTeeControllerTest {
         .courseId();
   }
 
-  private void createTeeViaService(UUID courseId, String name) {
-    try {
-      createTee(
-          courseId,
-          """
-          {"name": "%s", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
-          """
-              .formatted(name),
-          JwtPersona.forGaryGolfer());
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+  private record TeeStub(String name, int par, int yardage, double slope, double rating) {
+
+    String asRequestBody() {
+      return """
+        {"name": "%s", "par": %d, "yardage": %d, "slope": %.1f, "rating": %.1f}
+        """
+          .formatted(name, par, yardage, slope, rating);
+    }
+
+    static TeeStub defaultStub() {
+      return new TeeStub("Blue", 72, 6400, 123.4, 71.3);
     }
   }
 }
