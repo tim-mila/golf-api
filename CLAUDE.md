@@ -98,6 +98,7 @@ com.alimmit.golf
 **Migration Tool:** Flyway
 - Migrations go in: `src/main/resources/db/migration/`
 - Naming: `V{version}__{description}.sql` (e.g., `V1__create_scorecard_table.sql`)
+- Latest migration: `V5__add_course_search_vector.sql` — next migration is **V6**
 
 **Local Database:** PostgreSQL 17.6 via Docker Compose
 - Container: `golf-postgres`
@@ -130,7 +131,7 @@ AUTH0_AUDIENCE=https://your-api-audience
 Use `JwtPersona` utility for consistent test identities:
 ```java
 // Available personas: GARY_GOLFER (sub: "123"), PAT_PUTTER (sub: "234"), DANA_DRIVER (sub: "345"), AMY_ADMIN (sub: "456")
-// AMY_ADMIN defaults to ALL_SCOPES; other personas default to DEFAULT_SCOPES (read-only for course)
+// AMY_ADMIN defaults to SCOPE_READ_ACTUATOR; other personas default to DEFAULT_SCOPES (read+write for course and scorecard, read for handicap)
 mockMvc.perform(post("/v1/scorecard")
     .with(jwt().jwt(JwtPersona::forGaryGolfer))
     .content(requestBody))
@@ -171,6 +172,9 @@ public record ScorecardDto(String scorecardId, Long courseId, Integer score, Loc
 - Custom exceptions: `NotFoundException`
 - Global handler: `GlobalControllerErrorHandler` with `@ControllerAdvice`
 - Maps exceptions to HTTP status codes (404, 500, etc.)
+- `MethodArgumentNotValidException` → 400 (triggered by `@Valid` on `@RequestBody`)
+- `ConstraintViolationException` → 400 (triggered by `@NotBlank`/`@NotNull` on `@RequestParam`; requires `@Validated` on the controller class)
+- `HttpMessageNotReadableException` → 400 (e.g. invalid enum values in JSON)
 
 ## Known Issues & Future Work
 
