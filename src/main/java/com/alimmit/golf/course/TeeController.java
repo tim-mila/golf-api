@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Tag(name = "Tees")
 class TeeController {
+
+  private static final Logger logger = LoggerFactory.getLogger(TeeController.class);
 
   private final TeeService teeService;
 
@@ -94,6 +98,7 @@ class TeeController {
   @ResponseStatus(code = HttpStatus.CREATED)
   @PostMapping(path = TeeConstants.TEE_ENDPOINT)
   TeeDto create(@PathVariable("id") UUID courseId, @Valid @RequestBody CreateTeeRequest request) {
+    logger.debug("create tee | courseId={}", courseId);
     return teeService.create(courseId, request).orElseThrow(NotFoundException::new);
   }
 
@@ -119,6 +124,7 @@ class TeeController {
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @PatchMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
   TeeDto patch(@Valid @RequestBody PatchTeeRequest request, @PathVariable("id") UUID teeId) {
+    logger.debug("patch tee | id={}", teeId);
     return teeService.patch(teeId, request).orElseThrow(NotFoundException::new);
   }
 
@@ -133,6 +139,7 @@ class TeeController {
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
   void delete(@PathVariable("id") UUID teeId) {
+    logger.debug("delete tee | id={}", teeId);
     teeService.delete(teeId);
   }
 }
