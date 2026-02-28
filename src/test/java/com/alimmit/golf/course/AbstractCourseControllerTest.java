@@ -57,4 +57,13 @@ class AbstractCourseControllerTest extends AbstractControllerMockMvc {
         delete(CourseConstants.COURSE_ENDPOINT + GlobalConstants.API_RECORD_SUFFIX, courseId),
         expect);
   }
+
+  ResultActions searchCourses(String query, JwtClaimApplier fn, ResultMatcher... expect)
+      throws Exception {
+    return performMockMvc(
+        fn,
+        get(CourseConstants.COURSE_ENDPOINT + CourseConstants.COURSE_SEARCH_SUFFIX)
+            .param("q", query),
+        expect);
+  }
 }

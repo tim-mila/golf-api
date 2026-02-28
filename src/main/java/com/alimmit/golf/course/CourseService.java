@@ -44,4 +44,12 @@ public interface CourseService {
    * @param courseId Golf course identifier
    */
   void delete(UUID courseId);
+
+  /**
+   * Search golf courses by full-text query
+   *
+   * @param query Search query string
+   * @return list of matching CourseDto, ordered by relevance
+   */
+  List<CourseDto> search(String query);
 }

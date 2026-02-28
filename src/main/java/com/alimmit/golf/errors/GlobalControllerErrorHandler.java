@@ -1,5 +1,6 @@
 package com.alimmit.golf.errors;
 
+import jakarta.validation.ConstraintViolationException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -52,6 +53,17 @@ public class GlobalControllerErrorHandler {
             .collect(Collectors.joining(","));
 
     return ResponseEntity.badRequest().body(joinedErrors);
+  }
+
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(ConstraintViolationException.class)
+  ResponseEntity<String> constraintViolationException(ConstraintViolationException exception) {
+    logger.debug("handle ConstraintViolationException | {}", exception.getMessage());
+    String message =
+        exception.getConstraintViolations().stream()
+            .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+            .collect(Collectors.joining(", "));
+    return ResponseEntity.badRequest().body(message);
   }
 
   @ResponseStatus(HttpStatus.BAD_REQUEST)

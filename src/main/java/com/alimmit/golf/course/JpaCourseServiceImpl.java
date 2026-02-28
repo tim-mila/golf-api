@@ -1,9 +1,11 @@
 package com.alimmit.golf.course;
 
 import com.alimmit.golf.errors.NotFoundException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,5 +65,19 @@ class JpaCourseServiceImpl implements CourseService {
     courseRepository.findByIdForCurrentUser(courseId).orElseThrow(NotFoundException::new);
     teeRepository.deleteByCourse_Id(courseId);
     courseRepository.deleteById(courseId);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<CourseDto> search(String query) {
+    String sanitized = query.trim().replaceAll("[^\\w\\s]", "").trim();
+    if (sanitized.isBlank()) {
+      return List.of();
+    }
+    String tsQuery =
+        Arrays.stream(sanitized.split("\\s+"))
+            .map(word -> word + ":*")
+            .collect(Collectors.joining(" & "));
+    return courseRepository.search(tsQuery).stream().map(courseMapper::map).toList();
   }
 }
