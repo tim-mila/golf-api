@@ -261,4 +261,51 @@ class CourseControllerTest extends AbstractCourseControllerTest {
   void getCourseWithDisallowedScopes_ExpectForbidden(String scope) throws Exception {
     getCourse(UUID.randomUUID(), JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
   }
+
+  @Test
+  void searchCourses_ExpectOk() throws Exception {
+    when(courseService.search("Acme"))
+        .thenReturn(
+            List.of(
+                new CourseDto(
+                    UUID.randomUUID(),
+                    Instant.now(),
+                    Instant.now(),
+                    "Acme Club",
+                    "Acme Course",
+                    "Anytown",
+                    USState.WISCONSIN)));
+
+    searchCourses("Acme", JwtPersona.forGaryGolfer())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpectAll(
+            jsonPath("$.[0].club").value("Acme Club"),
+            jsonPath("$.[0].course").value("Acme Course"));
+  }
+
+  @Test
+  void searchCourses_BlankQuery_ExpectBadRequest() throws Exception {
+    searchCourses("", JwtPersona.forGaryGolfer()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void searchCourses_Unauthenticated_ExpectUnauthorized() throws Exception {
+    performWithoutAuth(
+            get(CourseConstants.COURSE_ENDPOINT + CourseConstants.COURSE_SEARCH_SUFFIX)
+                .param("q", "Acme"))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        JwtPersona.SCOPE_READ_SCORECARD,
+        JwtPersona.SCOPE_WRITE_SCORECARD,
+        JwtPersona.SCOPE_READ_HANDICAP,
+        "",
+      })
+  void searchCourses_DisallowedScopes_ExpectForbidden(String scope) throws Exception {
+    searchCourses("Acme", JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
+  }
 }

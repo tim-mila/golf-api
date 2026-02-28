@@ -13,14 +13,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping(path = CourseConstants.COURSE_ENDPOINT)
 @Tag(name = "Courses")
@@ -142,5 +145,25 @@ class CourseController {
   void delete(@PathVariable("id") UUID courseId) {
     logger.debug("delete course | id={}", courseId);
     courseService.delete(courseId);
+  }
+
+  @Operation(
+      method = "GET",
+      operationId = "course.search",
+      summary = "Search golf courses",
+      description = "Full-text search across club, course, city, and state fields",
+      parameters = {@Parameter(name = "q", description = "Search query", in = ParameterIn.QUERY)},
+      responses =
+          @ApiResponse(
+              responseCode = "200",
+              content =
+                  @Content(
+                      mediaType = MediaType.APPLICATION_JSON_VALUE,
+                      array = @ArraySchema(schema = @Schema(implementation = CourseDto.class)))))
+  @CanRead(GlobalConstants.SCOPE_COURSE)
+  @GetMapping(path = CourseConstants.COURSE_SEARCH_SUFFIX)
+  List<CourseDto> search(@RequestParam @NotBlank String q) {
+    logger.debug("search courses | q={}", q);
+    return courseService.search(q);
   }
 }

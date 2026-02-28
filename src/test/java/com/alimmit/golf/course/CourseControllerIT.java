@@ -97,6 +97,54 @@ class CourseControllerIT extends AbstractCourseControllerTest {
     deleteCourse(courseId, JwtPersona.forGaryGolfer(), status().isNotFound());
   }
 
+  @Test
+  void searchCourses_ExactWord() throws Exception {
+    createAndAssertCourse(JwtPersona.forGaryGolfer());
+
+    searchCourses("Test", JwtPersona.forGaryGolfer(), status().isOk())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$.[0].club").value("Test Club"));
+  }
+
+  @Test
+  void searchCourses_PartialWord() throws Exception {
+    createAndAssertCourse(JwtPersona.forGaryGolfer());
+
+    searchCourses("Tes", JwtPersona.forGaryGolfer(), status().isOk())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$.[0].club").value("Test Club"));
+  }
+
+  @Test
+  void searchCourses_MultiWord() throws Exception {
+    createAndAssertCourse(JwtPersona.forGaryGolfer());
+
+    searchCourses("Test Club", JwtPersona.forGaryGolfer(), status().isOk())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$.[0].club").value("Test Club"));
+  }
+
+  @Test
+  void searchCourses_SpecialCharsOnly_ReturnsEmpty() throws Exception {
+    createAndAssertCourse(JwtPersona.forGaryGolfer());
+
+    searchCourses("&|!", JwtPersona.forGaryGolfer(), status().isOk())
+        .andExpect(jsonPath("$.length()").value(0));
+  }
+
+  @Test
+  void searchCourses_MultiTenancy() throws Exception {
+    createAndAssertCourse(JwtPersona.forGaryGolfer());
+
+    // Gary finds his course
+    searchCourses("Test Club", JwtPersona.forGaryGolfer(), status().isOk())
+        .andExpect(jsonPath("$.length()").value(1));
+
+    // Pat finds nothing
+    searchCourses("Test Club", JwtPersona.forPatPutter(), status().isOk())
+        .andExpect(jsonPath("$.length()").value(0));
+  }
+
   private ResultActions createAndAssertCourse(JwtClaimApplier fn) throws Exception {
     return createCourse(REQUEST_BODY, fn, status().isCreated())
         .andExpectAll(
