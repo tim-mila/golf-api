@@ -19,4 +19,6 @@ public final class GlobalConstants {
   public static final String SCOPE_HANDICAP = "handicap";
 
   public static final String SCOPE_COURSE = "course";
+
+  public static final String SCOPE_ACTUATOR = "actuator";
 }
