@@ -2,6 +2,7 @@ package com.alimmit.golf.config;
 
 import com.alimmit.golf.GlobalConstants;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -19,6 +20,8 @@ class ActuatorSecurityConfiguration {
         .authorizeHttpRequests(
             requests ->
                 requests
+                    .requestMatchers(EndpointRequest.to(HealthEndpoint.class))
+                    .permitAll()
                     .anyRequest()
                     .hasAuthority(
                         "SCOPE_"

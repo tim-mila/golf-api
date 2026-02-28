@@ -6,8 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.alimmit.golf.utils.JwtPersona;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,29 +21,36 @@ class ActuatorSecurityConfigurationTest {
 
   @Autowired private MockMvc mockMvc;
 
-  @ParameterizedTest
-  @ValueSource(strings = {"/actuator/health", "/actuator/info"})
-  void unauthenticated_expectUnauthorized(String path) throws Exception {
-    mockMvc.perform(get(path)).andExpect(status().isUnauthorized());
+  // --- /actuator/health is public ---
+
+  @Test
+  void getHealth_unauthenticated_expectOk() throws Exception {
+    mockMvc.perform(get("/actuator/health")).andExpect(status().isOk());
   }
 
-  @ParameterizedTest
-  @ValueSource(strings = {"/actuator/health", "/actuator/info"})
-  void withDefaultScopes_expectForbidden(String path) throws Exception {
+  @Test
+  void getHealth_withDefaultScopes_expectOk() throws Exception {
     mockMvc
-        .perform(get(path).with(jwt().jwt(JwtPersona.forGaryGolfer()::apply)))
+        .perform(get("/actuator/health").with(jwt().jwt(JwtPersona.forGaryGolfer()::apply)))
+        .andExpect(status().isOk());
+  }
+
+  // --- /actuator/info requires read:actuator ---
+
+  @Test
+  void getInfo_unauthenticated_expectUnauthorized() throws Exception {
+    mockMvc.perform(get("/actuator/info")).andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void getInfo_withDefaultScopes_expectForbidden() throws Exception {
+    mockMvc
+        .perform(get("/actuator/info").with(jwt().jwt(JwtPersona.forGaryGolfer()::apply)))
         .andExpect(status().isForbidden());
   }
 
   @Test
-  void amyAdmin_getHealth_expectOk() throws Exception {
-    mockMvc
-        .perform(get("/actuator/health").with(jwt().jwt(JwtPersona.forAmyAdmin()::apply)))
-        .andExpect(status().isOk());
-  }
-
-  @Test
-  void amyAdmin_getInfo_expectOk() throws Exception {
+  void getInfo_amyAdmin_expectOk() throws Exception {
     mockMvc
         .perform(get("/actuator/info").with(jwt().jwt(JwtPersona.forAmyAdmin()::apply)))
         .andExpect(status().isOk());
