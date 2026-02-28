@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = CourseConstants.COURSE_ENDPOINT)
 @Tag(name = "Courses")
 class CourseController {
+
+  private static final Logger logger = LoggerFactory.getLogger(CourseController.class);
 
   private final CourseService courseService;
 
@@ -91,6 +95,7 @@ class CourseController {
   @ResponseStatus(code = HttpStatus.CREATED)
   @PostMapping
   CourseDto create(@Valid @RequestBody CreateCourseRequest request) {
+    logger.debug("create course");
     return courseService.create(request);
   }
 
@@ -135,6 +140,7 @@ class CourseController {
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   void delete(@PathVariable("id") UUID courseId) {
+    logger.debug("delete course | id={}", courseId);
     courseService.delete(courseId);
   }
 }
