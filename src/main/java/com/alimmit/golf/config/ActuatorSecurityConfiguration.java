@@ -1,5 +1,6 @@
 package com.alimmit.golf.config;
 
+import com.alimmit.golf.GlobalConstants;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,14 @@ class ActuatorSecurityConfiguration {
   SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
     return http.securityMatcher(EndpointRequest.toAnyEndpoint())
         .authorizeHttpRequests(
-            requests -> requests.anyRequest().hasAuthority("SCOPE_read:actuator"))
+            requests ->
+                requests
+                    .anyRequest()
+                    .hasAuthority(
+                        "SCOPE_"
+                            + GlobalConstants.SCOPE_PERMISSION_READ
+                            + ":"
+                            + GlobalConstants.SCOPE_ACTUATOR))
         .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()))
         .build();
   }
