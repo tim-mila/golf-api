@@ -8,6 +8,19 @@ Golf API is a Spring Boot 3.5.7 REST service for tracking golf scorecards and ca
 
 **Tech Stack:** Java 21, Spring Boot 3.5.7, PostgreSQL, OAuth2/JWT (Okta), Maven
 
+## Git Workflow
+
+**Prefer git worktrees** for feature branches to keep the main working directory clean and allow parallel work:
+```bash
+git worktree add .worktrees/<branch-name> -b <branch-name>
+cd .worktrees/<branch-name>
+```
+
+Worktrees are stored under `.worktrees/` (gitignored). Remove when done:
+```bash
+git worktree remove .worktrees/<branch-name>
+```
+
 ## Development Commands
 
 ### Local Development
