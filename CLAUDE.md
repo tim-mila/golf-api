@@ -155,9 +155,14 @@ mockMvc.perform(post("/v1/scorecard")
 - Active profile: "test"
 - Pattern: Test multi-tenancy (users can't see each other's data)
 
+### Service Unit Tests
+- Use `@ExtendWith(MockitoExtension.class)` with `@Mock` / `@InjectMocks` — no Spring context needed
+- Service classes are package-private; place tests in the same package
+
 ### Integration Tests
 - Tests with `IT` suffix are integration tests (e.g., `ScorecardControllerIT`, `TeeControllerIT`)
 - Use Testcontainers; Docker must be running
+- UUIDv7 is hexadecimal — use `[0-9a-f]` in UUID regex patterns, not `[0-9]`
 
 ## Code Conventions
 
@@ -185,6 +190,7 @@ public record ScorecardDto(String scorecardId, Long courseId, Integer score, Loc
 - Custom exceptions: `NotFoundException`
 - Global handler: `GlobalControllerErrorHandler` with `@ControllerAdvice`
 - Maps exceptions to HTTP status codes (404, 500, etc.)
+- `IllegalStateException` → 500 (e.g. delete returning more than 1 row)
 - `MethodArgumentNotValidException` → 400 (triggered by `@Valid` on `@RequestBody`)
 - `ConstraintViolationException` → 400 (triggered by `@NotBlank`/`@NotNull` on `@RequestParam`; requires `@Validated` on the controller class)
 - `HttpMessageNotReadableException` → 400 (e.g. invalid enum values in JSON)
