@@ -163,6 +163,16 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     deleteScorecard(JwtPersona.forGaryGolfer(), scorecardId).andExpect(status().isNotFound());
   }
 
+  @Test
+  void deleteScorecardAmbiguous_ExpectInternalServerError() throws Exception {
+    UUID scorecardId = UUID.randomUUID();
+
+    when(scorecardService.deleteById(scorecardId)).thenReturn(2);
+
+    deleteScorecard(JwtPersona.forGaryGolfer(), scorecardId)
+        .andExpect(status().isInternalServerError());
+  }
+
   // --- Authorization tests ---
 
   @ParameterizedTest

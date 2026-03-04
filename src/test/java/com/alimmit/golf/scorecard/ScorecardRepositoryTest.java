@@ -149,6 +149,35 @@ class ScorecardRepositoryTest {
   }
 
   @Test
+  void shouldFindAllCreatedBy() {
+    // Given: Gary creates 2 scorecards, Pat creates 1
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
+    scorecardRepository.save(createScorecard(88));
+    scorecardRepository.save(createScorecard(90));
+
+    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
+    scorecardRepository.save(createScorecard(85));
+
+    // When: Querying by Gary's user ID directly
+    List<ScorecardEntity> garyResults =
+        scorecardRepository.findAllCreatedBy(JwtPersona.GARY_GOLFER.sub());
+
+    // Then: Only Gary's scorecards are returned
+    assertThat(garyResults)
+        .hasSize(2)
+        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.GARY_GOLFER.sub()));
+
+    // When: Querying by Pat's user ID directly
+    List<ScorecardEntity> patResults =
+        scorecardRepository.findAllCreatedBy(JwtPersona.PAT_PUTTER.sub());
+
+    // Then: Only Pat's scorecard is returned
+    assertThat(patResults)
+        .hasSize(1)
+        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.PAT_PUTTER.sub()));
+  }
+
+  @Test
   void shouldDeleteByIdForCurrentUser() {
     // Given: Gary creates a scorecard
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
