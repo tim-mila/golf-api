@@ -113,7 +113,8 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
         .andExpectAll(
             jsonPath("$.scorecardId")
                 .value(
-                    MatchesPattern.matchesPattern("[0-9]{8}-[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{12}")),
+                    MatchesPattern.matchesPattern(
+                        "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")),
             jsonPath("$.courseName").value("Test Course"),
             jsonPath("$.teeName").value("Blue"),
             jsonPath("$.score").value(88),

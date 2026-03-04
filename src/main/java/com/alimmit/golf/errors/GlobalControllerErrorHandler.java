@@ -31,6 +31,11 @@ public class GlobalControllerErrorHandler {
     return ResponseEntity.notFound().build();
   }
 
+  @ExceptionHandler(IllegalStateException.class)
+  ResponseEntity<String> handleIllegalState() {
+    return ResponseEntity.internalServerError().build();
+  }
+
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(MethodArgumentNotValidException.class)
   ResponseEntity<String> constraintValidation(MethodArgumentNotValidException exception) {
