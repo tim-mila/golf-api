@@ -40,3 +40,7 @@ build/
 
 ### Claude Code
 .claude/
+
+### Postman
+.postman/
+postman/
