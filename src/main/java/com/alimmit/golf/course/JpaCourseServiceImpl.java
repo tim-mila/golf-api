@@ -1,5 +1,6 @@
 package com.alimmit.golf.course;
 
+import com.alimmit.golf.errors.DuplicateCourseException;
 import com.alimmit.golf.errors.NotFoundException;
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +39,10 @@ class JpaCourseServiceImpl implements CourseService {
   @Override
   @Transactional
   public CourseDto create(CreateCourseRequest request) {
+    if (courseRepository.existsByUniqueConstraintForCurrentUser(
+        request.club(), request.course(), request.city(), request.state())) {
+      throw new DuplicateCourseException();
+    }
     return courseMapper.map(courseRepository.save(courseMapper.map(request)));
   }
 

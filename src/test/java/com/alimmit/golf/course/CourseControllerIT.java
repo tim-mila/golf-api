@@ -45,6 +45,18 @@ class CourseControllerIT extends AbstractCourseControllerTest {
   }
 
   @Test
+  void addDuplicateCourse_ExpectConflict() throws Exception {
+    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isCreated());
+    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isConflict());
+  }
+
+  @Test
+  void addSameCourseForDifferentUsers_ExpectCreated() throws Exception {
+    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isCreated());
+    createCourse(REQUEST_BODY, JwtPersona.forPatPutter(), status().isCreated());
+  }
+
+  @Test
   void canOnlyListMyCourses() throws Exception {
     // Create course for Gary Golfer
     createAndAssertCourse(JwtPersona.forGaryGolfer());

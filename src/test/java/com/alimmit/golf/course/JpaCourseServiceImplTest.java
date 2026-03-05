@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.alimmit.golf.errors.DuplicateCourseException;
 import com.alimmit.golf.errors.NotFoundException;
 import java.time.Instant;
 import java.util.List;
@@ -90,6 +91,19 @@ class JpaCourseServiceImplTest {
     CourseDto result = courseService.create(request);
 
     assertThat(result).isEqualTo(dto);
+  }
+
+  @Test
+  void createDuplicate_ExpectDuplicateCourseException() {
+    CreateCourseRequest request =
+        new CreateCourseRequest("Test Club", "Test Course", "Test City", USState.WISCONSIN);
+
+    when(courseRepository.existsByUniqueConstraintForCurrentUser(
+            "Test Club", "Test Course", "Test City", USState.WISCONSIN))
+        .thenReturn(true);
+
+    assertThatThrownBy(() -> courseService.create(request))
+        .isInstanceOf(DuplicateCourseException.class);
   }
 
   @Test
