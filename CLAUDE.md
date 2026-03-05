@@ -163,6 +163,13 @@ mockMvc.perform(post("/v1/scorecard")
 - Tests with `IT` suffix are integration tests (e.g., `ScorecardControllerIT`, `TeeControllerIT`)
 - Use Testcontainers; Docker must be running
 - UUIDv7 is hexadecimal — use `[0-9a-f]` in UUID regex patterns, not `[0-9]`
+- Use `@MockitoBean` (Spring Boot 3.4+) to mock beans in `@SpringBootTest` IT tests
+
+### Async Event Testing
+For testing async Spring event pipelines (e.g., scorecard event → handicap recalculation):
+- Use Awaitility (`await().atMost(...).untilAsserted(...)`) for async assertions
+- Use `@ExtendWith(OutputCaptureExtension.class)` + `CapturedOutput` to assert log output
+- When testing create then delete, wait for the create event to settle before issuing the delete to avoid Mockito verify race conditions
 
 ## Code Conventions
 
