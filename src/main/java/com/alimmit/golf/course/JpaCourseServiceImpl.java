@@ -49,19 +49,25 @@ class JpaCourseServiceImpl implements CourseService {
   @Override
   @Transactional
   public Optional<CourseDto> patch(UUID courseId, PatchCourseRequest request) {
-
-    Optional<CourseEntity> toUpdate =
-        courseRepository
-            .findByIdForCurrentUser(courseId)
-            .map(
-                c -> {
-                  c.setClub(request.club().orElse(c.getClub()));
-                  c.setCourse(request.course().orElse(c.getCourse()));
-                  c.setCity(request.city().orElse(c.getCity()));
-                  c.setState(request.state().orElse(c.getState()));
-                  return c;
-                });
-    return toUpdate.map(c -> courseMapper.map(courseRepository.save(c)));
+    return courseRepository
+        .findByIdForCurrentUser(courseId)
+        .map(
+            c -> {
+              String mergedClub = request.club().orElse(c.getClub());
+              String mergedCourse = request.course().orElse(c.getCourse());
+              String mergedCity = request.city().orElse(c.getCity());
+              USState mergedState = request.state().orElse(c.getState());
+              if (courseRepository.existsByUniqueConstraintForCurrentUserExcluding(
+                  mergedClub, mergedCourse, mergedCity, mergedState, courseId)) {
+                throw new DuplicateCourseException();
+              }
+              c.setClub(mergedClub);
+              c.setCourse(mergedCourse);
+              c.setCity(mergedCity);
+              c.setState(mergedState);
+              return c;
+            })
+        .map(c -> courseMapper.map(courseRepository.save(c)));
   }
 
   @Override

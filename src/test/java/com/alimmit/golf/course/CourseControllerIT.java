@@ -57,6 +57,44 @@ class CourseControllerIT extends AbstractCourseControllerTest {
   }
 
   @Test
+  void patchCourseToMatchExisting_ExpectConflict() throws Exception {
+    // Create two distinct courses for Gary
+    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isCreated());
+    String secondBody =
+        """
+        {"club": "Other Club", "course": "Other Course", "city": "Other City", "state": "MI"}
+        """;
+    String secondResponse =
+        createCourse(secondBody, JwtPersona.forGaryGolfer(), status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    UUID secondId = UUID.fromString(objectMapper.readTree(secondResponse).at("/courseId").asText());
+
+    // Patching the second course to match the first should conflict
+    String patchBody =
+        """
+        {"club": "Test Club", "course": "Test Course", "city": "Test City", "state": "WI"}
+        """;
+    patchCourse(secondId, patchBody, JwtPersona.forGaryGolfer(), status().isConflict());
+  }
+
+  @Test
+  void patchCourseToSameValues_ExpectOk() throws Exception {
+    // Patching a course with its own values should not conflict with itself
+    String responseBody =
+        createAndAssertCourse(JwtPersona.forGaryGolfer())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    UUID courseId = UUID.fromString(objectMapper.readTree(responseBody).at("/courseId").asText());
+
+    patchCourse(courseId, REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isOk());
+  }
+
+  @Test
   void canOnlyListMyCourses() throws Exception {
     // Create course for Gary Golfer
     createAndAssertCourse(JwtPersona.forGaryGolfer());

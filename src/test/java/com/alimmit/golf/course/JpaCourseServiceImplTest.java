@@ -127,6 +127,23 @@ class JpaCourseServiceImplTest {
   }
 
   @Test
+  void patchDuplicate_ExpectDuplicateCourseException() {
+    UUID courseId = UUID.randomUUID();
+    CourseEntity entity = createEntity(courseId, "Old Club", "Old Course");
+    PatchCourseRequest request =
+        new PatchCourseRequest(
+            Optional.of("Other Club"), Optional.empty(), Optional.empty(), Optional.empty());
+
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.of(entity));
+    when(courseRepository.existsByUniqueConstraintForCurrentUserExcluding(
+            "Other Club", "Old Course", "Test City", USState.WISCONSIN, courseId))
+        .thenReturn(true);
+
+    assertThatThrownBy(() -> courseService.patch(courseId, request))
+        .isInstanceOf(DuplicateCourseException.class);
+  }
+
+  @Test
   void patchNotFound() {
     UUID courseId = UUID.randomUUID();
     PatchCourseRequest request =

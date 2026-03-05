@@ -205,6 +205,23 @@ class CourseControllerTest extends AbstractCourseControllerTest {
   }
 
   @Test
+  void patchCourse_Duplicate_ExpectConflict() throws Exception {
+    UUID courseId = UUID.randomUUID();
+    doThrow(DuplicateCourseException.class)
+        .when(courseService)
+        .patch(eq(courseId), argThat(m -> m.club().orElseThrow().equals("Other Club")));
+
+    String requestBody =
+        """
+        {
+          "club": "Other Club"
+        }
+        """;
+
+    patchCourse(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isConflict());
+  }
+
+  @Test
   void deleteCourse_ExpectNoContent() throws Exception {
     UUID courseId = UUID.randomUUID();
     doNothing().when(courseService).delete(courseId);
