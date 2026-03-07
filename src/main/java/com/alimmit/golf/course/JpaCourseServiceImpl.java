@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,11 @@ class JpaCourseServiceImpl implements CourseService {
         request.club(), request.course(), request.city(), request.state())) {
       throw new DuplicateCourseException();
     }
-    return courseMapper.map(courseRepository.save(courseMapper.map(request)));
+    try {
+      return courseMapper.map(courseRepository.save(courseMapper.map(request)));
+    } catch (DataIntegrityViolationException e) {
+      throw new DuplicateCourseException();
+    }
   }
 
   @Override
@@ -67,7 +72,14 @@ class JpaCourseServiceImpl implements CourseService {
               c.setState(mergedState);
               return c;
             })
-        .map(c -> courseMapper.map(courseRepository.save(c)));
+        .map(
+            c -> {
+              try {
+                return courseMapper.map(courseRepository.save(c));
+              } catch (DataIntegrityViolationException e) {
+                throw new DuplicateCourseException();
+              }
+            });
   }
 
   @Override
