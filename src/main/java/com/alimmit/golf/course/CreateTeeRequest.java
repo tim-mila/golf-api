@@ -7,6 +7,5 @@ import java.math.BigDecimal;
 public record CreateTeeRequest(
     @NotBlank String name,
     @NotNull Integer par,
-    @NotNull Integer yardage,
     @NotNull BigDecimal slope,
     @NotNull BigDecimal rating) {}

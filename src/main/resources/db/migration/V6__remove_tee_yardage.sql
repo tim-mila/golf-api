@@ -1,0 +1,2 @@
+ALTER TABLE tee DROP COLUMN yardage;
+ALTER TABLE tee_aud DROP COLUMN yardage;

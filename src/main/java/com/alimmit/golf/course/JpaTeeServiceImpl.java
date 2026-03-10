@@ -53,7 +53,6 @@ class JpaTeeServiceImpl implements TeeService {
                 t -> {
                   t.setName(request.name().orElse(t.getName()));
                   t.setPar(request.par().orElse(t.getPar()));
-                  t.setYardage(request.yardage().orElse(t.getYardage()));
                   t.setSlope(request.slope().orElse(t.getSlope()));
                   t.setRating(request.rating().orElse(t.getRating()));
                   return t;

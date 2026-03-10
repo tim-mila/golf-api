@@ -16,14 +16,13 @@ class TeeMapperTest {
   void mapCreateTeeRequest() {
     CourseEntity course = new CourseEntity("Test Club", "Test Course", "Test City", USState.OHIO);
     CreateTeeRequest request =
-        new CreateTeeRequest("Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
 
     TeeEntity result = teeMapper.map(course, request);
 
     assertThat(result)
         .isEqualTo(
-            new TeeEntity(
-                course, "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new TeeEntity(course, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
   }
 
   @Test
@@ -36,7 +35,7 @@ class TeeMapperTest {
     course.setId(courseId);
 
     TeeEntity entity =
-        new TeeEntity(course, "White", 72, 6100, new BigDecimal("125.0"), new BigDecimal("69.5"));
+        new TeeEntity(course, "White", 72, new BigDecimal("125.0"), new BigDecimal("69.5"));
     entity.setId(teeId);
     entity.setCreatedAt(createdAt);
 
@@ -51,7 +50,6 @@ class TeeMapperTest {
                 null,
                 "White",
                 72,
-                6100,
                 new BigDecimal("125.0"),
                 new BigDecimal("69.5")));
   }
@@ -66,7 +64,7 @@ class TeeMapperTest {
     course.setId(courseId);
 
     TeeEntity entity =
-        new TeeEntity(course, "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new TeeEntity(course, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
     entity.setId(teeId);
     entity.setCreatedAt(createdAt);
 
@@ -82,7 +80,6 @@ class TeeMapperTest {
                 null,
                 "Blue",
                 72,
-                6500,
                 new BigDecimal("131.0"),
                 new BigDecimal("71.2")));
   }

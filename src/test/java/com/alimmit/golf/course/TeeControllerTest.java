@@ -56,7 +56,6 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     "Blue",
                     72,
-                    6500,
                     new BigDecimal("131.0"),
                     new BigDecimal("71.2")),
                 new TeeDto(
@@ -66,7 +65,6 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     "White",
                     72,
-                    6100,
                     new BigDecimal("125.0"),
                     new BigDecimal("69.5"))));
 
@@ -75,11 +73,9 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         .andExpect(jsonPath("$.length()").value(2))
         .andExpectAll(
             jsonPath("$.[0].name").value("Blue"),
-            jsonPath("$.[0].yardage").value(6500),
             jsonPath("$.[0].slope").value(131.0),
             jsonPath("$.[0].rating").value(71.2),
             jsonPath("$.[1].name").value("White"),
-            jsonPath("$.[1].yardage").value(6100),
             jsonPath("$.[1].slope").value(125.0),
             jsonPath("$.[1].rating").value(69.5));
   }
@@ -108,7 +104,6 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     "Blue",
                     72,
-                    6500,
                     new BigDecimal("131.0"),
                     new BigDecimal("71.2"))));
 
@@ -118,7 +113,6 @@ class TeeControllerTest extends AbstractTeeControllerTest {
             jsonPath("$.teeId").value(teeId.toString()),
             jsonPath("$.courseId").value(courseId.toString()),
             jsonPath("$.name").value("Blue"),
-            jsonPath("$.yardage").value(6500),
             jsonPath("$.slope").value(131.0),
             jsonPath("$.rating").value(71.2));
   }
@@ -139,7 +133,6 @@ class TeeControllerTest extends AbstractTeeControllerTest {
             argThat(
                 m ->
                     m.name().equals("Blue")
-                        && m.yardage().equals(6500)
                         && m.slope().compareTo(new BigDecimal("131.0")) == 0
                         && m.rating().compareTo(new BigDecimal("71.2")) == 0)))
         .thenReturn(
@@ -151,20 +144,18 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     "Blue",
                     72,
-                    6500,
                     new BigDecimal("131.0"),
                     new BigDecimal("71.2"))));
 
     String requestBody =
         """
-        {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
+        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
         """;
 
     createTee(courseId, requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isCreated())
         .andExpectAll(
             jsonPath("$.name").value("Blue"),
-            jsonPath("$.yardage").value(6500),
             jsonPath("$.slope").value(131.0),
             jsonPath("$.rating").value(71.2),
             jsonPath("$.courseId").value(courseId.toString()),
@@ -181,7 +172,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
 
     String requestBody =
         """
-        {"name": "Blue", "par": 72, "yardage": 6500, "slope": 131.0, "rating": 71.2}
+        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
         """;
 
     createTee(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
@@ -209,12 +200,11 @@ class TeeControllerTest extends AbstractTeeControllerTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "{\"par\": 72, \"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"par\": 72, \"yardage\": 6500, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"par\": 72, \"yardage\": 6500, \"slope\": 131.0}",
-        "{\"name\": \"\", \"par\": 72, \"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"yardage\": 6500, \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"name\": \"Blue\", \"par\": 72, \"rating\": 71.2}",
+        "{\"name\": \"Blue\", \"par\": 72, \"slope\": 131.0}",
+        "{\"name\": \"\", \"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"name\": \"Blue\", \"slope\": 131.0, \"rating\": 71.2}",
       })
   void createTee_ExpectBadRequest(String requestBody) throws Exception {
     createTee(UUID.randomUUID(), requestBody, JwtPersona.forGaryGolfer())
@@ -235,20 +225,18 @@ class TeeControllerTest extends AbstractTeeControllerTest {
                     Instant.now(),
                     "White",
                     72,
-                    6100,
                     new BigDecimal("125.0"),
                     new BigDecimal("69.5"))));
 
     String requestBody =
         """
-        {"name": "White", "par": 72, "yardage": 6100, "slope": 125.0, "rating": 69.5}
+        {"name": "White", "par": 72, "slope": 125.0, "rating": 69.5}
         """;
 
     patchTee(teeId, requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
             jsonPath("$.name").value("White"),
-            jsonPath("$.yardage").value(6100),
             jsonPath("$.slope").value(125.0),
             jsonPath("$.rating").value(69.5));
   }

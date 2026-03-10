@@ -11,6 +11,5 @@ public record TeeDto(
     Instant lastModifiedAt,
     String name,
     Integer par,
-    Integer yardage,
     BigDecimal slope,
     BigDecimal rating) {}

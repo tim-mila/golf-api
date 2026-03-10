@@ -72,8 +72,7 @@ class TeeRepositoryTest {
 
     TeeEntity saved =
         teeRepository.save(
-            new TeeEntity(
-                course, "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new TeeEntity(course, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
     assertThat(saved)
         .hasFieldOrProperty("id")
@@ -83,7 +82,6 @@ class TeeRepositoryTest {
         .hasFieldOrPropertyWithValue("lastModifiedBy", "123")
         .hasFieldOrPropertyWithValue("name", "Blue")
         .hasFieldOrPropertyWithValue("par", 72)
-        .hasFieldOrPropertyWithValue("yardage", 6500)
         .hasFieldOrPropertyWithValue("slope", new BigDecimal("131.0"))
         .hasFieldOrPropertyWithValue("rating", new BigDecimal("71.2"));
 
@@ -92,12 +90,10 @@ class TeeRepositoryTest {
         .isPresent()
         .get()
         .hasFieldOrPropertyWithValue("id", saved.getId())
-        .hasFieldOrPropertyWithValue("name", "Blue")
-        .hasFieldOrPropertyWithValue("yardage", 6500);
+        .hasFieldOrPropertyWithValue("name", "Blue");
 
     TeeEntity toUpdate = read.get();
     toUpdate.setName("White");
-    toUpdate.setYardage(6100);
     toUpdate.setSlope(new BigDecimal("125.0"));
     toUpdate.setRating(new BigDecimal("69.5"));
 
@@ -105,7 +101,6 @@ class TeeRepositoryTest {
     assertThat(updated)
         .hasFieldOrPropertyWithValue("id", saved.getId())
         .hasFieldOrPropertyWithValue("name", "White")
-        .hasFieldOrPropertyWithValue("yardage", 6100)
         .hasFieldOrPropertyWithValue("slope", new BigDecimal("125.0"))
         .hasFieldOrPropertyWithValue("rating", new BigDecimal("69.5"));
 
@@ -127,14 +122,12 @@ class TeeRepositoryTest {
 
     TeeEntity tee1 =
         teeRepository.save(
-            new TeeEntity(
-                course1, "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new TeeEntity(course1, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
     TeeEntity tee2 =
         teeRepository.save(
-            new TeeEntity(
-                course1, "White", 72, 6100, new BigDecimal("125.0"), new BigDecimal("69.5")));
+            new TeeEntity(course1, "White", 72, new BigDecimal("125.0"), new BigDecimal("69.5")));
     teeRepository.save(
-        new TeeEntity(course2, "Red", 72, 5200, new BigDecimal("118.0"), new BigDecimal("66.0")));
+        new TeeEntity(course2, "Red", 72, new BigDecimal("118.0"), new BigDecimal("66.0")));
 
     List<TeeEntity> course1Tees = teeRepository.findByCourseIdForCurrentUser(course1.getId());
 

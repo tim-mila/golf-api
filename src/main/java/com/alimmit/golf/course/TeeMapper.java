@@ -7,13 +7,7 @@ import org.springframework.stereotype.Service;
 class TeeMapper {
 
   TeeEntity map(CourseEntity course, CreateTeeRequest request) {
-    return new TeeEntity(
-        course,
-        request.name(),
-        request.par(),
-        request.yardage(),
-        request.slope(),
-        request.rating());
+    return new TeeEntity(course, request.name(), request.par(), request.slope(), request.rating());
   }
 
   Optional<TeeDto> map(Optional<TeeEntity> entity) {
@@ -28,7 +22,6 @@ class TeeMapper {
         entity.getLastModifiedAt(),
         entity.getName(),
         entity.getPar(),
-        entity.getYardage(),
         entity.getSlope(),
         entity.getRating());
   }
