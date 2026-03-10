@@ -111,7 +111,7 @@ com.alimmit.golf
 **Migration Tool:** Flyway
 - Migrations go in: `src/main/resources/db/migration/`
 - Naming: `V{version}__{description}.sql` (e.g., `V1__create_scorecard_table.sql`)
-- Latest migration: `V5__add_course_search_vector.sql` — next migration is **V6**
+- Latest migration: `V6__remove_tee_yardage.sql` — next migration is **V7**
 
 **Local Database:** PostgreSQL 17.6 via Docker Compose
 - Container: `golf-postgres`
