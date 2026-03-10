@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.alimmit.golf.errors.DuplicateCourseException;
+import com.alimmit.golf.errors.DuplicateException;
 import com.alimmit.golf.errors.NotFoundException;
 import java.time.Instant;
 import java.util.List;
@@ -94,7 +94,7 @@ class JpaCourseServiceImplTest {
   }
 
   @Test
-  void createDuplicate_ExpectDuplicateCourseException() {
+  void createDuplicate_ExpectDuplicateException() {
     CreateCourseRequest request =
         new CreateCourseRequest("Test Club", "Test Course", "Test City", USState.WISCONSIN);
 
@@ -102,8 +102,7 @@ class JpaCourseServiceImplTest {
             "Test Club", "Test Course", "Test City", USState.WISCONSIN))
         .thenReturn(true);
 
-    assertThatThrownBy(() -> courseService.create(request))
-        .isInstanceOf(DuplicateCourseException.class);
+    assertThatThrownBy(() -> courseService.create(request)).isInstanceOf(DuplicateException.class);
   }
 
   @Test
@@ -127,7 +126,7 @@ class JpaCourseServiceImplTest {
   }
 
   @Test
-  void patchDuplicate_ExpectDuplicateCourseException() {
+  void patchDuplicate_ExpectDuplicateException() {
     UUID courseId = UUID.randomUUID();
     CourseEntity entity = createEntity(courseId, "Old Club", "Old Course");
     PatchCourseRequest request =
@@ -140,7 +139,7 @@ class JpaCourseServiceImplTest {
         .thenReturn(true);
 
     assertThatThrownBy(() -> courseService.patch(courseId, request))
-        .isInstanceOf(DuplicateCourseException.class);
+        .isInstanceOf(DuplicateException.class);
   }
 
   @Test

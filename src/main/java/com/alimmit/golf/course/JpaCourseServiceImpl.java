@@ -1,6 +1,6 @@
 package com.alimmit.golf.course;
 
-import com.alimmit.golf.errors.DuplicateCourseException;
+import com.alimmit.golf.errors.DuplicateException;
 import com.alimmit.golf.errors.NotFoundException;
 import java.util.Arrays;
 import java.util.List;
@@ -42,12 +42,12 @@ class JpaCourseServiceImpl implements CourseService {
   public CourseDto create(CreateCourseRequest request) {
     if (courseRepository.existsByUniqueConstraintForCurrentUser(
         request.club(), request.course(), request.city(), request.state())) {
-      throw new DuplicateCourseException();
+      throw new DuplicateException();
     }
     try {
       return courseMapper.map(courseRepository.save(courseMapper.map(request)));
     } catch (DataIntegrityViolationException e) {
-      throw new DuplicateCourseException();
+      throw new DuplicateException();
     }
   }
 
@@ -64,7 +64,7 @@ class JpaCourseServiceImpl implements CourseService {
               USState mergedState = request.state().orElse(c.getState());
               if (courseRepository.existsByUniqueConstraintForCurrentUserExcluding(
                   mergedClub, mergedCourse, mergedCity, mergedState, courseId)) {
-                throw new DuplicateCourseException();
+                throw new DuplicateException();
               }
               c.setClub(mergedClub);
               c.setCourse(mergedCourse);
@@ -77,7 +77,7 @@ class JpaCourseServiceImpl implements CourseService {
               try {
                 return courseMapper.map(courseRepository.save(c));
               } catch (DataIntegrityViolationException e) {
-                throw new DuplicateCourseException();
+                throw new DuplicateException();
               }
             });
   }
