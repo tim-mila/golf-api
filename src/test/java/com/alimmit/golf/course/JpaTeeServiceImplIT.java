@@ -127,8 +127,7 @@ class JpaTeeServiceImplIT {
         teeService
             .create(
                 course.courseId(),
-                new CreateTeeRequest(
-                    "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
+                new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
             .orElseThrow();
 
     Optional<TeeDto> patched =
@@ -187,8 +186,7 @@ class JpaTeeServiceImplIT {
         teeService
             .create(
                 course.courseId(),
-                new CreateTeeRequest(
-                    "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
+                new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
             .orElseThrow();
 
     teeService.delete(created.teeId());

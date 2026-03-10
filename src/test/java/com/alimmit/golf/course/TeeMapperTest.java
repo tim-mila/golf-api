@@ -22,8 +22,7 @@ class TeeMapperTest {
 
     assertThat(result)
         .isEqualTo(
-            new TeeEntity(
-                course, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new TeeEntity(course, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
   }
 
   @Test
