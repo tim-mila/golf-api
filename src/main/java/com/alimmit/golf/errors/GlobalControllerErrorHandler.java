@@ -31,6 +31,11 @@ public class GlobalControllerErrorHandler {
     return ResponseEntity.notFound().build();
   }
 
+  @ExceptionHandler(DuplicateException.class)
+  ResponseEntity<String> handleDuplicate() {
+    return ResponseEntity.status(HttpStatus.CONFLICT).build();
+  }
+
   @ExceptionHandler(IllegalStateException.class)
   ResponseEntity<String> handleIllegalState() {
     return ResponseEntity.internalServerError().build();

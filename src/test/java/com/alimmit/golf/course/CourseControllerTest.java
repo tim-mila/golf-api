@@ -3,6 +3,7 @@ package com.alimmit.golf.course;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -12,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.alimmit.golf.config.MethodSecurityConfiguration;
+import com.alimmit.golf.errors.DuplicateException;
 import com.alimmit.golf.utils.JwtPersona;
 import java.time.Instant;
 import java.util.List;
@@ -149,6 +151,25 @@ class CourseControllerTest extends AbstractCourseControllerTest {
   }
 
   @Test
+  void createCourse_Duplicate_ExpectConflict() throws Exception {
+    doThrow(DuplicateException.class)
+        .when(courseService)
+        .create(argThat(m -> m.club().equals("Acme Club")));
+
+    String requestBody =
+        """
+        {
+          "club": "Acme Club",
+          "course": "Acme Course",
+          "city": "Someplace",
+          "state": "MI"
+        }
+        """;
+
+    createCourse(requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isConflict());
+  }
+
+  @Test
   void patchCourse_ExpectOk() throws Exception {
 
     UUID courseId = UUID.randomUUID();
@@ -181,6 +202,23 @@ class CourseControllerTest extends AbstractCourseControllerTest {
         }
         """;
     patchCourse(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isOk());
+  }
+
+  @Test
+  void patchCourse_Duplicate_ExpectConflict() throws Exception {
+    UUID courseId = UUID.randomUUID();
+    doThrow(DuplicateException.class)
+        .when(courseService)
+        .patch(eq(courseId), argThat(m -> m.club().orElseThrow().equals("Other Club")));
+
+    String requestBody =
+        """
+        {
+          "club": "Other Club"
+        }
+        """;
+
+    patchCourse(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isConflict());
   }
 
   @Test

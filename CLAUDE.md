@@ -194,13 +194,21 @@ public record ScorecardDto(String scorecardId, Long courseId, Integer score, Loc
 - Prevents hardcoded strings in controllers
 
 ### Exception Handling
-- Custom exceptions: `NotFoundException`
+- Custom exceptions: `NotFoundException`, `DuplicateException`
 - Global handler: `GlobalControllerErrorHandler` with `@ControllerAdvice`
-- Maps exceptions to HTTP status codes (404, 500, etc.)
+- Maps exceptions to HTTP status codes (404, 409, 500, etc.)
 - `IllegalStateException` → 500 (e.g. delete returning more than 1 row)
 - `MethodArgumentNotValidException` → 400 (triggered by `@Valid` on `@RequestBody`)
 - `ConstraintViolationException` → 400 (triggered by `@NotBlank`/`@NotNull` on `@RequestParam`; requires `@Validated` on the controller class)
 - `HttpMessageNotReadableException` → 400 (e.g. invalid enum values in JSON)
+- `DuplicateException` → 409 (course POST/PATCH violates unique constraint on `created_by, club, course, city, state`)
+
+### Duplicate Course Detection
+- Uniqueness enforced via pre-flight service check (not JSR-303) — business logic, not input validation
+- `CourseRepository.existsByUniqueConstraintForCurrentUser(...)` — used on POST
+- `CourseRepository.existsByUniqueConstraintForCurrentUserExcluding(...)` — used on PATCH (excludes the course being updated to allow re-saving unchanged values)
+- DB unique index `idx_unique_club_course_location` on `(created_by, club, course, city, state)` remains as the authoritative constraint
+- TOCTOU fallback: `save()` is wrapped in `try/catch DataIntegrityViolationException` → re-thrown as `DuplicateException` to handle concurrent duplicate inserts that slip past the pre-flight check
 
 ## Known Issues & Future Work
 

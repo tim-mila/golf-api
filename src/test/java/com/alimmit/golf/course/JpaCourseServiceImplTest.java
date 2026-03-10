@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.alimmit.golf.errors.DuplicateException;
 import com.alimmit.golf.errors.NotFoundException;
 import java.time.Instant;
 import java.util.List;
@@ -93,6 +94,18 @@ class JpaCourseServiceImplTest {
   }
 
   @Test
+  void createDuplicate_ExpectDuplicateException() {
+    CreateCourseRequest request =
+        new CreateCourseRequest("Test Club", "Test Course", "Test City", USState.WISCONSIN);
+
+    when(courseRepository.existsByUniqueConstraintForCurrentUser(
+            "Test Club", "Test Course", "Test City", USState.WISCONSIN))
+        .thenReturn(true);
+
+    assertThatThrownBy(() -> courseService.create(request)).isInstanceOf(DuplicateException.class);
+  }
+
+  @Test
   void patch() {
     UUID courseId = UUID.randomUUID();
     CourseEntity entity = createEntity(courseId, "Old Club", "Old Course");
@@ -110,6 +123,23 @@ class JpaCourseServiceImplTest {
     Optional<CourseDto> result = courseService.patch(courseId, request);
 
     assertThat(result).isPresent().contains(dto);
+  }
+
+  @Test
+  void patchDuplicate_ExpectDuplicateException() {
+    UUID courseId = UUID.randomUUID();
+    CourseEntity entity = createEntity(courseId, "Old Club", "Old Course");
+    PatchCourseRequest request =
+        new PatchCourseRequest(
+            Optional.of("Other Club"), Optional.empty(), Optional.empty(), Optional.empty());
+
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.of(entity));
+    when(courseRepository.existsByUniqueConstraintForCurrentUserExcluding(
+            "Other Club", "Old Course", "Test City", USState.WISCONSIN, courseId))
+        .thenReturn(true);
+
+    assertThatThrownBy(() -> courseService.patch(courseId, request))
+        .isInstanceOf(DuplicateException.class);
   }
 
   @Test

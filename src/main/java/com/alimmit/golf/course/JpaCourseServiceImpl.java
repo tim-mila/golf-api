@@ -1,11 +1,13 @@
 package com.alimmit.golf.course;
 
+import com.alimmit.golf.errors.DuplicateException;
 import com.alimmit.golf.errors.NotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,25 +40,46 @@ class JpaCourseServiceImpl implements CourseService {
   @Override
   @Transactional
   public CourseDto create(CreateCourseRequest request) {
-    return courseMapper.map(courseRepository.save(courseMapper.map(request)));
+    if (courseRepository.existsByUniqueConstraintForCurrentUser(
+        request.club(), request.course(), request.city(), request.state())) {
+      throw new DuplicateException();
+    }
+    try {
+      return courseMapper.map(courseRepository.save(courseMapper.map(request)));
+    } catch (DataIntegrityViolationException e) {
+      throw new DuplicateException();
+    }
   }
 
   @Override
   @Transactional
   public Optional<CourseDto> patch(UUID courseId, PatchCourseRequest request) {
-
-    Optional<CourseEntity> toUpdate =
-        courseRepository
-            .findByIdForCurrentUser(courseId)
-            .map(
-                c -> {
-                  c.setClub(request.club().orElse(c.getClub()));
-                  c.setCourse(request.course().orElse(c.getCourse()));
-                  c.setCity(request.city().orElse(c.getCity()));
-                  c.setState(request.state().orElse(c.getState()));
-                  return c;
-                });
-    return toUpdate.map(c -> courseMapper.map(courseRepository.save(c)));
+    return courseRepository
+        .findByIdForCurrentUser(courseId)
+        .map(
+            c -> {
+              String mergedClub = request.club().orElse(c.getClub());
+              String mergedCourse = request.course().orElse(c.getCourse());
+              String mergedCity = request.city().orElse(c.getCity());
+              USState mergedState = request.state().orElse(c.getState());
+              if (courseRepository.existsByUniqueConstraintForCurrentUserExcluding(
+                  mergedClub, mergedCourse, mergedCity, mergedState, courseId)) {
+                throw new DuplicateException();
+              }
+              c.setClub(mergedClub);
+              c.setCourse(mergedCourse);
+              c.setCity(mergedCity);
+              c.setState(mergedState);
+              return c;
+            })
+        .map(
+            c -> {
+              try {
+                return courseMapper.map(courseRepository.save(c));
+              } catch (DataIntegrityViolationException e) {
+                throw new DuplicateException();
+              }
+            });
   }
 
   @Override

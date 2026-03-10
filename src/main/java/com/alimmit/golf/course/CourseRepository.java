@@ -17,6 +17,26 @@ interface CourseRepository extends JpaRepository<CourseEntity, UUID> {
   Optional<CourseEntity> findByIdForCurrentUser(@Param("courseId") UUID courseId);
 
   @Query(
+      "SELECT COUNT(c) > 0 FROM CourseEntity c WHERE c.createdBy = ?#{authentication.name}"
+          + " AND c.club = :club AND c.course = :course AND c.city = :city AND c.state = :state")
+  boolean existsByUniqueConstraintForCurrentUser(
+      @Param("club") String club,
+      @Param("course") String course,
+      @Param("city") String city,
+      @Param("state") USState state);
+
+  @Query(
+      "SELECT COUNT(c) > 0 FROM CourseEntity c WHERE c.createdBy = ?#{authentication.name}"
+          + " AND c.club = :club AND c.course = :course AND c.city = :city AND c.state = :state"
+          + " AND c.id <> :excludeId")
+  boolean existsByUniqueConstraintForCurrentUserExcluding(
+      @Param("club") String club,
+      @Param("course") String course,
+      @Param("city") String city,
+      @Param("state") USState state,
+      @Param("excludeId") UUID excludeId);
+
+  @Query(
       value =
           """
           SELECT course_id, created_at, created_by, last_modified_at, last_modified_by,
