@@ -208,6 +208,7 @@ public record ScorecardDto(String scorecardId, Long courseId, Integer score, Loc
 - `CourseRepository.existsByUniqueConstraintForCurrentUser(...)` — used on POST
 - `CourseRepository.existsByUniqueConstraintForCurrentUserExcluding(...)` — used on PATCH (excludes the course being updated to allow re-saving unchanged values)
 - DB unique index `idx_unique_club_course_location` on `(created_by, club, course, city, state)` remains as the authoritative constraint
+- TOCTOU fallback: `save()` is wrapped in `try/catch DataIntegrityViolationException` → re-thrown as `DuplicateCourseException` to handle concurrent duplicate inserts that slip past the pre-flight check
 
 ## Known Issues & Future Work
 
