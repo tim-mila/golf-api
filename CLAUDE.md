@@ -79,7 +79,7 @@ com.alimmit.golf
 - Has associated `Tee` entities (blue, white, red tees, etc.)
 
 **Tee** - Represents a set of tees for a course
-- Fields: `name`, `par`, `yardage`, `slope`, `rating`, audit fields
+- Fields: `name`, `par`, `slope`, `rating`, audit fields
 
 **Handicap** - Tracks a golfer's current handicap index
 - Fields: `golferId`, `handicapIndex`, `roundsUsed`, `totalRounds`, audit fields

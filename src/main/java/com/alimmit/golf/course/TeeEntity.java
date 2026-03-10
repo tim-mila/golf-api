@@ -58,9 +58,6 @@ class TeeEntity {
   @Column(nullable = false)
   private Integer par;
 
-  @Column(nullable = false)
-  private Integer yardage;
-
   @Column(nullable = false, precision = 4, scale = 1)
   private BigDecimal slope;
 
@@ -69,17 +66,10 @@ class TeeEntity {
 
   public TeeEntity() {}
 
-  TeeEntity(
-      CourseEntity course,
-      String name,
-      Integer par,
-      Integer yardage,
-      BigDecimal slope,
-      BigDecimal rating) {
+  TeeEntity(CourseEntity course, String name, Integer par, BigDecimal slope, BigDecimal rating) {
     this.course = course;
     this.name = name;
     this.par = par;
-    this.yardage = yardage;
     this.slope = slope;
     this.rating = rating;
   }
@@ -108,10 +98,6 @@ class TeeEntity {
     return par;
   }
 
-  public Integer getYardage() {
-    return yardage;
-  }
-
   public BigDecimal getSlope() {
     return slope;
   }
@@ -136,10 +122,6 @@ class TeeEntity {
     this.par = par;
   }
 
-  public void setYardage(Integer yardage) {
-    this.yardage = yardage;
-  }
-
   public void setSlope(BigDecimal slope) {
     this.slope = slope;
   }
@@ -155,14 +137,13 @@ class TeeEntity {
     return Objects.equals(id, that.id)
         && Objects.equals(name, that.name)
         && Objects.equals(par, that.par)
-        && Objects.equals(yardage, that.yardage)
         && Objects.equals(slope, that.slope)
         && Objects.equals(rating, that.rating);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, par, yardage, slope, rating);
+    return Objects.hash(id, name, par, slope, rating);
   }
 
   @Override
@@ -173,8 +154,6 @@ class TeeEntity {
         + '\''
         + ", par="
         + par
-        + ", yardage="
-        + yardage
         + ", slope="
         + slope
         + ", rating="

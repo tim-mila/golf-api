@@ -84,9 +84,9 @@ class JpaTeeServiceImplTest {
     course.setId(courseId);
 
     CreateTeeRequest request =
-        new CreateTeeRequest("Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
     TeeEntity unsaved =
-        new TeeEntity(course, "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new TeeEntity(course, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
     TeeEntity saved = createEntity(UUID.randomUUID(), "Blue");
     TeeDto dto = createDto(saved);
 
@@ -104,7 +104,7 @@ class JpaTeeServiceImplTest {
   void createCourseNotFound() {
     UUID courseId = UUID.randomUUID();
     CreateTeeRequest request =
-        new CreateTeeRequest("Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
 
     when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.empty());
 
@@ -122,11 +122,7 @@ class JpaTeeServiceImplTest {
 
     PatchTeeRequest request =
         new PatchTeeRequest(
-            Optional.of("White"),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
+            Optional.of("White"), Optional.empty(), Optional.empty(), Optional.empty());
 
     when(teeRepository.findByIdForCurrentUser(teeId)).thenReturn(Optional.of(entity));
     when(teeRepository.save(entity)).thenReturn(savedEntity);
@@ -142,11 +138,7 @@ class JpaTeeServiceImplTest {
     UUID teeId = UUID.randomUUID();
     PatchTeeRequest request =
         new PatchTeeRequest(
-            Optional.of("White"),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty());
+            Optional.of("White"), Optional.empty(), Optional.empty(), Optional.empty());
 
     when(teeRepository.findByIdForCurrentUser(teeId)).thenReturn(Optional.empty());
 
@@ -180,7 +172,7 @@ class JpaTeeServiceImplTest {
     course.setId(UUID.randomUUID());
 
     TeeEntity entity =
-        new TeeEntity(course, name, 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new TeeEntity(course, name, 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
     entity.setId(teeId);
     entity.setCreatedAt(Instant.now());
     return entity;
@@ -194,7 +186,6 @@ class JpaTeeServiceImplTest {
         Instant.now(),
         entity.getName(),
         entity.getPar(),
-        entity.getYardage(),
         entity.getSlope(),
         entity.getRating());
   }

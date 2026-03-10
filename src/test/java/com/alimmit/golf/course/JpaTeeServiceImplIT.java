@@ -85,8 +85,7 @@ class JpaTeeServiceImplIT {
     Optional<TeeDto> created =
         teeService.create(
             course.courseId(),
-            new CreateTeeRequest(
-                "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
     assertThat(created)
         .isPresent()
@@ -97,7 +96,6 @@ class JpaTeeServiceImplIT {
         .hasFieldOrPropertyWithValue("courseId", course.courseId())
         .hasFieldOrPropertyWithValue("name", "Blue")
         .hasFieldOrPropertyWithValue("par", 72)
-        .hasFieldOrPropertyWithValue("yardage", 6500)
         .hasFieldOrPropertyWithValue("slope", new BigDecimal("131.0"))
         .hasFieldOrPropertyWithValue("rating", new BigDecimal("71.2"));
 
@@ -112,8 +110,7 @@ class JpaTeeServiceImplIT {
     Optional<TeeDto> result =
         teeService.create(
             UUID.randomUUID(),
-            new CreateTeeRequest(
-                "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
     assertThat(result).isEmpty();
   }
@@ -131,7 +128,7 @@ class JpaTeeServiceImplIT {
             .create(
                 course.courseId(),
                 new CreateTeeRequest(
-                    "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")))
+                    "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
             .orElseThrow();
 
     Optional<TeeDto> patched =
@@ -140,7 +137,6 @@ class JpaTeeServiceImplIT {
             new PatchTeeRequest(
                 Optional.of("White"),
                 Optional.empty(),
-                Optional.of(6100),
                 Optional.of(new BigDecimal("125.0")),
                 Optional.of(new BigDecimal("69.5"))));
 
@@ -152,7 +148,6 @@ class JpaTeeServiceImplIT {
         .hasFieldOrPropertyWithValue("createdAt", created.createdAt())
         .hasFieldOrProperty("lastModifiedAt")
         .hasFieldOrPropertyWithValue("name", "White")
-        .hasFieldOrPropertyWithValue("yardage", 6100)
         .hasFieldOrPropertyWithValue("slope", new BigDecimal("125.0"))
         .hasFieldOrPropertyWithValue("rating", new BigDecimal("69.5"));
 
@@ -170,10 +165,10 @@ class JpaTeeServiceImplIT {
 
     teeService.create(
         course.courseId(),
-        new CreateTeeRequest("Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")));
+        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
     teeService.create(
         course.courseId(),
-        new CreateTeeRequest("White", 72, 6100, new BigDecimal("125.0"), new BigDecimal("69.5")));
+        new CreateTeeRequest("White", 72, new BigDecimal("125.0"), new BigDecimal("69.5")));
 
     List<TeeDto> tees = teeService.listByCourse(course.courseId());
 
@@ -193,7 +188,7 @@ class JpaTeeServiceImplIT {
             .create(
                 course.courseId(),
                 new CreateTeeRequest(
-                    "Blue", 72, 6500, new BigDecimal("131.0"), new BigDecimal("71.2")))
+                    "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
             .orElseThrow();
 
     teeService.delete(created.teeId());
