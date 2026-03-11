@@ -41,13 +41,16 @@ class TeeController {
       parameters = {
         @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
       },
-      responses =
-          @ApiResponse(
-              responseCode = "200",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      array = @ArraySchema(schema = @Schema(implementation = TeeDto.class)))))
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = TeeDto.class)))),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content)
+      })
   @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping(path = TeeConstants.TEE_ENDPOINT)
   List<TeeDto> listByCourse(@PathVariable("id") UUID courseId) {
@@ -60,13 +63,17 @@ class TeeController {
       summary = "Get a tee",
       description = "Get a tee by identifier",
       parameters = {@Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)},
-      responses =
-          @ApiResponse(
-              responseCode = "200",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = TeeDto.class))))
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = TeeDto.class))),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "404", content = @Content)
+      })
   @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
   TeeDto get(@PathVariable("id") UUID teeId) {
@@ -87,13 +94,18 @@ class TeeController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = CreateTeeRequest.class))),
-      responses =
-          @ApiResponse(
-              responseCode = "201",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = TeeDto.class))))
+      responses = {
+        @ApiResponse(
+            responseCode = "201",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = TeeDto.class))),
+        @ApiResponse(responseCode = "400", content = @Content),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "404", content = @Content)
+      })
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.CREATED)
   @PostMapping(path = TeeConstants.TEE_ENDPOINT)
@@ -114,13 +126,18 @@ class TeeController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = PatchTeeRequest.class))),
-      responses =
-          @ApiResponse(
-              responseCode = "200",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = TeeDto.class))))
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = TeeDto.class))),
+        @ApiResponse(responseCode = "400", content = @Content),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "404", content = @Content)
+      })
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @PatchMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
   TeeDto patch(@Valid @RequestBody PatchTeeRequest request, @PathVariable("id") UUID teeId) {
@@ -134,7 +151,12 @@ class TeeController {
       summary = "Delete a tee",
       description = "Delete a tee by identifier",
       parameters = {@Parameter(name = "id", description = "Tee identifier", in = ParameterIn.PATH)},
-      responses = @ApiResponse(responseCode = "204"))
+      responses = {
+        @ApiResponse(responseCode = "204", content = @Content),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "404", content = @Content)
+      })
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = TeeConstants.TEE_BY_ID_ENDPOINT)
