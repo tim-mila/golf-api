@@ -42,13 +42,16 @@ class CourseController {
       operationId = "course.list",
       summary = "List golf courses",
       description = "Get the list of all golf courses",
-      responses =
-          @ApiResponse(
-              responseCode = "200",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      array = @ArraySchema(schema = @Schema(implementation = CourseDto.class)))))
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = CourseDto.class)))),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content)
+      })
   @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping
   List<CourseDto> list() {
@@ -63,13 +66,17 @@ class CourseController {
       parameters = {
         @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
       },
-      responses =
-          @ApiResponse(
-              responseCode = "200",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = CourseDto.class))))
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = CourseDto.class))),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "404", content = @Content)
+      })
   @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   CourseDto get(@PathVariable("id") UUID courseId) {
@@ -87,13 +94,18 @@ class CourseController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = CreateCourseRequest.class))),
-      responses =
-          @ApiResponse(
-              responseCode = "201",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = CourseDto.class))))
+      responses = {
+        @ApiResponse(
+            responseCode = "201",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = CourseDto.class))),
+        @ApiResponse(responseCode = "400", content = @Content),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "409", content = @Content)
+      })
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.CREATED)
   @PostMapping
@@ -116,13 +128,19 @@ class CourseController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = PatchCourseRequest.class))),
-      responses =
-          @ApiResponse(
-              responseCode = "200",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = CourseDto.class))))
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = CourseDto.class))),
+        @ApiResponse(responseCode = "400", content = @Content),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "404", content = @Content),
+        @ApiResponse(responseCode = "409", content = @Content)
+      })
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @PatchMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   CourseDto patch(
@@ -138,7 +156,12 @@ class CourseController {
       parameters = {
         @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
       },
-      responses = @ApiResponse(responseCode = "204"))
+      responses = {
+        @ApiResponse(responseCode = "204", content = @Content),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "404", content = @Content)
+      })
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
@@ -153,13 +176,17 @@ class CourseController {
       summary = "Search golf courses",
       description = "Full-text search across club, course, city, and state fields",
       parameters = {@Parameter(name = "q", description = "Search query", in = ParameterIn.QUERY)},
-      responses =
-          @ApiResponse(
-              responseCode = "200",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      array = @ArraySchema(schema = @Schema(implementation = CourseDto.class)))))
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = CourseDto.class)))),
+        @ApiResponse(responseCode = "400", content = @Content),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content)
+      })
   @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping(path = CourseConstants.COURSE_SEARCH_SUFFIX)
   List<CourseDto> search(@RequestParam @NotBlank String q) {

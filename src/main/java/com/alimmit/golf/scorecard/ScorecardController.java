@@ -58,13 +58,17 @@ class ScorecardController {
                   @Content(
                       mediaType = MediaType.APPLICATION_JSON_VALUE,
                       schema = @Schema(implementation = ScorecardRequestDto.class))),
-      responses =
-          @ApiResponse(
-              responseCode = "201",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = ScorecardDto.class))))
+      responses = {
+        @ApiResponse(
+            responseCode = "201",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ScorecardDto.class))),
+        @ApiResponse(responseCode = "400", content = @Content),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content)
+      })
   @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
@@ -80,13 +84,16 @@ class ScorecardController {
       operationId = "scorecard.list",
       summary = "List your scorecards",
       description = "Get a list of your scorecards",
-      responses =
-          @ApiResponse(
-              responseCode = "200",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      array = @ArraySchema(schema = @Schema(implementation = ScorecardDto.class)))))
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = ScorecardDto.class)))),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content)
+      })
   @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping
   List<ScorecardDto> list() {
@@ -101,13 +108,17 @@ class ScorecardController {
       parameters = {
         @Parameter(name = "id", description = "Scorecard identifier", in = ParameterIn.PATH)
       },
-      responses =
-          @ApiResponse(
-              responseCode = "200",
-              content =
-                  @Content(
-                      mediaType = MediaType.APPLICATION_JSON_VALUE,
-                      schema = @Schema(implementation = ScorecardDto.class))))
+      responses = {
+        @ApiResponse(
+            responseCode = "200",
+            content =
+                @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ScorecardDto.class))),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "404", content = @Content)
+      })
   @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping(path = GlobalConstants.API_RECORD_SUFFIX)
   ScorecardDto get(@PathVariable UUID id) {
@@ -122,7 +133,12 @@ class ScorecardController {
       parameters = {
         @Parameter(name = "id", description = "Scorecard identifier", in = ParameterIn.PATH)
       },
-      responses = @ApiResponse(responseCode = "204"))
+      responses = {
+        @ApiResponse(responseCode = "204", content = @Content),
+        @ApiResponse(responseCode = "401", content = @Content),
+        @ApiResponse(responseCode = "403", content = @Content),
+        @ApiResponse(responseCode = "404", content = @Content)
+      })
   @CanWrite(GlobalConstants.SCOPE_SCORECARD)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping(path = GlobalConstants.API_RECORD_SUFFIX)
