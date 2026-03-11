@@ -23,12 +23,7 @@ public record ScorecardDto(
             description = "USGA course rating — expected score for a scratch golfer",
             example = "71.2")
         Double courseRating,
-    @Schema(
-            description = "USGA slope rating (55–155)",
-            example = "131.0",
-            minimum = "55",
-            maximum = "155")
-        Double slopeRating,
+    @Schema(description = "USGA slope rating (55–155)", example = "131.0") Double slopeRating,
     @Schema(description = "Number of holes played", example = "EIGHTEEN")
         ScorecardType scorecardType,
     @Schema(description = "Calculated score differential for handicap purposes", example = "14.7")

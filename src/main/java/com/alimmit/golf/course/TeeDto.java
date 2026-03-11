@@ -17,12 +17,7 @@ public record TeeDto(
     @Schema(description = "Timestamp when the tee was last modified") Instant lastModifiedAt,
     @Schema(description = "Tee name (e.g. Blue, White, Red)", example = "Blue") String name,
     @Schema(description = "Par for the course from this tee", example = "72") Integer par,
-    @Schema(
-            description = "USGA slope rating (55–155)",
-            example = "131.0",
-            minimum = "55",
-            maximum = "155")
-        BigDecimal slope,
+    @Schema(description = "USGA slope rating (55–155)", example = "131.0") BigDecimal slope,
     @Schema(
             description = "USGA course rating — expected score for a scratch golfer",
             example = "71.2")
