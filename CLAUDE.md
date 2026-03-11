@@ -188,6 +188,15 @@ All DTOs use Java Records for immutability:
 public record ScorecardDto(String scorecardId, Long courseId, Integer score, LocalDate scoreDate, ...) {}
 ```
 
+### OpenAPI Documentation
+All DTOs have class-level and field-level `@Schema` annotations for Swagger UI / OpenAPI JSON generation:
+- Class-level: `@Schema(description = "...")` on the record declaration
+- Field-level: `@Schema(description = "...", example = "...")` on each record component
+- Constraint fields (e.g. slope rating): include `minimum` and `maximum` attributes
+- All controllers use `@ApiResponse` for each status code: 200/201/204, 400, 401, 403, 404, and 409 where applicable
+- 204 No Content responses use `content = @Content` (no schema) to suppress a spurious body in the Swagger UI
+- Array responses use `content = @Content(array = @ArraySchema(schema = @Schema(implementation = Foo.class)))`
+
 ### Constants Organization
 - `GlobalConstants`: API version paths (`/v1`, `/{id}`)
 - Domain constants: `ScorecardConstants`, `CourseConstants`, `TeeConstants`, `HandicapConstants`
