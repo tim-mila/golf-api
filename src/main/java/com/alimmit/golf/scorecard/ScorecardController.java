@@ -90,8 +90,7 @@ class ScorecardController {
             content =
                 @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array =
-                        @ArraySchema(schema = @Schema(implementation = ScorecardDto.class)))),
+                    array = @ArraySchema(schema = @Schema(implementation = ScorecardDto.class)))),
         @ApiResponse(responseCode = "401", content = @Content),
         @ApiResponse(responseCode = "403", content = @Content)
       })

@@ -60,7 +60,8 @@ class HandicapController {
                 @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                     array =
-                        @ArraySchema(schema = @Schema(implementation = HandicapRevisionDto.class)))),
+                        @ArraySchema(
+                            schema = @Schema(implementation = HandicapRevisionDto.class)))),
         @ApiResponse(responseCode = "401", content = @Content),
         @ApiResponse(responseCode = "403", content = @Content)
       })
