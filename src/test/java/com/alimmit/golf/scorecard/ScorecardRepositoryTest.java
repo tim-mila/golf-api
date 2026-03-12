@@ -2,6 +2,7 @@ package com.alimmit.golf.scorecard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.alimmit.golf.TestJpaAuditingConfig;
 import com.alimmit.golf.utils.JwtPersona;
 import java.time.LocalDate;
 import java.util.List;
@@ -11,16 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -30,31 +26,10 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 @ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(ScorecardRepositoryTest.TestConfig.class)
+@Import(TestJpaAuditingConfig.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Sql(scripts = "classpath:cleanup.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ScorecardRepositoryTest {
-
-  @TestConfiguration
-  @EnableJpaAuditing
-  static class TestConfig {
-
-    @Bean
-    AuditorAware<String> auditorAware() {
-      return () -> {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-          return Optional.empty();
-        }
-        return Optional.of(authentication.getName());
-      };
-    }
-
-    @Bean
-    SecurityEvaluationContextExtension securityEvaluationContextExtension() {
-      return new SecurityEvaluationContextExtension();
-    }
-  }
 
   private final ScorecardRepository scorecardRepository;
 
