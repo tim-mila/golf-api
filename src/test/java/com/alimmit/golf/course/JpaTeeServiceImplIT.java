@@ -2,6 +2,7 @@ package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.alimmit.golf.TestJpaAuditingConfig;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -10,14 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -29,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({
-  JpaTeeServiceImplIT.TestConfig.class,
+  TestJpaAuditingConfig.class,
   JpaTeeServiceImpl.class,
   TeeMapper.class,
   JpaCourseServiceImpl.class,
@@ -38,27 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 @TestPropertySource(locations = "classpath:application-test.properties")
 @Sql(scripts = "classpath:cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class JpaTeeServiceImplIT {
-
-  @TestConfiguration
-  @EnableJpaAuditing
-  static class TestConfig {
-
-    @Bean
-    AuditorAware<String> auditorAware() {
-      return () -> {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-          return Optional.empty();
-        }
-        return Optional.of(authentication.getName());
-      };
-    }
-
-    @Bean
-    SecurityEvaluationContextExtension securityEvaluationContextExtension() {
-      return new SecurityEvaluationContextExtension();
-    }
-  }
 
   private final TeeService teeService;
   private final CourseService courseService;
