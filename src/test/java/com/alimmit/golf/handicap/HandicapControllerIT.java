@@ -45,6 +45,6 @@ class HandicapControllerIT extends AbstractHandicapControllerMockMvc {
 
   @Test
   void testGetHandicap_ExpectMissing() throws Exception {
-    getMyHandicap(JwtPersona.forPatPutter()).andExpect(status().isNotFound());
+    getMyHandicap(JwtPersona.forPatPutter()).andExpect(status().isNoContent());
   }
 }
