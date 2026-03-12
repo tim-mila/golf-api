@@ -8,6 +8,12 @@ Golf API is a Spring Boot 3.5.7 REST service for tracking golf scorecards and ca
 
 **Tech Stack:** Java 21, Spring Boot 3.5.7, PostgreSQL, OAuth2/JWT (Okta), Maven
 
+## Claude Code Skills
+
+Project-specific skills are stored in `.claude/skills/` and committed to source control.
+
+- **start-task** — starts a new development task from a GitHub issue (sets up branch/worktree and produces an implementation plan)
+
 ## Git Workflow
 
 **Prefer git worktrees** for feature branches to keep the main working directory clean and allow parallel work:
