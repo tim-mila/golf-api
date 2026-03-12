@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,8 +48,10 @@ class HandicapController {
   @CanRead(GlobalConstants.SCOPE_HANDICAP)
   @GetMapping
   ResponseEntity<HandicapDto> getHandicap() {
-    Optional<HandicapDto> handicap = handicapService.getHandicap();
-    return handicap.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
+    return handicapService
+        .getHandicap()
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.noContent().build());
   }
 
   @Operation(
