@@ -45,6 +45,7 @@ The `local-start` script:
 ./mvnw clean install              # Full build with tests
 ./mvnw clean package              # Build without running tests
 ./mvnw spring-boot:run            # Run the application
+./mvnw verify                     # Full build including integration-test phase (generates open-api.json)
 ```
 
 ### Testing
@@ -58,7 +59,8 @@ The `local-start` script:
 
 ### API Documentation
 - Swagger UI: http://localhost:8080/v1/api-docs/swagger-ui/index.html
-- OpenAPI JSON: http://localhost:8080/v1/api-docs
+- OpenAPI JSON (runtime): http://localhost:8080/v1/api-docs
+- OpenAPI JSON (build artifact): `open-api.json` at repo root — generated automatically by `springdoc-openapi-maven-plugin` during `./mvnw verify`
 
 ## Architecture
 
