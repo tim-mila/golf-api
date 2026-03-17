@@ -10,5 +10,20 @@ services:
     volumes:
       - postgres:/var/lib/postgresql
 
+  golf-api:
+    profiles: [app]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      DATASOURCE_URL: jdbc:postgresql://postgres:5432/golf
+
 volumes:
   postgres:
