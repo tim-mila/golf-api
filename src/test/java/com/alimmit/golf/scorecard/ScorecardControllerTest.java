@@ -256,6 +256,15 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
         delete(ScorecardConstants.SCORECARD_ENDPOINT + "/{id}", id).with(csrf()));
   }
 
+  // --- HttpMessageNotReadableException (invalid enum) ---
+
+  @Test
+  void createScorecard_InvalidEnum_Expect400() throws Exception {
+    String requestBody =
+        "{\"scoreDate\":\"2024-01-01\",\"courseName\":\"Test\",\"teeName\":\"blue\",\"score\":85,\"par\":72,\"rating\":72.1,\"slope\":125.0,\"scorecardType\":\"BOGUS\"}";
+    createScorecard(JwtPersona.forGaryGolfer(), requestBody).andExpect(status().isBadRequest());
+  }
+
   // --- Validation tests ---
 
   @ParameterizedTest
