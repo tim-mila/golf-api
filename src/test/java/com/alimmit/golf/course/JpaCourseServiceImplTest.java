@@ -2,6 +2,7 @@ package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @ExtendWith(MockitoExtension.class)
 class JpaCourseServiceImplTest {
@@ -176,6 +178,60 @@ class JpaCourseServiceImplTest {
     when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> courseService.delete(courseId)).isInstanceOf(NotFoundException.class);
+  }
+
+  // --- Gap 3: TOCTOU DataIntegrityViolationException fallback ---
+
+  @Test
+  void create_whenSaveThrowsDataIntegrityViolation_throwsDuplicateException() {
+    CreateCourseRequest request =
+        new CreateCourseRequest("Test Club", "Test Course", "Test City", USState.WISCONSIN);
+    CourseEntity unsaved =
+        new CourseEntity("Test Club", "Test Course", "Test City", USState.WISCONSIN);
+
+    when(courseRepository.existsByUniqueConstraintForCurrentUser(
+            "Test Club", "Test Course", "Test City", USState.WISCONSIN))
+        .thenReturn(false);
+    when(courseMapper.map(request)).thenReturn(unsaved);
+    when(courseRepository.save(unsaved)).thenThrow(DataIntegrityViolationException.class);
+
+    assertThatThrownBy(() -> courseService.create(request)).isInstanceOf(DuplicateException.class);
+  }
+
+  @Test
+  void patch_whenSaveThrowsDataIntegrityViolation_throwsDuplicateException() {
+    UUID courseId = UUID.randomUUID();
+    CourseEntity entity = createEntity(courseId, "Old Club", "Old Course");
+    PatchCourseRequest request =
+        new PatchCourseRequest(
+            Optional.of("New Club"), Optional.empty(), Optional.empty(), Optional.empty());
+
+    when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.of(entity));
+    when(courseRepository.existsByUniqueConstraintForCurrentUserExcluding(
+            "New Club", "Old Course", "Test City", USState.WISCONSIN, courseId))
+        .thenReturn(false);
+    when(courseRepository.save(any())).thenThrow(DataIntegrityViolationException.class);
+
+    assertThatThrownBy(() -> courseService.patch(courseId, request))
+        .isInstanceOf(DuplicateException.class);
+  }
+
+  // --- Gap 2: Search sanitization unit tests ---
+
+  @Test
+  void search_specialCharsOnly_returnsEmptyList() {
+    List<CourseDto> result = courseService.search("!@#$%");
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  void search_multiWordQuery_buildsCorrectTsQuery() {
+    when(courseRepository.search("Augusta:* & National:*")).thenReturn(List.of());
+
+    courseService.search("Augusta National");
+
+    verify(courseRepository).search("Augusta:* & National:*");
   }
 
   private CourseEntity createEntity(UUID courseId, String club, String course) {

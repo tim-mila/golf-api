@@ -300,6 +300,16 @@ class CourseControllerTest extends AbstractCourseControllerTest {
     getCourse(UUID.randomUUID(), JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
   }
 
+  // --- HttpMessageNotReadableException (invalid enum) ---
+
+  @Test
+  void createCourse_InvalidEnum_Expect400() throws Exception {
+    createCourse(
+            "{\"club\":\"Club\",\"course\":\"Course\",\"city\":\"City\",\"state\":\"NOTASTATE\"}",
+            JwtPersona.forGaryGolfer())
+        .andExpect(status().isBadRequest());
+  }
+
   @Test
   void searchCourses_ExpectOk() throws Exception {
     when(courseService.search("Acme"))
@@ -345,5 +355,23 @@ class CourseControllerTest extends AbstractCourseControllerTest {
       })
   void searchCourses_DisallowedScopes_ExpectForbidden(String scope) throws Exception {
     searchCourses("Acme", JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
+  }
+
+  // --- Gap 2: Search edge cases ---
+
+  @Test
+  void searchCourses_SpecialCharsOnly_ExpectOkEmptyList() throws Exception {
+    when(courseService.search("!@#$%")).thenReturn(List.of());
+    searchCourses("!@#$%", JwtPersona.forGaryGolfer())
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+  }
+
+  @Test
+  void searchCourses_NoResults_ExpectEmptyList() throws Exception {
+    when(courseService.search("Augusta")).thenReturn(List.of());
+    searchCourses("Augusta", JwtPersona.forGaryGolfer())
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
   }
 }
