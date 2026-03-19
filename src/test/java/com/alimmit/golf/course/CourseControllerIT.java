@@ -6,18 +6,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.alimmit.golf.utils.JwtClaimApplier;
 import com.alimmit.golf.utils.JwtPersona;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import tools.jackson.databind.ObjectMapper;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -46,20 +48,20 @@ class CourseControllerIT extends AbstractCourseControllerTest {
 
   @Test
   void addDuplicateCourse_ExpectConflict() throws Exception {
-    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isCreated());
-    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isConflict());
+    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer()).andExpect(status().isCreated());
+    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer()).andExpect(status().isConflict());
   }
 
   @Test
   void addSameCourseForDifferentUsers_ExpectCreated() throws Exception {
-    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isCreated());
-    createCourse(REQUEST_BODY, JwtPersona.forPatPutter(), status().isCreated());
+    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer()).andExpect(status().isCreated());
+    createCourse(REQUEST_BODY, JwtPersona.forPatPutter()).andExpect(status().isCreated());
   }
 
   @Test
   void patchCourseToMatchExisting_ExpectConflict() throws Exception {
     // Create two distinct courses for Gary
-    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isCreated());
+    createCourse(REQUEST_BODY, JwtPersona.forGaryGolfer()).andExpect(status().isCreated());
     String secondBody =
         """
         {"club": "Other Club", "course": "Other Course", "city": "Other City", "state": "MI"}
@@ -70,14 +72,15 @@ class CourseControllerIT extends AbstractCourseControllerTest {
             .getResponse()
             .getContentAsString();
 
-    UUID secondId = UUID.fromString(objectMapper.readTree(secondResponse).at("/courseId").asText());
+    UUID secondId =
+        UUID.fromString(objectMapper.readTree(secondResponse).at("/courseId").asString());
 
     // Patching the second course to match the first should conflict
     String patchBody =
         """
         {"club": "Test Club", "course": "Test Course", "city": "Test City", "state": "WI"}
         """;
-    patchCourse(secondId, patchBody, JwtPersona.forGaryGolfer(), status().isConflict());
+    patchCourse(secondId, patchBody, JwtPersona.forGaryGolfer()).andExpect(status().isConflict());
   }
 
   @Test
@@ -89,7 +92,7 @@ class CourseControllerIT extends AbstractCourseControllerTest {
             .getResponse()
             .getContentAsString();
 
-    UUID courseId = UUID.fromString(objectMapper.readTree(responseBody).at("/courseId").asText());
+    UUID courseId = UUID.fromString(objectMapper.readTree(responseBody).at("/courseId").asString());
 
     patchCourse(courseId, REQUEST_BODY, JwtPersona.forGaryGolfer(), status().isOk());
   }
@@ -116,7 +119,7 @@ class CourseControllerIT extends AbstractCourseControllerTest {
             .getResponse()
             .getContentAsString();
 
-    UUID courseId = UUID.fromString(objectMapper.readTree(responseBody).at("/courseId").asText());
+    UUID courseId = UUID.fromString(objectMapper.readTree(responseBody).at("/courseId").asString());
     assertThat(courseId).isNotNull();
 
     // Gary can fetch his course
@@ -134,7 +137,7 @@ class CourseControllerIT extends AbstractCourseControllerTest {
             .getResponse()
             .getContentAsString();
 
-    UUID courseId = UUID.fromString(objectMapper.readTree(responseBody).at("/courseId").asText());
+    UUID courseId = UUID.fromString(objectMapper.readTree(responseBody).at("/courseId").asString());
     assertThat(courseId).isNotNull();
 
     // Pat cannot delete Gary's course
@@ -147,29 +150,12 @@ class CourseControllerIT extends AbstractCourseControllerTest {
     deleteCourse(courseId, JwtPersona.forGaryGolfer(), status().isNotFound());
   }
 
-  @Test
-  void searchCourses_ExactWord() throws Exception {
+  @ParameterizedTest
+  @ValueSource(strings = {"Test", "Tes", "Test Club"})
+  void searchCourses_ExactWord(String input) throws Exception {
     createAndAssertCourse(JwtPersona.forGaryGolfer());
 
-    searchCourses("Test", JwtPersona.forGaryGolfer(), status().isOk())
-        .andExpect(jsonPath("$.length()").value(1))
-        .andExpect(jsonPath("$.[0].club").value("Test Club"));
-  }
-
-  @Test
-  void searchCourses_PartialWord() throws Exception {
-    createAndAssertCourse(JwtPersona.forGaryGolfer());
-
-    searchCourses("Tes", JwtPersona.forGaryGolfer(), status().isOk())
-        .andExpect(jsonPath("$.length()").value(1))
-        .andExpect(jsonPath("$.[0].club").value("Test Club"));
-  }
-
-  @Test
-  void searchCourses_MultiWord() throws Exception {
-    createAndAssertCourse(JwtPersona.forGaryGolfer());
-
-    searchCourses("Test Club", JwtPersona.forGaryGolfer(), status().isOk())
+    searchCourses(input, JwtPersona.forGaryGolfer(), status().isOk())
         .andExpect(jsonPath("$.length()").value(1))
         .andExpect(jsonPath("$.[0].club").value("Test Club"));
   }

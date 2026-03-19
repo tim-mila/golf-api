@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -16,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 class ScorecardEntity {
 
   @Id
-  @Generated(sql = "uuidv7()", writable = true)
+  @Generated(event = EventType.INSERT)
   @Column(
       name = "scorecard_id",
       updatable = false,

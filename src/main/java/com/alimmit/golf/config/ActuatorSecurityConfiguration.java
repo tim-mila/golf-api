@@ -1,8 +1,8 @@
 package com.alimmit.golf.config;
 
 import com.alimmit.golf.GlobalConstants;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
-import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -15,7 +15,7 @@ class ActuatorSecurityConfiguration {
 
   @Bean
   @Order(1)
-  SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
+  SecurityFilterChain actuatorFilterChain(HttpSecurity http) {
     return http.securityMatcher(EndpointRequest.toAnyEndpoint())
         .authorizeHttpRequests(
             requests ->

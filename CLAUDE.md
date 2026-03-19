@@ -45,7 +45,7 @@ The `local-start` script:
 ./mvnw clean install              # Full build with tests
 ./mvnw clean package              # Build without running tests
 ./mvnw spring-boot:run            # Run the application
-./mvnw verify                     # Full build including integration-test phase (generates open-api.json)
+./mvnw verify                     # Full build: runs unit tests, IT tests (Failsafe), and generates open-api.json
 ```
 
 ### Testing

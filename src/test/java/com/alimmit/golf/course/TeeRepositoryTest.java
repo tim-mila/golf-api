@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -93,12 +93,11 @@ class TeeRepositoryTest {
     CourseEntity course2 =
         courseRepository.save(new CourseEntity("Club B", "Course B", "City B", USState.OHIO));
 
-    TeeEntity tee1 =
-        teeRepository.save(
-            new TeeEntity(course1, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
-    TeeEntity tee2 =
-        teeRepository.save(
-            new TeeEntity(course1, "White", 72, new BigDecimal("125.0"), new BigDecimal("69.5")));
+    teeRepository.save(
+        new TeeEntity(course1, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
+
+    teeRepository.save(
+        new TeeEntity(course1, "White", 72, new BigDecimal("125.0"), new BigDecimal("69.5")));
     teeRepository.save(
         new TeeEntity(course2, "Red", 72, new BigDecimal("118.0"), new BigDecimal("66.0")));
 

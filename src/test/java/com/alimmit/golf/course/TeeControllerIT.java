@@ -6,19 +6,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.alimmit.golf.utils.JwtClaimApplier;
 import com.alimmit.golf.utils.JwtPersona;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import tools.jackson.databind.ObjectMapper;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -69,7 +69,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
             .getResponse()
             .getContentAsString();
 
-    UUID teeId = UUID.fromString(objectMapper.readTree(responseBody).at("/teeId").asText());
+    UUID teeId = UUID.fromString(objectMapper.readTree(responseBody).at("/teeId").asString());
     assertThat(teeId).isNotNull();
 
     // Gary can fetch his tee
@@ -89,7 +89,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
             .getResponse()
             .getContentAsString();
 
-    UUID teeId = UUID.fromString(objectMapper.readTree(responseBody).at("/teeId").asText());
+    UUID teeId = UUID.fromString(objectMapper.readTree(responseBody).at("/teeId").asString());
     assertThat(teeId).isNotNull();
 
     // Pat cannot delete Gary's tee
@@ -127,7 +127,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
             .getResponse()
             .getContentAsString();
 
-    UUID teeId = UUID.fromString(objectMapper.readTree(responseBody).at("/teeId").asText());
+    UUID teeId = UUID.fromString(objectMapper.readTree(responseBody).at("/teeId").asString());
 
     getTee(teeId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
@@ -193,7 +193,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
             .getResponse()
             .getContentAsString();
 
-    UUID teeId = UUID.fromString(objectMapper.readTree(createResponse).at("/teeId").asText());
+    UUID teeId = UUID.fromString(objectMapper.readTree(createResponse).at("/teeId").asString());
 
     String patchBody =
         """
@@ -238,7 +238,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
             .getResponse()
             .getContentAsString();
 
-    UUID teeId = UUID.fromString(objectMapper.readTree(createResponse).at("/teeId").asText());
+    UUID teeId = UUID.fromString(objectMapper.readTree(createResponse).at("/teeId").asString());
 
     deleteTee(teeId, JwtPersona.forGaryGolfer()).andExpect(status().isNoContent());
 
