@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.alimmit.golf.TestJpaAuditingConfig;
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -117,7 +118,8 @@ class JpaTeeServiceImplIT {
         .get()
         .hasFieldOrPropertyWithValue("teeId", created.teeId())
         .hasFieldOrPropertyWithValue("courseId", course.courseId())
-        .hasFieldOrPropertyWithValue("createdAt", created.createdAt())
+        .hasFieldOrPropertyWithValue(
+            "createdAt", created.createdAt().truncatedTo(ChronoUnit.MICROS))
         .hasFieldOrProperty("lastModifiedAt")
         .hasFieldOrPropertyWithValue("name", "White")
         .hasFieldOrPropertyWithValue("slope", new BigDecimal("125.0"))
