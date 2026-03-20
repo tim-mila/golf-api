@@ -169,6 +169,7 @@ mockMvc.perform(post("/v1/scorecard")
 
 ### Integration Tests
 - Tests with `IT` suffix are integration tests (e.g., `ScorecardControllerIT`, `TeeControllerIT`)
+- Run via `./mvnw verify` (Maven Failsafe plugin); `./mvnw test` only runs `*Test.java` classes
 - Use Testcontainers; Docker must be running
 - UUIDv7 is hexadecimal — use `[0-9a-f]` in UUID regex patterns, not `[0-9]`
 - Use `@MockitoBean` (Spring Boot 3.4+) to mock beans in `@SpringBootTest` IT tests
