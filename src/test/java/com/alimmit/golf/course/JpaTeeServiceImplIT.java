@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.alimmit.golf.TestJpaAuditingConfig;
 import java.math.BigDecimal;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -116,14 +115,15 @@ class JpaTeeServiceImplIT {
     assertThat(patched)
         .isPresent()
         .get()
-        .hasFieldOrPropertyWithValue("teeId", created.teeId())
-        .hasFieldOrPropertyWithValue("courseId", course.courseId())
-        .hasFieldOrPropertyWithValue(
-            "createdAt", created.createdAt().truncatedTo(ChronoUnit.MICROS))
-        .hasFieldOrProperty("lastModifiedAt")
-        .hasFieldOrPropertyWithValue("name", "White")
-        .hasFieldOrPropertyWithValue("slope", new BigDecimal("125.0"))
-        .hasFieldOrPropertyWithValue("rating", new BigDecimal("69.5"));
+        .satisfies(
+            toAssert -> {
+              assertThat(toAssert.teeId()).isEqualTo(created.teeId());
+              assertThat(toAssert.courseId()).isEqualTo(created.courseId());
+              assertThat(toAssert.createdAt()).isEqualTo(created.createdAt());
+              assertThat(toAssert.name()).isEqualTo("White");
+              assertThat(toAssert.rating()).isEqualTo(new BigDecimal("69.5"));
+              assertThat(toAssert.slope()).isEqualTo(new BigDecimal("125.0"));
+            });
 
     Optional<TeeDto> read = teeService.get(created.teeId());
     assertThat(read.orElseThrow().lastModifiedAt()).isAfter(created.lastModifiedAt());

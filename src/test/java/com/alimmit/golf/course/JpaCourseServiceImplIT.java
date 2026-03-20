@@ -67,13 +67,15 @@ class JpaCourseServiceImplIT {
     assertThat(patched)
         .isPresent()
         .get()
-        .hasFieldOrPropertyWithValue("courseId", created.courseId())
-        .hasFieldOrPropertyWithValue("createdAt", created.createdAt())
-        .hasFieldOrProperty("lastModifiedAt")
-        .hasFieldOrPropertyWithValue("club", "After Club")
-        .hasFieldOrPropertyWithValue("course", "After Course")
-        .hasFieldOrPropertyWithValue("city", "After City")
-        .hasFieldOrPropertyWithValue("state", USState.RHODE_ISLAND);
+        .satisfies(
+            toAssert -> {
+              assertThat(toAssert.courseId()).isEqualTo(created.courseId());
+              assertThat(toAssert.createdAt()).isEqualTo(created.createdAt());
+              assertThat(toAssert.club()).isEqualTo("After Club");
+              assertThat(toAssert.course()).isEqualTo("After Course");
+              assertThat(toAssert.city()).isEqualTo("After City");
+              assertThat(toAssert.state()).isEqualTo(USState.RHODE_ISLAND);
+            });
 
     Optional<CourseDto> read = courseService.get(created.courseId());
     assertThat(read.orElseThrow().lastModifiedAt()).isAfter(created.lastModifiedAt());
