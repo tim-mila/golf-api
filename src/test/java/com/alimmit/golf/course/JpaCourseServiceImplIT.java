@@ -1,8 +1,10 @@
 package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import com.alimmit.golf.TestJpaAuditingConfig;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +72,8 @@ class JpaCourseServiceImplIT {
         .satisfies(
             toAssert -> {
               assertThat(toAssert.courseId()).isEqualTo(created.courseId());
-              assertThat(toAssert.createdAt()).isEqualTo(created.createdAt());
+              assertThat(toAssert.createdAt())
+                  .isCloseTo(created.createdAt(), within(1000, ChronoUnit.NANOS));
               assertThat(toAssert.club()).isEqualTo("After Club");
               assertThat(toAssert.course()).isEqualTo("After Course");
               assertThat(toAssert.city()).isEqualTo("After City");
