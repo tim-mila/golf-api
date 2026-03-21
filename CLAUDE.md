@@ -179,6 +179,19 @@ For testing async Spring event pipelines (e.g., scorecard event → handicap rec
 - Use `@ExtendWith(OutputCaptureExtension.class)` + `CapturedOutput` to assert log output
 - When testing create then delete, wait for the create event to settle before issuing the delete to avoid Mockito verify race conditions
 
+### HttpMessageNotReadableException tests
+- `ScorecardType` has no `@JsonCreator` — submitting an invalid enum value (e.g. `"BOGUS"`) triggers standard Jackson deserialization failure → `HttpMessageNotReadableException` → 400
+- `USState` has a `@JsonCreator` that throws `IllegalArgumentException("Invalid state abbreviation: ...")` — Jackson wraps this as `HttpMessageNotReadableException` → handler extracts root cause message → 400
+
+### TOCTOU DataIntegrityViolationException fallback
+- `JpaCourseServiceImpl.create()` and `patch()` catch `DataIntegrityViolationException` from `save()` and rethrow as `DuplicateException`
+- This fallback is unit-tested in `JpaCourseServiceImplTest` — if Hibernate 7 changes the exception hierarchy this will surface immediately
+
+### Course search sanitization
+- `JpaCourseServiceImpl.search()` strips `[^\w\s]`, returns `List.of()` for blank-after-sanitize (no exception, no repository call)
+- tsquery is built without lowercasing: `"Augusta National"` → `"Augusta:* & National:*"`
+- `"!@#$%"` is NOT blank (passes `@NotBlank` at the controller) — the controller returns 200 with `[]`; the sanitization-to-blank behavior is tested at the service unit test level
+
 ## Code Conventions
 
 ### ID Generation
