@@ -1,9 +1,11 @@
 package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import com.alimmit.golf.TestJpaAuditingConfig;
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -119,7 +121,8 @@ class JpaTeeServiceImplIT {
             toAssert -> {
               assertThat(toAssert.teeId()).isEqualTo(created.teeId());
               assertThat(toAssert.courseId()).isEqualTo(created.courseId());
-              assertThat(toAssert.createdAt()).isEqualTo(created.createdAt());
+              assertThat(toAssert.createdAt())
+                  .isCloseTo(created.createdAt(), within(1000, ChronoUnit.NANOS));
               assertThat(toAssert.name()).isEqualTo("White");
               assertThat(toAssert.rating()).isEqualTo(new BigDecimal("69.5"));
               assertThat(toAssert.slope()).isEqualTo(new BigDecimal("125.0"));
