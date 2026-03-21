@@ -78,17 +78,18 @@ class JpaTeeServiceImplIT {
     assertThat(read)
         .isPresent()
         .get()
-        .satisfies(toAssert -> {
-          final TeeDto createdDto = created.orElseThrow();
-          assertThat(toAssert.teeId()).isEqualTo(createdDto.teeId());
-          assertThat(toAssert.courseId()).isEqualTo(createdDto.courseId());
-          assertThat(toAssert.createdAt())
-              .isCloseTo(createdDto.createdAt(), within(1000, ChronoUnit.NANOS));
-          assertThat(toAssert.name()).isEqualTo(createdDto.name());
-          assertThat(toAssert.par()).isEqualTo(createdDto.par());
-          assertThat(toAssert.rating()).isEqualTo(createdDto.rating());
-          assertThat(toAssert.slope()).isEqualTo(createdDto.slope());
-        });
+        .satisfies(
+            toAssert -> {
+              final TeeDto createdDto = created.orElseThrow();
+              assertThat(toAssert.teeId()).isEqualTo(createdDto.teeId());
+              assertThat(toAssert.courseId()).isEqualTo(createdDto.courseId());
+              assertThat(toAssert.createdAt())
+                  .isCloseTo(createdDto.createdAt(), within(1000, ChronoUnit.NANOS));
+              assertThat(toAssert.name()).isEqualTo(createdDto.name());
+              assertThat(toAssert.par()).isEqualTo(createdDto.par());
+              assertThat(toAssert.rating()).isEqualTo(createdDto.rating());
+              assertThat(toAssert.slope()).isEqualTo(createdDto.slope());
+            });
   }
 
   @Test
