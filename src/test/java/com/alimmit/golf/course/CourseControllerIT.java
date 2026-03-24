@@ -152,7 +152,7 @@ class CourseControllerIT extends AbstractCourseControllerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"Test", "Tes", "Test Club"})
-  void searchCourses_ExactWord(String input) throws Exception {
+  void searchCourses(String input) throws Exception {
     createAndAssertCourse(JwtPersona.forGaryGolfer());
 
     searchCourses(input, JwtPersona.forGaryGolfer(), status().isOk())
