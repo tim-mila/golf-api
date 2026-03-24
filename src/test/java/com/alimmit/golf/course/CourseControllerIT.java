@@ -67,7 +67,8 @@ class CourseControllerIT extends AbstractCourseControllerTest {
         {"club": "Other Club", "course": "Other Course", "city": "Other City", "state": "MI"}
         """;
     String secondResponse =
-        createCourse(secondBody, JwtPersona.forGaryGolfer()).andExpect(status().isCreated())
+        createCourse(secondBody, JwtPersona.forGaryGolfer())
+            .andExpect(status().isCreated())
             .andReturn()
             .getResponse()
             .getContentAsString();
