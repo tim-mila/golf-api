@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Golf API is a Spring Boot 3.5.7 REST service for tracking golf scorecards and calculating handicap indexes.
+Golf API is a Spring Boot 4.0.3 REST service for tracking golf scorecards and calculating handicap indexes.
 
-**Tech Stack:** Java 21, Spring Boot 3.5.7, PostgreSQL, OAuth2/JWT (Okta), Maven
+**Tech Stack:** Java 21, Spring Boot 4.0.3 (Spring Framework 7, Spring Security 7, Hibernate ORM 7, Jackson 3), PostgreSQL, OAuth2/JWT (Auth0), Maven
 
 ## Claude Code Skills
 
@@ -95,9 +95,10 @@ com.alimmit.golf
 
 ### Security Model
 
-**Authentication:** OAuth2 JWT tokens via Okta
+**Authentication:** OAuth2 JWT tokens via Auth0 (native Spring Security resource server — no Okta starter)
 - Resource server validates JWT signatures against configured issuer
 - User identity extracted from `sub` claim in JWT
+- Properties: `spring.security.oauth2.resourceserver.jwt.issuer-uri` / `.audiences` / `.jwk-set-uri`
 
 **Authorization:** User-scoped data isolation
 - Every operation filters data by `SecurityContextHolder.getContext().getAuthentication().getName()`
@@ -109,7 +110,7 @@ com.alimmit.golf
 - `@CanRead("course")` → requires `SCOPE_read:course` authority (CourseController, TeeController)
 - `@CanWrite("course")` → requires `SCOPE_write:course` authority (CourseController, TeeController)
 - Uses Spring Security's `@PreAuthorize` template placeholders (`{value}`)
-- Enabled by `MethodSecurityConfiguration` (`@EnableMethodSecurity` + `PrePostTemplateDefaults` bean)
+- Enabled by `MethodSecurityConfiguration` (`@EnableMethodSecurity` + `AnnotationTemplateExpressionDefaults` bean — Spring Security 7 replacement for `PrePostTemplateDefaults`)
 - `@WebMvcTest` classes must `@Import(MethodSecurityConfiguration.class)` for method security to be enforced
 
 **Public Endpoints:** `/v1/api-docs/**` (OpenAPI documentation)
@@ -126,8 +127,8 @@ com.alimmit.golf
 - Port: 9876 (maps to 5432 inside container)
 - Connection URL: `jdbc:postgresql://localhost:9876/golf`
 
-**Test Database:** Testcontainers with PostgreSQL 17.6
-- Uses JDBC URL: `jdbc:tc:postgresql:17.6:///databasename`
+**Test Database:** Testcontainers with PostgreSQL 18.1
+- Uses JDBC URL: `jdbc:tc:postgresql:18.1:///databasename`
 - Automatic container lifecycle per test class
 
 ### Configuration
@@ -159,7 +160,7 @@ mockMvc.perform(post("/v1/scorecard")
 ```
 
 ### Controller Tests
-- Use `@WebMvcTest` for lightweight testing
+- Use `@WebMvcTest` for lightweight testing — import from `org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest` (Spring Boot 4 modular package)
 - Active profile: "test"
 - Pattern: Test multi-tenancy (users can't see each other's data)
 
@@ -172,7 +173,8 @@ mockMvc.perform(post("/v1/scorecard")
 - Run via `./mvnw verify` (Maven Failsafe plugin); `./mvnw test` only runs `*Test.java` classes
 - Use Testcontainers; Docker must be running
 - UUIDv7 is hexadecimal — use `[0-9a-f]` in UUID regex patterns, not `[0-9]`
-- Use `@MockitoBean` (Spring Boot 3.4+) to mock beans in `@SpringBootTest` IT tests
+- Use `@MockitoBean` to mock beans in `@SpringBootTest` IT tests
+- Spring Boot 4 modular import packages: `@AutoConfigureMockMvc` → `org.springframework.boot.webmvc.test.autoconfigure`, `@AutoConfigureTestDatabase` → `org.springframework.boot.jdbc.test.autoconfigure`, `@DataJpaTest` → `org.springframework.boot.data.jpa.test.autoconfigure`
 
 ### Async Event Testing
 For testing async Spring event pipelines (e.g., scorecard event → handicap recalculation):
@@ -199,10 +201,11 @@ For testing async Spring event pipelines (e.g., scorecard event → handicap rec
 All entity primary keys are UUIDs generated via PostgreSQL's `uuidv7()` function:
 ```java
 @Id
-@Generated(sql = "uuidv7()", writable = true)
+@Generated(event = EventType.INSERT)  // Hibernate 7: re-reads DB-generated value after INSERT
 @Column(name = "scorecard_id", updatable = false, nullable = false, columnDefinition = "UUID DEFAULT uuidv7()")
 private UUID id;
 ```
+The `columnDefinition` triggers the PostgreSQL `uuidv7()` function; `@Generated(event = EventType.INSERT)` tells Hibernate 7 to re-read the generated value post-insert. The old `@Generated(sql = "uuidv7()", writable = true)` form was removed in Hibernate 7.
 
 ### DTOs as Records
 All DTOs use Java Records for immutability:
