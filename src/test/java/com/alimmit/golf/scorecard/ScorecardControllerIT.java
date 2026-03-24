@@ -31,9 +31,12 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
   @MockitoBean private ScorecardEventPublisher scorecardEventPublisher;
 
+  private final ObjectMapper objectMapper;
+
   @Autowired
-  ScorecardControllerIT(MockMvc mockMvc) {
+  ScorecardControllerIT(MockMvc mockMvc, ObjectMapper objectMapper) {
     super(mockMvc);
+    this.objectMapper = objectMapper;
   }
 
   // , "rating": 72.1, "slope": 125
@@ -75,7 +78,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
             .getContentAsString();
 
     UUID scorecardId =
-        UUID.fromString(new ObjectMapper().readTree(responseBody).at("/scorecardId").asString());
+        UUID.fromString(objectMapper.readTree(responseBody).at("/scorecardId").asString());
     assertThat(scorecardId).isNotNull();
 
     // Fetch scorecards for Gary Golfer and expect ok
@@ -95,7 +98,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
             .getContentAsString();
 
     UUID scorecardId =
-        UUID.fromString(new ObjectMapper().readTree(responseBody).at("/scorecardId").asString());
+        UUID.fromString(objectMapper.readTree(responseBody).at("/scorecardId").asString());
     assertThat(scorecardId).isNotNull();
 
     // Delete scorecards as Pat Putter and expect not found
