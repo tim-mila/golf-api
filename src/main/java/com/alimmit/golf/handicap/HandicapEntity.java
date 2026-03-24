@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.hibernate.annotations.Generated;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
+import org.hibernate.generator.EventType;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,7 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 class HandicapEntity {
 
   @Id
-  @Generated(sql = "uuidv7()", writable = true)
+  @Generated(event = EventType.INSERT)
   @Column(
       name = "handicap_id",
       nullable = false,

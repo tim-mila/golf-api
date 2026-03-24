@@ -6,21 +6,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.alimmit.golf.utils.JwtClaimApplier;
 import com.alimmit.golf.utils.JwtPersona;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import tools.jackson.databind.ObjectMapper;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -31,9 +31,12 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
   @MockitoBean private ScorecardEventPublisher scorecardEventPublisher;
 
+  private final ObjectMapper objectMapper;
+
   @Autowired
-  ScorecardControllerIT(MockMvc mockMvc) {
+  ScorecardControllerIT(MockMvc mockMvc, ObjectMapper objectMapper) {
     super(mockMvc);
+    this.objectMapper = objectMapper;
   }
 
   // , "rating": 72.1, "slope": 125
@@ -75,7 +78,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
             .getContentAsString();
 
     UUID scorecardId =
-        UUID.fromString(new ObjectMapper().readTree(responseBody).at("/scorecardId").asText());
+        UUID.fromString(objectMapper.readTree(responseBody).at("/scorecardId").asString());
     assertThat(scorecardId).isNotNull();
 
     // Fetch scorecards for Gary Golfer and expect ok
@@ -95,7 +98,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
             .getContentAsString();
 
     UUID scorecardId =
-        UUID.fromString(new ObjectMapper().readTree(responseBody).at("/scorecardId").asText());
+        UUID.fromString(objectMapper.readTree(responseBody).at("/scorecardId").asString());
     assertThat(scorecardId).isNotNull();
 
     // Delete scorecards as Pat Putter and expect not found

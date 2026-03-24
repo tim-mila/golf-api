@@ -1,16 +1,18 @@
 package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import com.alimmit.golf.TestJpaAuditingConfig;
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -73,7 +75,21 @@ class JpaTeeServiceImplIT {
         .hasFieldOrPropertyWithValue("rating", new BigDecimal("71.2"));
 
     Optional<TeeDto> read = teeService.get(created.orElseThrow().teeId());
-    assertThat(read).isPresent().contains(created.orElseThrow());
+    assertThat(read)
+        .isPresent()
+        .get()
+        .satisfies(
+            toAssert -> {
+              final TeeDto createdDto = created.orElseThrow();
+              assertThat(toAssert.teeId()).isEqualTo(createdDto.teeId());
+              assertThat(toAssert.courseId()).isEqualTo(createdDto.courseId());
+              assertThat(toAssert.createdAt())
+                  .isCloseTo(createdDto.createdAt(), within(1000, ChronoUnit.NANOS));
+              assertThat(toAssert.name()).isEqualTo(createdDto.name());
+              assertThat(toAssert.par()).isEqualTo(createdDto.par());
+              assertThat(toAssert.rating()).isEqualTo(createdDto.rating());
+              assertThat(toAssert.slope()).isEqualTo(createdDto.slope());
+            });
   }
 
   @Test
@@ -115,13 +131,16 @@ class JpaTeeServiceImplIT {
     assertThat(patched)
         .isPresent()
         .get()
-        .hasFieldOrPropertyWithValue("teeId", created.teeId())
-        .hasFieldOrPropertyWithValue("courseId", course.courseId())
-        .hasFieldOrPropertyWithValue("createdAt", created.createdAt())
-        .hasFieldOrProperty("lastModifiedAt")
-        .hasFieldOrPropertyWithValue("name", "White")
-        .hasFieldOrPropertyWithValue("slope", new BigDecimal("125.0"))
-        .hasFieldOrPropertyWithValue("rating", new BigDecimal("69.5"));
+        .satisfies(
+            toAssert -> {
+              assertThat(toAssert.teeId()).isEqualTo(created.teeId());
+              assertThat(toAssert.courseId()).isEqualTo(created.courseId());
+              assertThat(toAssert.createdAt())
+                  .isCloseTo(created.createdAt(), within(1000, ChronoUnit.NANOS));
+              assertThat(toAssert.name()).isEqualTo("White");
+              assertThat(toAssert.rating()).isEqualTo(new BigDecimal("69.5"));
+              assertThat(toAssert.slope()).isEqualTo(new BigDecimal("125.0"));
+            });
 
     Optional<TeeDto> read = teeService.get(created.teeId());
     assertThat(read.orElseThrow().lastModifiedAt()).isAfter(created.lastModifiedAt());

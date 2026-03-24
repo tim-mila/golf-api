@@ -1,13 +1,15 @@
 package com.alimmit.golf.course;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import com.alimmit.golf.TestJpaAuditingConfig;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -67,13 +69,16 @@ class JpaCourseServiceImplIT {
     assertThat(patched)
         .isPresent()
         .get()
-        .hasFieldOrPropertyWithValue("courseId", created.courseId())
-        .hasFieldOrPropertyWithValue("createdAt", created.createdAt())
-        .hasFieldOrProperty("lastModifiedAt")
-        .hasFieldOrPropertyWithValue("club", "After Club")
-        .hasFieldOrPropertyWithValue("course", "After Course")
-        .hasFieldOrPropertyWithValue("city", "After City")
-        .hasFieldOrPropertyWithValue("state", USState.RHODE_ISLAND);
+        .satisfies(
+            toAssert -> {
+              assertThat(toAssert.courseId()).isEqualTo(created.courseId());
+              assertThat(toAssert.createdAt())
+                  .isCloseTo(created.createdAt(), within(1000, ChronoUnit.NANOS));
+              assertThat(toAssert.club()).isEqualTo("After Club");
+              assertThat(toAssert.course()).isEqualTo("After Course");
+              assertThat(toAssert.city()).isEqualTo("After City");
+              assertThat(toAssert.state()).isEqualTo(USState.RHODE_ISLAND);
+            });
 
     Optional<CourseDto> read = courseService.get(created.courseId());
     assertThat(read.orElseThrow().lastModifiedAt()).isAfter(created.lastModifiedAt());

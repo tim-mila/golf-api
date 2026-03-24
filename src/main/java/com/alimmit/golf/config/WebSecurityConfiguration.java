@@ -12,7 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 class WebSecurityConfiguration {
 
   @Bean
-  SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  SecurityFilterChain filterChain(HttpSecurity http) {
     return http.securityMatcher("/**")
         .authorizeHttpRequests(
             requests -> {

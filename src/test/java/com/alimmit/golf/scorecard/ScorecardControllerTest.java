@@ -23,7 +23,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -187,7 +187,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
   @ValueSource(strings = {JwtPersona.SCOPE_WRITE_SCORECARD, JwtPersona.SCOPE_READ_HANDICAP, ""})
   void listScorecardsWithDisallowedScope_ExpectForbidden(String scope) throws Exception {
     when(scorecardService.listAll()).thenReturn(List.of());
-    listScorecards(JwtPersona.forGaryGolfer(scope), status().isForbidden());
+    listScorecards(JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
   }
 
   @ParameterizedTest
@@ -226,7 +226,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
             true);
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
-    createScorecard(JwtPersona.forGaryGolfer(), requestBody, status().isCreated());
+    createScorecard(JwtPersona.forGaryGolfer(), requestBody).andExpect(status().isCreated());
   }
 
   @Test
