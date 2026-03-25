@@ -12,7 +12,7 @@ COPY src src
 RUN ./mvnw package -DskipTests -q
 
 # Extract layered jar for optimized runtime image
-RUN java -Djarmode=tools -jar target/golf-api-0.0.1-SNAPSHOT.jar extract --layers --launcher --destination target/extracted
+RUN java -Djarmode=tools -jar target/golf-api-*.jar extract --layers --launcher --destination target/extracted
 
 # Stage 2 — runtime
 FROM eclipse-temurin:21-jre-alpine@sha256:6ad8ed080d9be96b61438ec3ce99388e294af216ed57356000c06070e85c5d5d AS runtime
