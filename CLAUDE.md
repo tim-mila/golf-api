@@ -38,7 +38,9 @@ git worktree remove .worktrees/<branch-name>
 The `local-start` script:
 1. Sources environment variables from `.local/.env.public`
 2. Starts PostgreSQL container on port 9876 via Docker Compose
-3. Runs Spring Boot with `./mvnw spring-boot:run`
+3. Runs Spring Boot with `./mvnw spring-boot:run -Dspring-boot.run.profiles=local`
+
+The `local` Spring profile activates `application-local.properties`, which sets `logging.level.com.alimmit.golf=debug`. The default (`application.properties`) uses `info` to prevent debug log output in production.
 
 ### Building
 ```bash
