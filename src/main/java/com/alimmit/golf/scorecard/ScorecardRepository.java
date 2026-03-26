@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
  * expressions (?#{principal.name}) to automatically filter by current authenticated user.
  */
 @Repository
-interface ScorecardRepository extends JpaRepository<ScorecardEntity, String> {
+interface ScorecardRepository extends JpaRepository<ScorecardEntity, UUID> {
 
   /**
    * Find all scorecards for the currently authenticated user. Uses SpEL to automatically inject the
