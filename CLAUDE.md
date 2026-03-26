@@ -13,6 +13,7 @@ Golf API is a Spring Boot 4.0.3 REST service for tracking golf scorecards and ca
 Project-specific skills are stored in `.claude/skills/` and committed to source control.
 
 - **start-task** — starts a new development task from a GitHub issue (sets up branch/worktree and produces an implementation plan)
+- **arch-review** — performs a holistic architectural review across application design, test architecture, security (OWASP Top 10), and DevOps/release; automatically files GitHub issues for every new finding
 
 ## Git Workflow
 
