@@ -202,7 +202,7 @@
 				<configuration>
 					<apiDocsUrl>http://localhost:8080/v1/api-docs</apiDocsUrl>
 					<outputFileName>open-api.json</outputFileName>
-					<outputDir>${project.basedir}</outputDir>
+					<outputDir>${project.basedir}/..</outputDir>
 				</configuration>
 			</plugin>
 			<plugin>

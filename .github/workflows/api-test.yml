@@ -1,7 +1,10 @@
-name: Test
+name: API Test
 
 on:
   pull_request:
+    paths:
+      - 'api/**'
+      - '.github/workflows/api*.yml'
 
 permissions:
   contents: read
@@ -21,4 +24,4 @@ jobs:
           cache: 'maven'
 
       - name: Run tests
-        run: ./mvnw --no-transfer-progress verify
+        run: cd api && ./mvnw --no-transfer-progress verify

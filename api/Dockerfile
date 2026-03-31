@@ -2,13 +2,13 @@
 FROM eclipse-temurin:21-jdk-alpine@sha256:c98f0d2e171c898bf896dc4166815d28a56d428e218190a1f35cdc7d82efd61f AS builder
 WORKDIR /build
 
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
+COPY api/mvnw .
+COPY api/.mvn .mvn
+COPY api/pom.xml .
 # Download dependencies first for better layer caching
 RUN ./mvnw dependency:go-offline -q
 
-COPY src src
+COPY api/src src
 RUN ./mvnw package -DskipTests -q
 
 # Extract layered jar for optimized runtime image
