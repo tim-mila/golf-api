@@ -17,7 +17,18 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
+      - name: Check if web directory exists
+        id: web-check
+        run: |
+          if [ -f "web/package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "web/ not yet scaffolded — skipping tests"
+          fi
+
       - name: Set up Node
+        if: steps.web-check.outputs.exists == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -25,4 +36,5 @@ jobs:
           cache-dependency-path: web/package-lock.json
 
       - name: Run tests
+        if: steps.web-check.outputs.exists == 'true'
         run: cd web && npm ci && npm test
