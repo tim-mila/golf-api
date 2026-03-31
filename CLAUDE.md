@@ -32,6 +32,7 @@ git worktree remove .worktrees/<branch-name>
 
 ### Local Development
 ```bash
+cd api
 ./local-setup    # Initialize environment (uses 1Password CLI to inject secrets)
 ./local-start    # Start PostgreSQL Docker container and run Spring Boot app
 ```
@@ -45,14 +46,16 @@ The `local` Spring profile activates `application-local.properties`, which sets 
 
 ### Building
 ```bash
+cd api
 ./mvnw clean install              # Full build with tests
 ./mvnw clean package              # Build without running tests
 ./mvnw spring-boot:run            # Run the application
-./mvnw verify                     # Full build: runs unit tests, IT tests (Failsafe), and generates open-api.json
+./mvnw verify                     # Full build: runs unit tests, IT tests (Failsafe), and generates open-api.json at repo root
 ```
 
 ### Testing
 ```bash
+cd api
 ./mvnw test                                    # Run all tests (uses Testcontainers)
 ./mvnw test -Dtest=ScorecardControllerTest     # Run single test class
 ./mvnw test -Dtest=ScorecardControllerTest#testMethodName  # Run single test method
@@ -63,7 +66,12 @@ The `local` Spring profile activates `application-local.properties`, which sets 
 ### API Documentation
 - Swagger UI: http://localhost:8080/v1/api-docs/swagger-ui/index.html
 - OpenAPI JSON (runtime): http://localhost:8080/v1/api-docs
-- OpenAPI JSON (build artifact): `open-api.json` at repo root — generated automatically by `springdoc-openapi-maven-plugin` during `./mvnw verify`
+- OpenAPI JSON (build artifact): `open-api.json` at repo root — generated automatically by `springdoc-openapi-maven-plugin` during `cd api && ./mvnw verify`
+
+### Docker
+```bash
+docker build -f api/Dockerfile -t golf-api .    # Build API image (run from repo root)
+```
 
 ## Architecture
 
@@ -121,7 +129,7 @@ com.alimmit.golf
 ### Database
 
 **Migration Tool:** Flyway
-- Migrations go in: `src/main/resources/db/migration/`
+- Migrations go in: `api/src/main/resources/db/migration/`
 - Naming: `V{version}__{description}.sql` (e.g., `V1__create_scorecard_table.sql`)
 - Latest migration: `V6__remove_tee_yardage.sql` — next migration is **V7**
 

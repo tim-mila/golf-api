@@ -1,6 +1,6 @@
 HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
+api/target/
+api/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -48,3 +48,9 @@ postman/
 
 ### Git worktrees
 .worktrees/
+
+### Web frontend
+web/node_modules/
+web/.next/
+web/.env.local
+web/src/lib/api/generated/
