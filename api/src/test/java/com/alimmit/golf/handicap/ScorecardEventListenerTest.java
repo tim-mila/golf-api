@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 
 import com.alimmit.golf.scorecard.ScorecardDto;
 import com.alimmit.golf.scorecard.ScorecardEvent;
-import com.alimmit.golf.scorecard.ScorecardService;
+import com.alimmit.golf.scorecard.ScorecardQueryService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ScorecardEventListenerTest {
 
   @Mock private HandicapService handicapService;
-  @Mock private ScorecardService scorecardService;
+  @Mock private ScorecardQueryService scorecardQueryService;
 
   @InjectMocks private ScorecardEventListener listener;
 
@@ -26,22 +26,22 @@ class ScorecardEventListenerTest {
   @Test
   void createdEvent_triggersHandicapCalculation() {
     List<ScorecardDto> scorecards = List.of();
-    when(scorecardService.listAll(USER_ID)).thenReturn(scorecards);
+    when(scorecardQueryService.findAllForUser(USER_ID)).thenReturn(scorecards);
 
     listener.scorecardEvent(new ScorecardEvent(USER_ID, ScorecardEvent.Type.CREATED));
 
-    verify(scorecardService).listAll(USER_ID);
+    verify(scorecardQueryService).findAllForUser(USER_ID);
     verify(handicapService).calculate(scorecards, USER_ID);
   }
 
   @Test
   void deletedEvent_triggersHandicapCalculation() {
     List<ScorecardDto> scorecards = List.of();
-    when(scorecardService.listAll(USER_ID)).thenReturn(scorecards);
+    when(scorecardQueryService.findAllForUser(USER_ID)).thenReturn(scorecards);
 
     listener.scorecardEvent(new ScorecardEvent(USER_ID, ScorecardEvent.Type.DELETED));
 
-    verify(scorecardService).listAll(USER_ID);
+    verify(scorecardQueryService).findAllForUser(USER_ID);
     verify(handicapService).calculate(scorecards, USER_ID);
   }
 }

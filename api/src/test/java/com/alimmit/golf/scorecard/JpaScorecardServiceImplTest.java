@@ -102,18 +102,6 @@ class JpaScorecardServiceImplTest {
   }
 
   @Test
-  void listAll_byUserId_delegatesToFindAllCreatedBy() {
-    String userId = "user-123";
-    ScorecardEntity entity = entity();
-    ScorecardDto expected = dto(UUID.randomUUID());
-
-    when(scorecardRepository.findAllCreatedBy(userId)).thenReturn(List.of(entity));
-    when(scorecardMapper.toDto(entity)).thenReturn(expected);
-
-    assertThat(service.listAll(userId)).containsExactly(expected);
-  }
-
-  @Test
   void getById_found_returnsDto() {
     UUID id = UUID.randomUUID();
     ScorecardEntity entity = entity();
