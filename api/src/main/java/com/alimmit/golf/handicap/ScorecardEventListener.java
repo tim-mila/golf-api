@@ -1,7 +1,7 @@
 package com.alimmit.golf.handicap;
 
 import com.alimmit.golf.scorecard.ScorecardEvent;
-import com.alimmit.golf.scorecard.ScorecardService;
+import com.alimmit.golf.scorecard.ScorecardQueryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
@@ -14,11 +14,12 @@ class ScorecardEventListener {
   private static final Logger logger = LoggerFactory.getLogger(ScorecardEventListener.class);
 
   private final HandicapService handicapService;
-  private final ScorecardService scorecardService;
+  private final ScorecardQueryService scorecardQueryService;
 
-  ScorecardEventListener(HandicapService handicapService, ScorecardService scorecardService) {
+  ScorecardEventListener(
+      HandicapService handicapService, ScorecardQueryService scorecardQueryService) {
     this.handicapService = handicapService;
-    this.scorecardService = scorecardService;
+    this.scorecardQueryService = scorecardQueryService;
   }
 
   @Async("scorecardEventListenerExecutor")
@@ -28,7 +29,8 @@ class ScorecardEventListener {
 
     if (event.type() == ScorecardEvent.Type.CREATED
         || event.type() == ScorecardEvent.Type.DELETED) {
-      handicapService.calculate(scorecardService.listAll(event.userId()), event.userId());
+      handicapService.calculate(
+          scorecardQueryService.findAllForUser(event.userId()), event.userId());
     }
   }
 }

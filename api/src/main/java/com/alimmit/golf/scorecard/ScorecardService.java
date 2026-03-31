@@ -20,14 +20,6 @@ public interface ScorecardService {
   List<ScorecardDto> listAll();
 
   /**
-   * List all scorecards for the provided user
-   *
-   * @param userId User identifier
-   * @return List of scorecards
-   */
-  List<ScorecardDto> listAll(String userId);
-
-  /**
    * Get a scorecard by identifier
    *
    * @param id Scorecard identifier

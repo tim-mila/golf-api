@@ -49,20 +49,6 @@ class JpaScorecardServiceImpl implements ScorecardService {
         .toList();
   }
 
-  /**
-   * List all scorecards for provided user
-   *
-   * @param userId User id
-   * @return List of ScorecardDto
-   */
-  @Transactional(readOnly = true)
-  @Override
-  public List<ScorecardDto> listAll(String userId) {
-    return scorecardRepository.findAllCreatedBy(userId).stream()
-        .map(scorecardMapper::toDto)
-        .toList();
-  }
-
   /** Get a single scorecard by ID for the current authenticated user. */
   @Transactional(readOnly = true)
   @Override
