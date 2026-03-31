@@ -124,6 +124,10 @@ com.alimmit.golf
 - Enabled by `MethodSecurityConfiguration` (`@EnableMethodSecurity` + `AnnotationTemplateExpressionDefaults` bean — Spring Security 7 replacement for `PrePostTemplateDefaults`)
 - `@WebMvcTest` classes must `@Import(MethodSecurityConfiguration.class)` for method security to be enforced
 
+**Internal Event Services:** Cross-user queries must NOT be placed on public service interfaces (OWASP A01)
+- `ScorecardQueryService` / `JpaScorecardQueryServiceImpl` — internal-only service for fetching scorecards by userId; used exclusively by `ScorecardEventListener` for handicap recalculation; not injected by any controller
+- Do not add cross-user query methods to `ScorecardService` — the public interface is scoped to the current authenticated user only
+
 **Public Endpoints:** `/v1/api-docs/**` (OpenAPI documentation)
 
 ### Database
