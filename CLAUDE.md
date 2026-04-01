@@ -126,6 +126,7 @@ com.alimmit.golf
 
 **Internal Event Services:** Cross-user queries must NOT be placed on public service interfaces (OWASP A01)
 - `ScorecardQueryService` / `JpaScorecardQueryServiceImpl` — internal-only service for fetching scorecards by userId; used exclusively by `ScorecardEventListener` for handicap recalculation; not injected by any controller
+  - `findMostRecentForUser(String userId, int limit)` — returns the most recent N scorecards ordered by `scoreDate DESC`; called by `ScorecardEventListener` with `HandicapConstants.HANDICAP_LOOKBACK_ROUNDS` (20)
 - Do not add cross-user query methods to `ScorecardService` — the public interface is scoped to the current authenticated user only
 
 **Public Endpoints:** `/v1/api-docs/**` (OpenAPI documentation)

@@ -15,10 +15,6 @@ class HandicapCalculatorImpl implements HandicapCalculator {
 
   private static final Logger logger = LoggerFactory.getLogger(HandicapCalculatorImpl.class);
 
-  private static final double EXCELLENCE_MULTIPLIER = 0.96;
-  private static final int MINIMUM_HOLES = 54;
-  private static final int MAXIMUM_ROUNDS_CONSIDERED = 20;
-
   /**
    * Calculate the handicap handicapIndex for the current authenticated user.
    *
@@ -35,7 +31,7 @@ class HandicapCalculatorImpl implements HandicapCalculator {
     logger.debug("calculate handicap | holes played = {}", holesPlayed);
 
     // Need minimum 54 holes played to calculate handicap
-    if (holesPlayed < MINIMUM_HOLES) {
+    if (holesPlayed < HandicapConstants.MINIMUM_HOLES_FOR_INDEX) {
       logger.debug("calculate handicap | did not meet minimum hole threshold");
       return Optional.empty();
     }
@@ -44,7 +40,7 @@ class HandicapCalculatorImpl implements HandicapCalculator {
     List<Double> allDifferentials =
         scorecards.stream()
             .sorted(Comparator.comparing(ScorecardDto::scoreDate).reversed())
-            .limit(MAXIMUM_ROUNDS_CONSIDERED)
+            .limit(HandicapConstants.HANDICAP_LOOKBACK_ROUNDS)
             .map(ScorecardDto::differential)
             .toList();
 
@@ -71,7 +67,7 @@ class HandicapCalculatorImpl implements HandicapCalculator {
         bestDifferentials.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
     logger.debug("calculate handicap | average differential {}", average);
 
-    double handicapIndex = (average + adjustment) * EXCELLENCE_MULTIPLIER;
+    double handicapIndex = (average + adjustment) * HandicapConstants.EXCELLENCE_MULTIPLIER;
     logger.debug(
         "calculate handicap | handicap index after applying adjust and excellence multiplier {}",
         average);

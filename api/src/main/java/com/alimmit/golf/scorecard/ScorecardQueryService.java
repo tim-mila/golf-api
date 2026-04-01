@@ -10,10 +10,11 @@ import java.util.List;
 public interface ScorecardQueryService {
 
   /**
-   * Find all scorecards for the given user.
+   * Find the most recent scorecards for the given user, ordered by score date descending.
    *
    * @param userId the user identifier
-   * @return list of scorecards belonging to the user
+   * @param limit maximum number of scorecards to return
+   * @return bounded list of most recent scorecards belonging to the user
    */
-  List<ScorecardDto> findAllForUser(String userId);
+  List<ScorecardDto> findMostRecentForUser(String userId, int limit);
 }

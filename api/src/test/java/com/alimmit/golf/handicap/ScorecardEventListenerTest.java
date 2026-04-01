@@ -26,22 +26,28 @@ class ScorecardEventListenerTest {
   @Test
   void createdEvent_triggersHandicapCalculation() {
     List<ScorecardDto> scorecards = List.of();
-    when(scorecardQueryService.findAllForUser(USER_ID)).thenReturn(scorecards);
+    when(scorecardQueryService.findMostRecentForUser(
+            USER_ID, HandicapConstants.HANDICAP_LOOKBACK_ROUNDS))
+        .thenReturn(scorecards);
 
     listener.scorecardEvent(new ScorecardEvent(USER_ID, ScorecardEvent.Type.CREATED));
 
-    verify(scorecardQueryService).findAllForUser(USER_ID);
+    verify(scorecardQueryService)
+        .findMostRecentForUser(USER_ID, HandicapConstants.HANDICAP_LOOKBACK_ROUNDS);
     verify(handicapService).calculate(scorecards, USER_ID);
   }
 
   @Test
   void deletedEvent_triggersHandicapCalculation() {
     List<ScorecardDto> scorecards = List.of();
-    when(scorecardQueryService.findAllForUser(USER_ID)).thenReturn(scorecards);
+    when(scorecardQueryService.findMostRecentForUser(
+            USER_ID, HandicapConstants.HANDICAP_LOOKBACK_ROUNDS))
+        .thenReturn(scorecards);
 
     listener.scorecardEvent(new ScorecardEvent(USER_ID, ScorecardEvent.Type.DELETED));
 
-    verify(scorecardQueryService).findAllForUser(USER_ID);
+    verify(scorecardQueryService)
+        .findMostRecentForUser(USER_ID, HandicapConstants.HANDICAP_LOOKBACK_ROUNDS);
     verify(handicapService).calculate(scorecards, USER_ID);
   }
 }

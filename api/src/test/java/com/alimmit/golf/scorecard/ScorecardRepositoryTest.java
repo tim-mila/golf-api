@@ -7,12 +7,14 @@ import com.alimmit.golf.utils.JwtPersona;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -124,35 +126,6 @@ class ScorecardRepositoryTest {
   }
 
   @Test
-  void shouldFindAllCreatedBy() {
-    // Given: Gary creates 2 scorecards, Pat creates 1
-    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    scorecardRepository.save(createScorecard(88));
-    scorecardRepository.save(createScorecard(90));
-
-    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
-    scorecardRepository.save(createScorecard(85));
-
-    // When: Querying by Gary's user ID directly
-    List<ScorecardEntity> garyResults =
-        scorecardRepository.findAllCreatedBy(JwtPersona.GARY_GOLFER.sub());
-
-    // Then: Only Gary's scorecards are returned
-    assertThat(garyResults)
-        .hasSize(2)
-        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.GARY_GOLFER.sub()));
-
-    // When: Querying by Pat's user ID directly
-    List<ScorecardEntity> patResults =
-        scorecardRepository.findAllCreatedBy(JwtPersona.PAT_PUTTER.sub());
-
-    // Then: Only Pat's scorecard is returned
-    assertThat(patResults)
-        .hasSize(1)
-        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.PAT_PUTTER.sub()));
-  }
-
-  @Test
   void shouldDeleteByIdForCurrentUser() {
     // Given: Gary creates a scorecard
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
@@ -177,9 +150,52 @@ class ScorecardRepositoryTest {
     assertThat(scorecardRepository.findByIdForCurrentUser(saved.getId())).isEmpty();
   }
 
+  @Test
+  void findMostRecentForUser_isScopedToUser() {
+    // Given: Gary and Pat each have a scorecard
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
+    scorecardRepository.save(createScorecard(88));
+
+    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
+    scorecardRepository.save(createScorecard(85));
+
+    // When: querying by Gary's user ID
+    List<ScorecardEntity> results =
+        scorecardRepository.findMostRecentForUser(
+            JwtPersona.GARY_GOLFER.sub(), PageRequest.of(0, 20));
+
+    // Then: only Gary's scorecard is returned
+    assertThat(results)
+        .hasSize(1)
+        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.GARY_GOLFER.sub()));
+  }
+
+  @Test
+  void findMostRecentForUser_returnsBoundedResultsOrderedByDateDesc() {
+    // Given: Gary has 25 scorecards with dates spanning 25 consecutive days
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
+    LocalDate baseDate = LocalDate.of(2025, 1, 1);
+    IntStream.range(0, 25)
+        .forEach(i -> scorecardRepository.save(createScorecard(80, baseDate.plusDays(i))));
+
+    // When: fetching the most recent 20
+    List<ScorecardEntity> results =
+        scorecardRepository.findMostRecentForUser(
+            JwtPersona.GARY_GOLFER.sub(), PageRequest.of(0, 20));
+
+    // Then: exactly 20 returned, ordered most-recent first (days 24..5, not days 4..0)
+    assertThat(results).hasSize(20);
+    assertThat(results.getFirst().getScoreDate()).isEqualTo(baseDate.plusDays(24));
+    assertThat(results.getLast().getScoreDate()).isEqualTo(baseDate.plusDays(5));
+  }
+
   private ScorecardEntity createScorecard(Integer score) {
+    return createScorecard(score, LocalDate.of(2025, 9, 21));
+  }
+
+  private ScorecardEntity createScorecard(Integer score, LocalDate scoreDate) {
     return new ScorecardEntity(
-        LocalDate.of(2025, 9, 21),
+        scoreDate,
         "Test Course",
         "Test Tee",
         score,
