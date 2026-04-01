@@ -1,7 +1,10 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOCAL_DIR="$SCRIPT_DIR/../.local"
+
 # Remove local containers
-docker-compose -f .local/docker-compose.yaml down
+docker-compose -f "$LOCAL_DIR/docker-compose.yaml" down
 
 # Remove postgres data volume
 docker volume rm local_postgres
