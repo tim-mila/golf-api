@@ -126,35 +126,6 @@ class ScorecardRepositoryTest {
   }
 
   @Test
-  void shouldFindAllCreatedBy() {
-    // Given: Gary creates 2 scorecards, Pat creates 1
-    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    scorecardRepository.save(createScorecard(88));
-    scorecardRepository.save(createScorecard(90));
-
-    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
-    scorecardRepository.save(createScorecard(85));
-
-    // When: Querying by Gary's user ID directly
-    List<ScorecardEntity> garyResults =
-        scorecardRepository.findAllCreatedBy(JwtPersona.GARY_GOLFER.sub());
-
-    // Then: Only Gary's scorecards are returned
-    assertThat(garyResults)
-        .hasSize(2)
-        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.GARY_GOLFER.sub()));
-
-    // When: Querying by Pat's user ID directly
-    List<ScorecardEntity> patResults =
-        scorecardRepository.findAllCreatedBy(JwtPersona.PAT_PUTTER.sub());
-
-    // Then: Only Pat's scorecard is returned
-    assertThat(patResults)
-        .hasSize(1)
-        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.PAT_PUTTER.sub()));
-  }
-
-  @Test
   void shouldDeleteByIdForCurrentUser() {
     // Given: Gary creates a scorecard
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
@@ -180,6 +151,26 @@ class ScorecardRepositoryTest {
   }
 
   @Test
+  void findMostRecentForUser_isScopedToUser() {
+    // Given: Gary and Pat each have a scorecard
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
+    scorecardRepository.save(createScorecard(88));
+
+    setSecurityContext(JwtPersona.PAT_PUTTER.sub());
+    scorecardRepository.save(createScorecard(85));
+
+    // When: querying by Gary's user ID
+    List<ScorecardEntity> results =
+        scorecardRepository.findMostRecentForUser(
+            JwtPersona.GARY_GOLFER.sub(), PageRequest.of(0, 20));
+
+    // Then: only Gary's scorecard is returned
+    assertThat(results)
+        .hasSize(1)
+        .allMatch(s -> s.getCreatedBy().equals(JwtPersona.GARY_GOLFER.sub()));
+  }
+
+  @Test
   void findMostRecentForUser_returnsBoundedResultsOrderedByDateDesc() {
     // Given: Gary has 25 scorecards with dates spanning 25 consecutive days
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
@@ -196,24 +187,6 @@ class ScorecardRepositoryTest {
     assertThat(results).hasSize(20);
     assertThat(results.getFirst().getScoreDate()).isEqualTo(baseDate.plusDays(24));
     assertThat(results.getLast().getScoreDate()).isEqualTo(baseDate.plusDays(5));
-  }
-
-  @Test
-  void findAllCreatedBy_returnsAllScorecards_unbounded() {
-    // Given: Gary has 25 scorecards
-    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    IntStream.range(0, 25)
-        .forEach(
-            i ->
-                scorecardRepository.save(
-                    createScorecard(80, LocalDate.of(2025, 1, 1).plusDays(i))));
-
-    // When: fetching all
-    List<ScorecardEntity> results =
-        scorecardRepository.findAllCreatedBy(JwtPersona.GARY_GOLFER.sub());
-
-    // Then: all 25 returned
-    assertThat(results).hasSize(25);
   }
 
   private ScorecardEntity createScorecard(Integer score) {

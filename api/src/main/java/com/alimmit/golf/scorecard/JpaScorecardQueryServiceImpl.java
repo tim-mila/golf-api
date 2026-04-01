@@ -19,13 +19,6 @@ class JpaScorecardQueryServiceImpl implements ScorecardQueryService {
   }
 
   @Override
-  public List<ScorecardDto> findAllForUser(String userId) {
-    return scorecardRepository.findAllCreatedBy(userId).stream()
-        .map(scorecardMapper::toDto)
-        .toList();
-  }
-
-  @Override
   public List<ScorecardDto> findMostRecentForUser(String userId, int limit) {
     return scorecardRepository.findMostRecentForUser(userId, PageRequest.of(0, limit)).stream()
         .map(scorecardMapper::toDto)

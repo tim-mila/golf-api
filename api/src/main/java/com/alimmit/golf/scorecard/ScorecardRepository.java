@@ -27,15 +27,6 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, UUID> {
   List<ScorecardEntity> findAllForCurrentUser();
 
   /**
-   * Find all scorecards for the provided user
-   *
-   * @param createdBy User that created the scorecards
-   * @return list of scorecards for the provided user
-   */
-  @Query("SELECT s FROM ScorecardEntity s WHERE s.createdBy = :createdBy")
-  List<ScorecardEntity> findAllCreatedBy(@Param("createdBy") String createdBy);
-
-  /**
    * Find the most recent scorecards for the provided user, ordered by score date descending. Use
    * {@link org.springframework.data.domain.PageRequest#of(int, int)} to bound the result set.
    *

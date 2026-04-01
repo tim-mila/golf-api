@@ -54,27 +54,6 @@ class JpaScorecardQueryServiceImplTest {
   }
 
   @Test
-  void findAllForUser_returnsMappedDtos() {
-    String userId = "user-123";
-    ScorecardEntity entity = entity();
-    ScorecardDto expected = dto(UUID.randomUUID());
-
-    when(scorecardRepository.findAllCreatedBy(userId)).thenReturn(List.of(entity));
-    when(scorecardMapper.toDto(entity)).thenReturn(expected);
-
-    assertThat(service.findAllForUser(userId)).containsExactly(expected);
-  }
-
-  @Test
-  void findAllForUser_noResults_returnsEmptyList() {
-    String userId = "user-123";
-
-    when(scorecardRepository.findAllCreatedBy(userId)).thenReturn(List.of());
-
-    assertThat(service.findAllForUser(userId)).isEmpty();
-  }
-
-  @Test
   void findMostRecentForUser_returnsMappedDtos() {
     String userId = "user-123";
     ScorecardEntity entity = entity();
