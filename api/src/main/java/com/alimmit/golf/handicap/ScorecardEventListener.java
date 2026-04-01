@@ -30,7 +30,9 @@ class ScorecardEventListener {
     if (event.type() == ScorecardEvent.Type.CREATED
         || event.type() == ScorecardEvent.Type.DELETED) {
       handicapService.calculate(
-          scorecardQueryService.findAllForUser(event.userId()), event.userId());
+          scorecardQueryService.findMostRecentForUser(
+              event.userId(), HandicapConstants.HANDICAP_LOOKBACK_ROUNDS),
+          event.userId());
     }
   }
 }

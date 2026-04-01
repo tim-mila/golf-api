@@ -7,12 +7,14 @@ import com.alimmit.golf.utils.JwtPersona;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -177,9 +179,50 @@ class ScorecardRepositoryTest {
     assertThat(scorecardRepository.findByIdForCurrentUser(saved.getId())).isEmpty();
   }
 
+  @Test
+  void findMostRecentForUser_returnsBoundedResultsOrderedByDateDesc() {
+    // Given: Gary has 25 scorecards with dates spanning 25 consecutive days
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
+    LocalDate baseDate = LocalDate.of(2025, 1, 1);
+    IntStream.range(0, 25)
+        .forEach(i -> scorecardRepository.save(createScorecard(80, baseDate.plusDays(i))));
+
+    // When: fetching the most recent 20
+    List<ScorecardEntity> results =
+        scorecardRepository.findMostRecentForUser(
+            JwtPersona.GARY_GOLFER.sub(), PageRequest.of(0, 20));
+
+    // Then: exactly 20 returned, ordered most-recent first (days 24..5, not days 4..0)
+    assertThat(results).hasSize(20);
+    assertThat(results.getFirst().getScoreDate()).isEqualTo(baseDate.plusDays(24));
+    assertThat(results.getLast().getScoreDate()).isEqualTo(baseDate.plusDays(5));
+  }
+
+  @Test
+  void findAllCreatedBy_returnsAllScorecards_unbounded() {
+    // Given: Gary has 25 scorecards
+    setSecurityContext(JwtPersona.GARY_GOLFER.sub());
+    IntStream.range(0, 25)
+        .forEach(
+            i ->
+                scorecardRepository.save(
+                    createScorecard(80, LocalDate.of(2025, 1, 1).plusDays(i))));
+
+    // When: fetching all
+    List<ScorecardEntity> results =
+        scorecardRepository.findAllCreatedBy(JwtPersona.GARY_GOLFER.sub());
+
+    // Then: all 25 returned
+    assertThat(results).hasSize(25);
+  }
+
   private ScorecardEntity createScorecard(Integer score) {
+    return createScorecard(score, LocalDate.of(2025, 9, 21));
+  }
+
+  private ScorecardEntity createScorecard(Integer score, LocalDate scoreDate) {
     return new ScorecardEntity(
-        LocalDate.of(2025, 9, 21),
+        scoreDate,
         "Test Course",
         "Test Tee",
         score,

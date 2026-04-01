@@ -3,6 +3,7 @@ package com.alimmit.golf.scorecard;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -33,6 +34,18 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, UUID> {
    */
   @Query("SELECT s FROM ScorecardEntity s WHERE s.createdBy = :createdBy")
   List<ScorecardEntity> findAllCreatedBy(@Param("createdBy") String createdBy);
+
+  /**
+   * Find the most recent scorecards for the provided user, ordered by score date descending. Use
+   * {@link org.springframework.data.domain.PageRequest#of(int, int)} to bound the result set.
+   *
+   * @param createdBy User that created the scorecards
+   * @param pageable pagination/limit descriptor
+   * @return bounded list of most recent scorecards for the provided user
+   */
+  @Query("SELECT s FROM ScorecardEntity s WHERE s.createdBy = :createdBy ORDER BY s.scoreDate DESC")
+  List<ScorecardEntity> findMostRecentForUser(
+      @Param("createdBy") String createdBy, Pageable pageable);
 
   /**
    * Find a scorecard by ID for the currently authenticated user. Uses SpEL to automatically inject

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 @ExtendWith(MockitoExtension.class)
 class JpaScorecardQueryServiceImplTest {
@@ -71,5 +72,28 @@ class JpaScorecardQueryServiceImplTest {
     when(scorecardRepository.findAllCreatedBy(userId)).thenReturn(List.of());
 
     assertThat(service.findAllForUser(userId)).isEmpty();
+  }
+
+  @Test
+  void findMostRecentForUser_returnsMappedDtos() {
+    String userId = "user-123";
+    ScorecardEntity entity = entity();
+    ScorecardDto expected = dto(UUID.randomUUID());
+
+    when(scorecardRepository.findMostRecentForUser(userId, PageRequest.of(0, 5)))
+        .thenReturn(List.of(entity));
+    when(scorecardMapper.toDto(entity)).thenReturn(expected);
+
+    assertThat(service.findMostRecentForUser(userId, 5)).containsExactly(expected);
+  }
+
+  @Test
+  void findMostRecentForUser_passesLimitAsPageSize() {
+    String userId = "user-123";
+
+    when(scorecardRepository.findMostRecentForUser(userId, PageRequest.of(0, 20)))
+        .thenReturn(List.of());
+
+    assertThat(service.findMostRecentForUser(userId, 20)).isEmpty();
   }
 }

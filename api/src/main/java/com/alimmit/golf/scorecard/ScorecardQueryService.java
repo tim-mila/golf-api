@@ -16,4 +16,13 @@ public interface ScorecardQueryService {
    * @return list of scorecards belonging to the user
    */
   List<ScorecardDto> findAllForUser(String userId);
+
+  /**
+   * Find the most recent scorecards for the given user, ordered by score date descending.
+   *
+   * @param userId the user identifier
+   * @param limit maximum number of scorecards to return
+   * @return bounded list of most recent scorecards belonging to the user
+   */
+  List<ScorecardDto> findMostRecentForUser(String userId, int limit);
 }
