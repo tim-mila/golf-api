@@ -1,10 +1,13 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOCAL_DIR="$SCRIPT_DIR/../.local"
+
 # Import public environment variables
-source ./.local/.env.public
+source "$LOCAL_DIR/.env.public"
 
 # Start docker services to support local development
-docker-compose -f .local/docker-compose.yaml up -d
+docker-compose -f "$LOCAL_DIR/docker-compose.yaml" up -d
 
 # Start Spring Boot application
-sh mvnw spring-boot:run -Dspring-boot.run.profiles=local
+"$SCRIPT_DIR/mvnw" spring-boot:run -Dspring-boot.run.profiles=local

@@ -1,4 +1,7 @@
 #!/bin/bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOCAL_DIR="$SCRIPT_DIR/../.local"
+
 # Inject secrets into new environment file created from template
-op inject -i .local/.env.example -o .local/.env -f
+op inject -i "$LOCAL_DIR/.env.example" -o "$LOCAL_DIR/.env" -f
