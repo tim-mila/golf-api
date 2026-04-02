@@ -1,7 +1,6 @@
 package com.alimmit.golf.config;
 
-import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -14,10 +13,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties(CorsProperties.class)
 class WebSecurityConfiguration {
 
-  @Value("${cors.allowed-origins}")
-  private List<String> allowedOrigins;
+  private final CorsProperties corsProperties;
+
+  WebSecurityConfiguration(CorsProperties corsProperties) {
+    this.corsProperties = corsProperties;
+  }
 
   @Bean
   SecurityFilterChain filterChain(HttpSecurity http) {
@@ -35,10 +38,10 @@ class WebSecurityConfiguration {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(allowedOrigins);
-    config.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
-    config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-    config.setMaxAge(3600L);
+    config.setAllowedOrigins(corsProperties.allowedOrigins());
+    config.setAllowedMethods(corsProperties.allowedMethods());
+    config.setAllowedHeaders(corsProperties.allowedHeaders());
+    config.setMaxAge(corsProperties.maxAge());
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", config);
     return source;
