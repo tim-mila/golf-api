@@ -8,7 +8,6 @@ import com.alimmit.golf.scorecard.ScorecardType;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,8 +58,8 @@ class JpaHandicapServiceImplIT {
 
     handicapService.calculate(scorecards, "123");
 
-    Optional<HandicapDto> result = handicapService.getHandicap();
-    assertThat(result).isEmpty();
+    HandicapDto result = handicapService.getHandicap();
+    assertThat(result.established()).isFalse();
   }
 
   @Test
@@ -69,11 +68,10 @@ class JpaHandicapServiceImplIT {
   void calculate_thenGetHandicap() {
     handicapService.calculate(threeRoundScorecards("123"), "123");
 
-    Optional<HandicapDto> result = handicapService.getHandicap();
+    HandicapDto result = handicapService.getHandicap();
 
+    assertThat(result.established()).isTrue();
     assertThat(result)
-        .isPresent()
-        .get()
         .hasFieldOrProperty("handicapId")
         .hasFieldOrProperty("createdAt")
         .hasFieldOrProperty("lastModifiedAt")
@@ -87,12 +85,13 @@ class JpaHandicapServiceImplIT {
   @Transactional(propagation = Propagation.NEVER)
   void calculate_updatesExistingHandicap() {
     handicapService.calculate(threeRoundScorecards("123"), "123");
-    HandicapDto initial = handicapService.getHandicap().orElseThrow();
+    HandicapDto initial = handicapService.getHandicap();
 
     handicapService.calculate(sixRoundScorecards("123"), "123");
-    HandicapDto updated = handicapService.getHandicap().orElseThrow();
+    HandicapDto updated = handicapService.getHandicap();
 
     assertThat(updated)
+        .hasFieldOrPropertyWithValue("established", true)
         .hasFieldOrPropertyWithValue("handicapId", initial.handicapId())
         .hasFieldOrPropertyWithValue("golferId", "123")
         .hasFieldOrPropertyWithValue("totalRounds", 6);

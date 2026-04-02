@@ -88,23 +88,26 @@ class JpaHandicapServiceImplTest {
     Optional<HandicapEntity> optionalEntity = Optional.of(entity);
 
     when(handicapRepository.findHandicapForCurrentUser()).thenReturn(optionalEntity);
-    when(handicapMapper.toOptionalDto(optionalEntity)).thenReturn(Optional.of(dto));
+    when(handicapMapper.toDto(optionalEntity)).thenReturn(dto);
 
-    Optional<HandicapDto> result = handicapService.getHandicap();
+    HandicapDto result = handicapService.getHandicap();
 
-    assertThat(result).isPresent().contains(dto);
+    assertThat(result).isEqualTo(dto);
+    assertThat(result.established()).isTrue();
   }
 
   @Test
-  void getHandicapNotFound() {
+  void getHandicapNotEstablished() {
     Optional<HandicapEntity> empty = Optional.empty();
 
     when(handicapRepository.findHandicapForCurrentUser()).thenReturn(empty);
-    when(handicapMapper.toOptionalDto(empty)).thenReturn(Optional.empty());
+    when(handicapMapper.toDto(empty)).thenReturn(HandicapDto.unestablished());
 
-    Optional<HandicapDto> result = handicapService.getHandicap();
+    HandicapDto result = handicapService.getHandicap();
 
-    assertThat(result).isEmpty();
+    assertThat(result.established()).isFalse();
+    assertThat(result.handicapId()).isNull();
+    assertThat(result.handicapIndex()).isNull();
   }
 
   @Test
@@ -137,6 +140,7 @@ class JpaHandicapServiceImplTest {
 
   private HandicapDto createDto(HandicapEntity entity) {
     return new HandicapDto(
+        true,
         entity.getId(),
         entity.getGolferId(),
         entity.getCreatedAt(),
