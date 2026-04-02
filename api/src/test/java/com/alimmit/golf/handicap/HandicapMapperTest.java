@@ -29,6 +29,7 @@ class HandicapMapperTest {
 
     HandicapEntity entity = new HandicapEntity("Test", 7.5, 9, 10);
     Assertions.assertThat(mapper.toDto(entity))
+        .hasFieldOrPropertyWithValue("established", true)
         .hasFieldOrProperty("handicapId")
         .hasFieldOrPropertyWithValue("golferId", "Test")
         .hasFieldOrPropertyWithValue("handicapIndex", 7.5)
@@ -40,9 +41,8 @@ class HandicapMapperTest {
   void fromOptionalEntityToDto() {
 
     Optional<HandicapEntity> entity = Optional.of(new HandicapEntity("Test", 7.5, 9, 10));
-    Assertions.assertThat(mapper.toOptionalDto(entity))
-        .isPresent()
-        .get()
+    Assertions.assertThat(mapper.toDto(entity))
+        .hasFieldOrPropertyWithValue("established", true)
         .hasFieldOrProperty("handicapId")
         .hasFieldOrPropertyWithValue("golferId", "Test")
         .hasFieldOrPropertyWithValue("handicapIndex", 7.5)
@@ -52,6 +52,9 @@ class HandicapMapperTest {
 
   @Test
   void fromEmptyOptionalToDto() {
-    Assertions.assertThat(mapper.toOptionalDto(Optional.empty())).isNotPresent();
+    Assertions.assertThat(mapper.toDto(Optional.empty()))
+        .hasFieldOrPropertyWithValue("established", false)
+        .hasFieldOrPropertyWithValue("handicapId", null)
+        .hasFieldOrPropertyWithValue("handicapIndex", null);
   }
 }

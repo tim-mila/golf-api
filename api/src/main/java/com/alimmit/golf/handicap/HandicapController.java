@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,24 +33,19 @@ class HandicapController {
       responses = {
         @ApiResponse(
             responseCode = "200",
+            description =
+                "Handicap status for the current user. Check the 'established' field to determine if a handicap index has been calculated.",
             content =
                 @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = HandicapDto.class))),
-        @ApiResponse(
-            responseCode = "204",
-            content = @Content,
-            description = "Golfer does not have established handicap index"),
         @ApiResponse(responseCode = "401", content = @Content),
         @ApiResponse(responseCode = "403", content = @Content)
       })
   @CanRead(GlobalConstants.SCOPE_HANDICAP)
   @GetMapping
-  ResponseEntity<HandicapDto> getHandicap() {
-    return handicapService
-        .getHandicap()
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.noContent().build());
+  HandicapDto getHandicap() {
+    return handicapService.getHandicap();
   }
 
   @Operation(
