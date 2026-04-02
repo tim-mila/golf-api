@@ -138,6 +138,8 @@ com.alimmit.golf
 
 **Public Endpoints:** `/v1/api-docs/**` (OpenAPI documentation)
 
+**CORS:** Configured in `WebSecurityConfiguration` via a `CorsConfigurationSource` bean, wired into the security filter chain with `.cors(...)`. Allowed origins are read from `CORS_ALLOWED_ORIGINS` env var (comma-separated); allowed methods: GET, POST, PATCH, DELETE, OPTIONS; allowed headers: Authorization, Content-Type. Test properties set `cors.allowed-origins=http://localhost:3000`.
+
 ### Database
 
 **Migration Tool:** Flyway
@@ -166,6 +168,9 @@ DATASOURCE_PASSOWRD=password          # Note: typo in property name
 # OAuth2 (Okta/Auth0)
 AUTH0_ISSUER_URL=https://your-tenant.auth0.com/
 AUTH0_AUDIENCE=https://your-api-audience
+
+# CORS
+CORS_ALLOWED_ORIGINS=http://localhost:3000   # Comma-separated list of allowed origins
 ```
 
 **Local Setup:** Secrets managed via 1Password CLI (`op inject`)
