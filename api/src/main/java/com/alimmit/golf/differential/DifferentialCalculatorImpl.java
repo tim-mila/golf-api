@@ -4,7 +4,6 @@ import com.alimmit.golf.handicap.HandicapDto;
 import com.alimmit.golf.handicap.HandicapService;
 import com.alimmit.golf.scorecard.ScorecardRequestDto;
 import com.alimmit.golf.scorecard.ScorecardType;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,18 +25,17 @@ class DifferentialCalculatorImpl implements DifferentialCalculator {
     // The standard differential is needed for both nine and 18 hole scores
     double standardDifferential = standardDifferential(scorecard);
 
-    Optional<HandicapDto> handicap = handicapService.getHandicap();
+    HandicapDto handicap = handicapService.getHandicap();
 
     // For 18 hole scores, use the standard differential
     if (ScorecardType.EIGHTEEN == scorecard.scorecardType()) {
-      differential = new Differential(standardDifferential, handicap.isPresent());
+      differential = new Differential(standardDifferential, handicap.established());
     }
     // For nine hole scores with an established handicap index convert to an 18 hole
     // differential using the expected score.
     // https://www.usga.org/content/usga/home-page/handicapping/world-handicap-system/2024-revision/2024-treatment-of-9-hole-scores-FAQ.html
-    else if (ScorecardType.NINE == scorecard.scorecardType() && handicap.isPresent()) {
-      double expectedDifferential =
-          expectedDifferential(handicap.map(HandicapDto::handicapIndex).orElse(0.0));
+    else if (ScorecardType.NINE == scorecard.scorecardType() && handicap.established()) {
+      double expectedDifferential = expectedDifferential(handicap.handicapIndex());
       differential = new Differential(standardDifferential + expectedDifferential, true);
     }
     // For nine hole scores without an established handicap index use the standard differential

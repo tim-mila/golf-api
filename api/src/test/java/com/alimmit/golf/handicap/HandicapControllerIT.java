@@ -32,6 +32,7 @@ class HandicapControllerIT extends AbstractHandicapControllerMockMvc {
     getMyHandicap(JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
+            jsonPath("$.established").value(true),
             jsonPath("$.handicapId")
                 .value(
                     MatchesPattern.matchesPattern(
@@ -44,7 +45,12 @@ class HandicapControllerIT extends AbstractHandicapControllerMockMvc {
   }
 
   @Test
-  void testGetHandicap_ExpectMissing() throws Exception {
-    getMyHandicap(JwtPersona.forPatPutter()).andExpect(status().isNoContent());
+  void testGetHandicap_NotEstablished() throws Exception {
+    getMyHandicap(JwtPersona.forPatPutter())
+        .andExpect(status().isOk())
+        .andExpectAll(
+            jsonPath("$.established").value(false),
+            jsonPath("$.handicapId").doesNotExist(),
+            jsonPath("$.handicapIndex").doesNotExist());
   }
 }

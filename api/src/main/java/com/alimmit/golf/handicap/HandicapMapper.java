@@ -18,12 +18,13 @@ class HandicapMapper {
     return existing;
   }
 
-  Optional<HandicapDto> toOptionalDto(Optional<HandicapEntity> entity) {
-    return entity.flatMap(e -> Optional.of(toDto(e)));
+  HandicapDto toDto(Optional<HandicapEntity> entity) {
+    return entity.map(this::toDto).orElse(HandicapDto.unestablished());
   }
 
   HandicapDto toDto(HandicapEntity entity) {
     return new HandicapDto(
+        true,
         entity.getId(),
         entity.getGolferId(),
         entity.getCreatedAt(),
