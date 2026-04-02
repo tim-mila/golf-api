@@ -138,7 +138,11 @@ com.alimmit.golf
 
 **Public Endpoints:** `/v1/api-docs/**` (OpenAPI documentation)
 
-**CORS:** Configured in `WebSecurityConfiguration` via a `CorsConfigurationSource` bean, wired into the security filter chain with `.cors(...)`. Allowed origins are read from `CORS_ALLOWED_ORIGINS` env var (comma-separated); allowed methods: GET, POST, PATCH, DELETE, OPTIONS; allowed headers: Authorization, Content-Type. Test properties set `cors.allowed-origins=http://localhost:3000`.
+**CORS:** Configured in `WebSecurityConfiguration` via a `CorsConfigurationSource` bean wired into the security filter chain with `.cors(...)`. Settings are bound from a `CorsProperties` record (`@ConfigurationProperties(prefix = "cors")`); all four fields are environment-configurable:
+- `CORS_ALLOWED_ORIGINS` — required (`@NotEmpty`), comma-separated list of allowed origins
+- `CORS_ALLOWED_METHODS` — default: `GET,POST,PATCH,DELETE,OPTIONS`
+- `CORS_ALLOWED_HEADERS` — default: `Authorization,Content-Type`
+- `CORS_MAX_AGE` — default: `3600` (seconds)
 
 ### Database
 
