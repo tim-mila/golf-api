@@ -73,6 +73,11 @@ cd api
 docker build -f api/Dockerfile -t golf-api .    # Build API image (run from repo root)
 ```
 
+### CI/CD Workflows
+- `api-test.yml` — runs `cd api && ./mvnw verify` on pull requests touching `api/**`
+- `api-release.yml` — triggers on push to `main` touching `api/**`; runs tests first, then bumps semver tag, builds and pushes Docker image to GHCR, and creates a GitHub Release
+- Docker image is only published if tests pass — the `Run tests` step gates all downstream release steps
+
 ## Architecture
 
 ### Package Structure
