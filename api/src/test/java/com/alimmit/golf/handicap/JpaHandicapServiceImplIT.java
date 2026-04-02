@@ -91,6 +91,7 @@ class JpaHandicapServiceImplIT {
     HandicapDto updated = handicapService.getHandicap();
 
     assertThat(updated)
+        .hasFieldOrPropertyWithValue("established", true)
         .hasFieldOrPropertyWithValue("handicapId", initial.handicapId())
         .hasFieldOrPropertyWithValue("golferId", "123")
         .hasFieldOrPropertyWithValue("totalRounds", 6);
