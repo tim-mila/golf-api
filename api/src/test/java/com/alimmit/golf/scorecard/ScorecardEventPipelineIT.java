@@ -6,13 +6,16 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.alimmit.golf.handicap.HandicapDto;
 import com.alimmit.golf.handicap.HandicapService;
 import com.alimmit.golf.utils.JwtPersona;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,11 @@ class ScorecardEventPipelineIT extends AbstractScorecardControllerMockMvc {
   @Autowired
   ScorecardEventPipelineIT(MockMvc mockMvc) {
     super(mockMvc);
+  }
+
+  @BeforeEach
+  void setUp() {
+    when(handicapService.getHandicap()).thenReturn(HandicapDto.unestablished());
   }
 
   private static final String REQUEST_BODY =

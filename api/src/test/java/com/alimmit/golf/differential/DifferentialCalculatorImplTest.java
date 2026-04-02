@@ -9,7 +9,6 @@ import com.alimmit.golf.scorecard.ScorecardRequestDto;
 import com.alimmit.golf.scorecard.ScorecardType;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,7 @@ class DifferentialCalculatorImplTest {
   void testNineHoleDifferentialWithoutHandicap() {
 
     // GIVEN: no existing handicap index established
-    when(handicapService.getHandicap()).thenReturn(Optional.empty());
+    when(handicapService.getHandicap()).thenReturn(HandicapDto.unestablished());
 
     Differential differential =
         differentialCalculator.calculateDifferential(
@@ -59,15 +58,15 @@ class DifferentialCalculatorImplTest {
     // GIVEN: existing handicap index of 14.1
     when(handicapService.getHandicap())
         .thenReturn(
-            Optional.of(
-                new HandicapDto(
-                    UUID.fromString("10000000-0000-0000-0000-000000000000"),
-                    "auth0|123",
-                    Instant.now(),
-                    Instant.now(),
-                    14.1,
-                    8,
-                    20)));
+            new HandicapDto(
+                true,
+                UUID.fromString("10000000-0000-0000-0000-000000000000"),
+                "auth0|123",
+                Instant.now(),
+                Instant.now(),
+                14.1,
+                8,
+                20));
 
     // WHEN: score posted of 38 on a 35.6/126 rating and slope course
     Differential differential =
@@ -96,7 +95,7 @@ class DifferentialCalculatorImplTest {
   void testEighteenHoleDifferentialWithoutHandicap() {
 
     // GIVEN: no existing handicap index established
-    when(handicapService.getHandicap()).thenReturn(Optional.empty());
+    when(handicapService.getHandicap()).thenReturn(HandicapDto.unestablished());
 
     // WHEN: score posted of 87 on a 70.9/123 rating and slope course
     Differential differential =
@@ -125,15 +124,15 @@ class DifferentialCalculatorImplTest {
     // GIVEN: existing handicap index of 14.1
     when(handicapService.getHandicap())
         .thenReturn(
-            Optional.of(
-                new HandicapDto(
-                    UUID.fromString("10000000-0000-0000-0000-000000000000"),
-                    "auth0|123",
-                    Instant.now(),
-                    Instant.now(),
-                    10.2,
-                    8,
-                    20)));
+            new HandicapDto(
+                true,
+                UUID.fromString("10000000-0000-0000-0000-000000000000"),
+                "auth0|123",
+                Instant.now(),
+                Instant.now(),
+                10.2,
+                8,
+                20));
 
     // WHEN: score posted of 87 on a 70.9/123 rating and slope course
     Differential differential =

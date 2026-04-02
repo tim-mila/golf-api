@@ -11,7 +11,6 @@ import com.alimmit.golf.scorecard.ScorecardService;
 import com.alimmit.golf.utils.JwtPersona;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -45,18 +44,19 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
   void getMyHandicap() throws Exception {
     when(handicapService.getHandicap())
         .thenReturn(
-            Optional.of(
-                new HandicapDto(
-                    UUID.fromString("10000000-0000-0000-0000-000000000000"),
-                    JwtPersona.GARY_GOLFER.sub(),
-                    Instant.now(),
-                    Instant.now(),
-                    10.2,
-                    8,
-                    20)));
+            new HandicapDto(
+                true,
+                UUID.fromString("10000000-0000-0000-0000-000000000000"),
+                JwtPersona.GARY_GOLFER.sub(),
+                Instant.now(),
+                Instant.now(),
+                10.2,
+                8,
+                20));
     super.getMyHandicap(JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
         .andExpectAll(
+            jsonPath("established").value(true),
             jsonPath("handicapId").value("10000000-0000-0000-0000-000000000000"),
             jsonPath("handicapIndex").value(10.2),
             jsonPath("roundsUsed").value(8),
@@ -66,9 +66,14 @@ class HandicapControllerTest extends AbstractHandicapControllerMockMvc {
   }
 
   @Test
-  void getMyHandicap_ExpectMissing() throws Exception {
-    when(handicapService.getHandicap()).thenReturn(Optional.empty());
-    super.getMyHandicap(JwtPersona.forGaryGolfer()).andExpect(status().isNoContent());
+  void getMyHandicap_NotEstablished() throws Exception {
+    when(handicapService.getHandicap()).thenReturn(HandicapDto.unestablished());
+    super.getMyHandicap(JwtPersona.forGaryGolfer())
+        .andExpect(status().isOk())
+        .andExpectAll(
+            jsonPath("established").value(false),
+            jsonPath("handicapId").doesNotExist(),
+            jsonPath("handicapIndex").doesNotExist());
   }
 
   @Test

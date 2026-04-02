@@ -108,6 +108,8 @@ com.alimmit.golf
 **Handicap** - Tracks a golfer's current handicap index
 - Fields: `golferId`, `handicapIndex`, `roundsUsed`, `totalRounds`, audit fields
 - Full revision history via Hibernate Envers (`@Audited`)
+- `GET /v1/handicap` always returns 200 with `HandicapDto`; check `established: boolean` to determine if the 54-hole WHS threshold has been met — all other fields are null when `established: false`
+- `HandicapDto.unestablished()` is the static factory for the not-yet-established state
 
 ### Security Model
 
@@ -239,7 +241,7 @@ All DTOs have class-level and field-level `@Schema` annotations for Swagger UI /
 - Class-level: `@Schema(description = "...")` on the record declaration
 - Field-level: `@Schema(description = "...", example = "...")` on each record component
 - Constraint fields (e.g. slope rating): include `minimum` and `maximum` attributes
-- All controllers use `@ApiResponse` for each status code: 200/201/204, 400, 401, 403, 404, and 409 where applicable
+- All controllers use `@ApiResponse` for each status code: 200/201/204, 400, 401, 403, 404, and 409 where applicable (exception: `HandicapController.getHandicap` uses 200-only — no 204)
 - 204 No Content responses use `content = @Content` (no schema) to suppress a spurious body in the Swagger UI
 - Array responses use `content = @Content(array = @ArraySchema(schema = @Schema(implementation = Foo.class)))`
 

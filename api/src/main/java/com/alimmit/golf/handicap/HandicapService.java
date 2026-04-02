@@ -2,7 +2,6 @@ package com.alimmit.golf.handicap;
 
 import com.alimmit.golf.scorecard.ScorecardDto;
 import java.util.List;
-import java.util.Optional;
 
 public interface HandicapService {
 
@@ -11,9 +10,10 @@ public interface HandicapService {
   /**
    * Get handicap for currently authenticated user
    *
-   * @return Optional, most recent handicap
+   * @return HandicapDto with established=true and full data when threshold met, established=false
+   *     with null fields otherwise
    */
-  Optional<HandicapDto> getHandicap();
+  HandicapDto getHandicap();
 
   /**
    * Get handicap history for currently authenticated user
