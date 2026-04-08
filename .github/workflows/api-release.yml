@@ -8,13 +8,14 @@ on:
       - 'api/**'
       - '.github/workflows/api*.yml'
 
-permissions:
-  contents: write
-  packages: write
+permissions: {}
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout
