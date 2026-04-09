@@ -111,7 +111,7 @@ class TeeController {
   @PostMapping(path = TeeConstants.TEE_ENDPOINT)
   TeeDto create(@Valid @RequestBody CreateTeeRequest request) {
     logger.debug("create tee | courseId={}", request.courseId());
-    return teeService.create(request.courseId(), request).orElseThrow(NotFoundException::new);
+    return teeService.create(request).orElseThrow(NotFoundException::new);
   }
 
   @Operation(

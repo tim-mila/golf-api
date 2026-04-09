@@ -25,11 +25,10 @@ interface TeeService {
   /**
    * Create a new tee for a course
    *
-   * @param courseId Golf course identifier
-   * @param request Create tee request
+   * @param request Create tee request (includes courseId)
    * @return TeeDto
    */
-  Optional<TeeDto> create(UUID courseId, CreateTeeRequest request);
+  Optional<TeeDto> create(CreateTeeRequest request);
 
   /**
    * Partially update a tee

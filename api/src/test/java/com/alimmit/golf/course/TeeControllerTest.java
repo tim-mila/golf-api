@@ -129,10 +129,10 @@ class TeeControllerTest extends AbstractTeeControllerTest {
   void createTee_ExpectCreated() throws Exception {
     UUID courseId = UUID.randomUUID();
     when(teeService.create(
-            eq(courseId),
             argThat(
                 m ->
-                    m.name().equals("Blue")
+                    m.courseId().equals(courseId)
+                        && m.name().equals("Blue")
                         && m.slope().compareTo(new BigDecimal("131.0")) == 0
                         && m.rating().compareTo(new BigDecimal("71.2")) == 0)))
         .thenReturn(
@@ -168,7 +168,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
   @Test
   void createTee_CourseNotFound_ExpectNotFound() throws Exception {
     UUID courseId = UUID.randomUUID();
-    when(teeService.create(eq(courseId), argThat(m -> m.name().equals("Blue"))))
+    when(teeService.create(argThat(m -> m.courseId().equals(courseId) && m.name().equals("Blue"))))
         .thenReturn(Optional.empty());
 
     String requestBody =

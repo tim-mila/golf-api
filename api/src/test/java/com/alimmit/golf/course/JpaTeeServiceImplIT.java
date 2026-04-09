@@ -59,7 +59,6 @@ class JpaTeeServiceImplIT {
 
     Optional<TeeDto> created =
         teeService.create(
-            course.courseId(),
             new CreateTeeRequest(
                 course.courseId(), "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
@@ -100,7 +99,6 @@ class JpaTeeServiceImplIT {
     UUID courseId = UUID.randomUUID();
     Optional<TeeDto> result =
         teeService.create(
-            courseId,
             new CreateTeeRequest(
                 courseId, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
@@ -118,7 +116,6 @@ class JpaTeeServiceImplIT {
     TeeDto created =
         teeService
             .create(
-                course.courseId(),
                 new CreateTeeRequest(
                     course.courseId(), "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
             .orElseThrow();
@@ -159,11 +156,9 @@ class JpaTeeServiceImplIT {
             new CreateCourseRequest("Test Club", "Test Course", "Test City", USState.WISCONSIN));
 
     teeService.create(
-        course.courseId(),
         new CreateTeeRequest(
             course.courseId(), "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
     teeService.create(
-        course.courseId(),
         new CreateTeeRequest(
             course.courseId(), "White", 72, new BigDecimal("125.0"), new BigDecimal("69.5")));
 
@@ -183,7 +178,6 @@ class JpaTeeServiceImplIT {
     TeeDto created =
         teeService
             .create(
-                course.courseId(),
                 new CreateTeeRequest(
                     course.courseId(), "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
             .orElseThrow();

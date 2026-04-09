@@ -37,9 +37,9 @@ class JpaTeeServiceImpl implements TeeService {
 
   @Override
   @Transactional
-  public Optional<TeeDto> create(UUID courseId, CreateTeeRequest request) {
+  public Optional<TeeDto> create(CreateTeeRequest request) {
     return courseRepository
-        .findByIdForCurrentUser(courseId)
+        .findByIdForCurrentUser(request.courseId())
         .map(course -> teeMapper.map(teeRepository.save(teeMapper.map(course, request))));
   }
 

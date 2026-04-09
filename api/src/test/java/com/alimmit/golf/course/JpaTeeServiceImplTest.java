@@ -95,7 +95,7 @@ class JpaTeeServiceImplTest {
     when(teeRepository.save(unsaved)).thenReturn(saved);
     when(teeMapper.map(saved)).thenReturn(dto);
 
-    Optional<TeeDto> result = teeService.create(courseId, request);
+    Optional<TeeDto> result = teeService.create(request);
 
     assertThat(result).isPresent().contains(dto);
   }
@@ -108,7 +108,7 @@ class JpaTeeServiceImplTest {
 
     when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.empty());
 
-    Optional<TeeDto> result = teeService.create(courseId, request);
+    Optional<TeeDto> result = teeService.create(request);
 
     assertThat(result).isEmpty();
   }
