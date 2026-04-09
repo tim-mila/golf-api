@@ -129,10 +129,10 @@ class TeeControllerTest extends AbstractTeeControllerTest {
   void createTee_ExpectCreated() throws Exception {
     UUID courseId = UUID.randomUUID();
     when(teeService.create(
-            eq(courseId),
             argThat(
                 m ->
-                    m.name().equals("Blue")
+                    m.courseId().equals(courseId)
+                        && m.name().equals("Blue")
                         && m.slope().compareTo(new BigDecimal("131.0")) == 0
                         && m.rating().compareTo(new BigDecimal("71.2")) == 0)))
         .thenReturn(
@@ -149,10 +149,11 @@ class TeeControllerTest extends AbstractTeeControllerTest {
 
     String requestBody =
         """
-        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
-        """;
+        {"courseId": "%s", "name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
+        """
+            .formatted(courseId);
 
-    createTee(courseId, requestBody, JwtPersona.forGaryGolfer())
+    createTee(requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isCreated())
         .andExpectAll(
             jsonPath("$.name").value("Blue"),
@@ -167,15 +168,16 @@ class TeeControllerTest extends AbstractTeeControllerTest {
   @Test
   void createTee_CourseNotFound_ExpectNotFound() throws Exception {
     UUID courseId = UUID.randomUUID();
-    when(teeService.create(eq(courseId), argThat(m -> m.name().equals("Blue"))))
+    when(teeService.create(argThat(m -> m.courseId().equals(courseId) && m.name().equals("Blue"))))
         .thenReturn(Optional.empty());
 
     String requestBody =
         """
-        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
-        """;
+        {"courseId": "%s", "name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
+        """
+            .formatted(courseId);
 
-    createTee(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
+    createTee(requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isBadRequest());
   }
 
   // --- Unauthenticated tests ---
@@ -190,25 +192,30 @@ class TeeControllerTest extends AbstractTeeControllerTest {
     UUID courseId = UUID.randomUUID();
     UUID teeId = UUID.randomUUID();
     return Stream.of(
-        get(TeeConstants.TEE_ENDPOINT, courseId),
+        get(TeeConstants.TEE_ENDPOINT).param("courseId", courseId.toString()),
         get(TeeConstants.TEE_BY_ID_ENDPOINT, teeId),
-        post(TeeConstants.TEE_ENDPOINT, courseId).with(csrf()),
+        post(TeeConstants.TEE_ENDPOINT).with(csrf()),
         patch(TeeConstants.TEE_BY_ID_ENDPOINT, teeId).with(csrf()),
         delete(TeeConstants.TEE_BY_ID_ENDPOINT, teeId).with(csrf()));
+  }
+
+  @Test
+  void listTeesByCourse_MissingCourseId_ExpectBadRequest() throws Exception {
+    performMockMvc(JwtPersona.forGaryGolfer(), get(TeeConstants.TEE_ENDPOINT))
+        .andExpect(status().isBadRequest());
   }
 
   @ParameterizedTest
   @ValueSource(
       strings = {
         "{\"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"par\": 72, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"par\": 72, \"slope\": 131.0}",
-        "{\"name\": \"\", \"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"courseId\": \"00000000-0000-0000-0000-000000000001\", \"name\": \"Blue\", \"par\": 72, \"rating\": 71.2}",
+        "{\"courseId\": \"00000000-0000-0000-0000-000000000001\", \"name\": \"Blue\", \"par\": 72, \"slope\": 131.0}",
+        "{\"courseId\": \"00000000-0000-0000-0000-000000000001\", \"name\": \"\", \"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"courseId\": \"00000000-0000-0000-0000-000000000001\", \"name\": \"Blue\", \"slope\": 131.0, \"rating\": 71.2}",
       })
   void createTee_ExpectBadRequest(String requestBody) throws Exception {
-    createTee(UUID.randomUUID(), requestBody, JwtPersona.forGaryGolfer())
-        .andExpect(status().isBadRequest());
+    createTee(requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isBadRequest());
   }
 
   @Test

@@ -59,8 +59,8 @@ class JpaTeeServiceImplIT {
 
     Optional<TeeDto> created =
         teeService.create(
-            course.courseId(),
-            new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new CreateTeeRequest(
+                course.courseId(), "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
     assertThat(created)
         .isPresent()
@@ -96,10 +96,11 @@ class JpaTeeServiceImplIT {
   @WithMockUser("123")
   @Transactional(propagation = Propagation.NEVER)
   void createCourseNotFound() {
+    UUID courseId = UUID.randomUUID();
     Optional<TeeDto> result =
         teeService.create(
-            UUID.randomUUID(),
-            new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
+            new CreateTeeRequest(
+                courseId, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
 
     assertThat(result).isEmpty();
   }
@@ -115,8 +116,8 @@ class JpaTeeServiceImplIT {
     TeeDto created =
         teeService
             .create(
-                course.courseId(),
-                new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
+                new CreateTeeRequest(
+                    course.courseId(), "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
             .orElseThrow();
 
     Optional<TeeDto> patched =
@@ -155,11 +156,11 @@ class JpaTeeServiceImplIT {
             new CreateCourseRequest("Test Club", "Test Course", "Test City", USState.WISCONSIN));
 
     teeService.create(
-        course.courseId(),
-        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
+        new CreateTeeRequest(
+            course.courseId(), "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")));
     teeService.create(
-        course.courseId(),
-        new CreateTeeRequest("White", 72, new BigDecimal("125.0"), new BigDecimal("69.5")));
+        new CreateTeeRequest(
+            course.courseId(), "White", 72, new BigDecimal("125.0"), new BigDecimal("69.5")));
 
     List<TeeDto> tees = teeService.listByCourse(course.courseId());
 
@@ -177,8 +178,8 @@ class JpaTeeServiceImplIT {
     TeeDto created =
         teeService
             .create(
-                course.courseId(),
-                new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
+                new CreateTeeRequest(
+                    course.courseId(), "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2")))
             .orElseThrow();
 
     teeService.delete(created.teeId());

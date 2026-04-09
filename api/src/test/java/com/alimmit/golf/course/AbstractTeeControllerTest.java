@@ -18,19 +18,19 @@ class AbstractTeeControllerTest extends AbstractControllerMockMvc {
 
   ResultActions listTeesByCourse(UUID courseId, JwtClaimApplier fn, ResultMatcher... expect)
       throws Exception {
-    return performMockMvc(fn, get(CourseConstants.COURSE_ENDPOINT + "/{id}/tee", courseId), expect);
+    return performMockMvc(
+        fn, get(TeeConstants.TEE_ENDPOINT).param("courseId", courseId.toString()), expect);
   }
 
   ResultActions getTee(UUID teeId, JwtClaimApplier fn, ResultMatcher... expect) throws Exception {
     return performMockMvc(fn, get(TeeConstants.TEE_BY_ID_ENDPOINT, teeId), expect);
   }
 
-  ResultActions createTee(
-      UUID courseId, String requestBody, JwtClaimApplier fn, ResultMatcher... expect)
+  ResultActions createTee(String requestBody, JwtClaimApplier fn, ResultMatcher... expect)
       throws Exception {
     return performMockMvc(
         fn,
-        post(CourseConstants.COURSE_ENDPOINT + "/{id}/tee", courseId)
+        post(TeeConstants.TEE_ENDPOINT)
             .contentType(MediaType.APPLICATION_JSON)
             .content(requestBody),
         expect);

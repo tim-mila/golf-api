@@ -4,9 +4,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Schema(description = "Request body for adding a new tee to a golf course")
 public record CreateTeeRequest(
+    @NotNull
+        @Schema(
+            description = "Golf course identifier",
+            example = "01960000-0000-7000-0000-000000000001")
+        UUID courseId,
     @NotBlank @Schema(description = "Tee name (e.g. Blue, White, Red)", example = "Blue")
         String name,
     @NotNull @Schema(description = "Par for the course from this tee", example = "72") Integer par,

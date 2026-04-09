@@ -41,14 +41,14 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   @WithMockUser("123")
   void addTee() throws Exception {
     UUID courseId = createCourse();
-    createAndAssertTee(courseId, new TeeStub("Black", 72, 128.3, 71.9), JwtPersona.forGaryGolfer());
+    createAndAssertTee(new TeeStub(courseId, "Black", 72, 128.3, 71.9), JwtPersona.forGaryGolfer());
   }
 
   @Test
   @WithMockUser("123")
   void canOnlyListMyTees() throws Exception {
     UUID courseId = createCourse();
-    createAndAssertTee(courseId, TeeStub.defaultStub(), JwtPersona.forGaryGolfer());
+    createAndAssertTee(TeeStub.defaultStub(courseId), JwtPersona.forGaryGolfer());
 
     // Gary sees his tee
     listTeesByCourse(courseId, JwtPersona.forGaryGolfer(), status().isOk())
@@ -64,7 +64,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   void canOnlyFetchMyTees() throws Exception {
     UUID courseId = createCourse();
     String responseBody =
-        createAndAssertTee(courseId, TeeStub.defaultStub(), JwtPersona.forGaryGolfer())
+        createAndAssertTee(TeeStub.defaultStub(courseId), JwtPersona.forGaryGolfer())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -84,7 +84,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   void canOnlyDeleteMyTees() throws Exception {
     UUID courseId = createCourse();
     String responseBody =
-        createAndAssertTee(courseId, TeeStub.defaultStub(), JwtPersona.forGaryGolfer())
+        createAndAssertTee(TeeStub.defaultStub(courseId), JwtPersona.forGaryGolfer())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -107,22 +107,9 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   void createAndGetTee() throws Exception {
     UUID courseId = createCourse();
 
-    String requestBody =
-        """
-        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
-        """;
-
     String responseBody =
-        createTee(courseId, requestBody, JwtPersona.forGaryGolfer())
-            .andExpect(status().isCreated())
-            .andExpectAll(
-                jsonPath("$.courseId").value(courseId.toString()),
-                jsonPath("$.name").value("Blue"),
-                jsonPath("$.slope").value(131.0),
-                jsonPath("$.rating").value(71.2),
-                jsonPath("$.teeId").exists(),
-                jsonPath("$.createdAt").exists(),
-                jsonPath("$.lastModifiedAt").exists())
+        createAndAssertTee(
+                new TeeStub(courseId, "Blue", 72, 131.0, 71.2), JwtPersona.forGaryGolfer())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -140,21 +127,18 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   @Test
   @WithMockUser("123")
   void createTee_courseNotFound() throws Exception {
-    String requestBody =
-        """
-        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
-        """;
-
-    createTee(UUID.randomUUID(), requestBody, JwtPersona.forGaryGolfer())
-        .andExpect(status().isNotFound());
+    createTee(
+            new TeeStub(UUID.randomUUID(), "Blue", 72, 131.0, 71.2).asRequestBody(),
+            JwtPersona.forGaryGolfer())
+        .andExpect(status().isBadRequest());
   }
 
   @Test
   @WithMockUser("123")
   void listTeesByCourse() throws Exception {
     UUID courseId = createCourse();
-    createAndAssertTee(courseId, new TeeStub("Blue", 72, 123.2, 71.5), JwtPersona.forGaryGolfer());
-    createAndAssertTee(courseId, new TeeStub("White", 72, 121.2, 71.0), JwtPersona.forGaryGolfer());
+    createAndAssertTee(new TeeStub(courseId, "Blue", 72, 123.2, 71.5), JwtPersona.forGaryGolfer());
+    createAndAssertTee(new TeeStub(courseId, "White", 72, 121.2, 71.0), JwtPersona.forGaryGolfer());
 
     listTeesByCourse(courseId, JwtPersona.forGaryGolfer())
         .andExpect(status().isOk())
@@ -181,14 +165,9 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   void patchTee() throws Exception {
     UUID courseId = createCourse();
 
-    String createBody =
-        """
-        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
-        """;
-
     String createResponse =
-        createTee(courseId, createBody, JwtPersona.forGaryGolfer())
-            .andExpect(status().isCreated())
+        createAndAssertTee(
+                new TeeStub(courseId, "Blue", 72, 131.0, 71.2), JwtPersona.forGaryGolfer())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -226,14 +205,9 @@ class TeeControllerIT extends AbstractTeeControllerTest {
   void deleteTee() throws Exception {
     UUID courseId = createCourse();
 
-    String createBody =
-        """
-        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
-        """;
-
     String createResponse =
-        createTee(courseId, createBody, JwtPersona.forGaryGolfer())
-            .andExpect(status().isCreated())
+        createAndAssertTee(
+                new TeeStub(courseId, "Blue", 72, 131.0, 71.2), JwtPersona.forGaryGolfer())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -245,13 +219,11 @@ class TeeControllerIT extends AbstractTeeControllerTest {
     getTee(teeId, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
-  private ResultActions createAndAssertTee(UUID courseId, TeeStub stub, JwtClaimApplier fn)
-      throws Exception {
-
-    return createTee(courseId, stub.asRequestBody(), fn, status().isCreated())
+  private ResultActions createAndAssertTee(TeeStub stub, JwtClaimApplier fn) throws Exception {
+    return createTee(stub.asRequestBody(), fn, status().isCreated())
         .andExpectAll(
             jsonPath("$.teeId").exists(),
-            jsonPath("$.courseId").value(courseId.toString()),
+            jsonPath("$.courseId").value(stub.courseId.toString()),
             jsonPath("$.name").value(stub.name),
             jsonPath("$.par").value(stub.par),
             jsonPath("$.slope").value(stub.slope),
@@ -266,17 +238,17 @@ class TeeControllerIT extends AbstractTeeControllerTest {
         .courseId();
   }
 
-  private record TeeStub(String name, int par, double slope, double rating) {
+  private record TeeStub(UUID courseId, String name, int par, double slope, double rating) {
 
     String asRequestBody() {
       return """
-        {"name": "%s", "par": %d, "slope": %.1f, "rating": %.1f}
+        {"courseId": "%s", "name": "%s", "par": %d, "slope": %.1f, "rating": %.1f}
         """
-          .formatted(name, par, slope, rating);
+          .formatted(courseId, name, par, slope, rating);
     }
 
-    static TeeStub defaultStub() {
-      return new TeeStub("Blue", 72, 123.4, 71.3);
+    static TeeStub defaultStub(UUID courseId) {
+      return new TeeStub(courseId, "Blue", 72, 123.4, 71.3);
     }
   }
 }

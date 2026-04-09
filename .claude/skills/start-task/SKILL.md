@@ -36,6 +36,8 @@ A clear issue has:
 
 An unclear issue is missing one or more of those things — vague goals, no reproduction steps for a bug, ambiguous scope, no success criteria.
 
+**Also treat as unclear:** an issue that presents two or more design options without making a decision. Even if acceptance criteria exist, they are conditional on the choice. Always ask before formulating a plan.
+
 **If clear → proceed to Step 3.**  
 **If unclear → go to Step 2b: Interview.**
 

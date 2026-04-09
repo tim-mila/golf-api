@@ -68,6 +68,13 @@ cd api
 - OpenAPI JSON (runtime): http://localhost:8080/v1/api-docs
 - OpenAPI JSON (build artifact): `open-api.json` at repo root — generated automatically by `springdoc-openapi-maven-plugin` during `cd api && ./mvnw verify`
 
+**Any PR that changes a controller's endpoints, request/response types, or OpenAPI annotations must regenerate `open-api.json` before merging:**
+```bash
+cd api && ./mvnw verify
+git add open-api.json
+```
+This includes changes to: URL paths, HTTP methods, `@RequestParam`/`@PathVariable`/`@RequestBody` shape, `@Schema`/`@Operation`/`@ApiResponse`/`@Parameter` annotations, and request/response record fields.
+
 ### Docker
 ```bash
 docker build -f api/Dockerfile -t golf-api .    # Build API image (run from repo root)
@@ -104,6 +111,8 @@ com.alimmit.golf
 
 **Tee** - Represents a set of tees for a course
 - Fields: `name`, `par`, `slope`, `rating`, audit fields
+- All tee endpoints are flat under `/v1/tee`: `GET /v1/tee?courseId=`, `POST /v1/tee` (courseId in body), `GET/PATCH/DELETE /v1/tee/{id}`
+- `CreateTeeRequest` includes `courseId` — the service reads it via `request.courseId()` in `TeeService.create(CreateTeeRequest)`
 
 **Handicap** - Tracks a golfer's current handicap index
 - Fields: `golferId`, `handicapIndex`, `roundsUsed`, `totalRounds`, audit fields

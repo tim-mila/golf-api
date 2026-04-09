@@ -84,7 +84,7 @@ class JpaTeeServiceImplTest {
     course.setId(courseId);
 
     CreateTeeRequest request =
-        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new CreateTeeRequest(courseId, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
     TeeEntity unsaved =
         new TeeEntity(course, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
     TeeEntity saved = createEntity(UUID.randomUUID(), "Blue");
@@ -95,7 +95,7 @@ class JpaTeeServiceImplTest {
     when(teeRepository.save(unsaved)).thenReturn(saved);
     when(teeMapper.map(saved)).thenReturn(dto);
 
-    Optional<TeeDto> result = teeService.create(courseId, request);
+    Optional<TeeDto> result = teeService.create(request);
 
     assertThat(result).isPresent().contains(dto);
   }
@@ -104,11 +104,11 @@ class JpaTeeServiceImplTest {
   void createCourseNotFound() {
     UUID courseId = UUID.randomUUID();
     CreateTeeRequest request =
-        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new CreateTeeRequest(courseId, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
 
     when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.empty());
 
-    Optional<TeeDto> result = teeService.create(courseId, request);
+    Optional<TeeDto> result = teeService.create(request);
 
     assertThat(result).isEmpty();
   }

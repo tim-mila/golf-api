@@ -16,7 +16,8 @@ class TeeMapperTest {
   void mapCreateTeeRequest() {
     CourseEntity course = new CourseEntity("Test Club", "Test Course", "Test City", USState.OHIO);
     CreateTeeRequest request =
-        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new CreateTeeRequest(
+            UUID.randomUUID(), "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
 
     TeeEntity result = teeMapper.map(course, request);
 
