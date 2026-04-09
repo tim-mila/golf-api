@@ -199,6 +199,12 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         delete(TeeConstants.TEE_BY_ID_ENDPOINT, teeId).with(csrf()));
   }
 
+  @Test
+  void listTeesByCourse_MissingCourseId_ExpectBadRequest() throws Exception {
+    performMockMvc(JwtPersona.forGaryGolfer(), get(TeeConstants.TEE_ENDPOINT))
+        .andExpect(status().isBadRequest());
+  }
+
   @ParameterizedTest
   @ValueSource(
       strings = {
