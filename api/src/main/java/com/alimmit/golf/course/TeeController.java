@@ -42,7 +42,8 @@ class TeeController {
         @Parameter(
             name = "courseId",
             description = "Golf course identifier",
-            in = ParameterIn.QUERY)
+            in = ParameterIn.QUERY,
+            required = true)
       },
       responses = {
         @ApiResponse(
