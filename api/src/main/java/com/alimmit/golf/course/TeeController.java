@@ -39,7 +39,10 @@ class TeeController {
       summary = "List tees for a course",
       description = "Get all tees for a given golf course",
       parameters = {
-        @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
+        @Parameter(
+            name = "courseId",
+            description = "Golf course identifier",
+            in = ParameterIn.QUERY)
       },
       responses = {
         @ApiResponse(
@@ -53,7 +56,7 @@ class TeeController {
       })
   @CanRead(GlobalConstants.SCOPE_COURSE)
   @GetMapping(path = TeeConstants.TEE_ENDPOINT)
-  List<TeeDto> listByCourse(@PathVariable("id") UUID courseId) {
+  List<TeeDto> listByCourse(@RequestParam UUID courseId) {
     return teeService.listByCourse(courseId);
   }
 
@@ -85,9 +88,6 @@ class TeeController {
       operationId = "tee.create",
       summary = "Add a new tee to a course",
       description = "Add a new tee to a golf course",
-      parameters = {
-        @Parameter(name = "id", description = "Golf course identifier", in = ParameterIn.PATH)
-      },
       requestBody =
           @io.swagger.v3.oas.annotations.parameters.RequestBody(
               content =
@@ -109,9 +109,9 @@ class TeeController {
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.CREATED)
   @PostMapping(path = TeeConstants.TEE_ENDPOINT)
-  TeeDto create(@PathVariable("id") UUID courseId, @Valid @RequestBody CreateTeeRequest request) {
-    logger.debug("create tee | courseId={}", courseId);
-    return teeService.create(courseId, request).orElseThrow(NotFoundException::new);
+  TeeDto create(@Valid @RequestBody CreateTeeRequest request) {
+    logger.debug("create tee | courseId={}", request.courseId());
+    return teeService.create(request.courseId(), request).orElseThrow(NotFoundException::new);
   }
 
   @Operation(

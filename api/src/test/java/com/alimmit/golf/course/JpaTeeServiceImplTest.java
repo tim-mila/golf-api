@@ -84,7 +84,7 @@ class JpaTeeServiceImplTest {
     course.setId(courseId);
 
     CreateTeeRequest request =
-        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new CreateTeeRequest(courseId, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
     TeeEntity unsaved =
         new TeeEntity(course, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
     TeeEntity saved = createEntity(UUID.randomUUID(), "Blue");
@@ -104,7 +104,7 @@ class JpaTeeServiceImplTest {
   void createCourseNotFound() {
     UUID courseId = UUID.randomUUID();
     CreateTeeRequest request =
-        new CreateTeeRequest("Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
+        new CreateTeeRequest(courseId, "Blue", 72, new BigDecimal("131.0"), new BigDecimal("71.2"));
 
     when(courseRepository.findByIdForCurrentUser(courseId)).thenReturn(Optional.empty());
 

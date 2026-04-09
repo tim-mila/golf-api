@@ -104,6 +104,8 @@ com.alimmit.golf
 
 **Tee** - Represents a set of tees for a course
 - Fields: `name`, `par`, `slope`, `rating`, audit fields
+- All tee endpoints are flat under `/v1/tee`: `GET /v1/tee?courseId=`, `POST /v1/tee` (courseId in body), `GET/PATCH/DELETE /v1/tee/{id}`
+- `CreateTeeRequest` includes `courseId` — the controller passes it to `TeeService.create(UUID courseId, CreateTeeRequest)`
 
 **Handicap** - Tracks a golfer's current handicap index
 - Fields: `golferId`, `handicapIndex`, `roundsUsed`, `totalRounds`, audit fields

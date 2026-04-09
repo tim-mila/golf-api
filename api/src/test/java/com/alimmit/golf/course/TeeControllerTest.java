@@ -149,10 +149,11 @@ class TeeControllerTest extends AbstractTeeControllerTest {
 
     String requestBody =
         """
-        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
-        """;
+        {"courseId": "%s", "name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
+        """
+            .formatted(courseId);
 
-    createTee(courseId, requestBody, JwtPersona.forGaryGolfer())
+    createTee(requestBody, JwtPersona.forGaryGolfer())
         .andExpect(status().isCreated())
         .andExpectAll(
             jsonPath("$.name").value("Blue"),
@@ -172,10 +173,11 @@ class TeeControllerTest extends AbstractTeeControllerTest {
 
     String requestBody =
         """
-        {"name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
-        """;
+        {"courseId": "%s", "name": "Blue", "par": 72, "slope": 131.0, "rating": 71.2}
+        """
+            .formatted(courseId);
 
-    createTee(courseId, requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
+    createTee(requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
   }
 
   // --- Unauthenticated tests ---
@@ -190,9 +192,9 @@ class TeeControllerTest extends AbstractTeeControllerTest {
     UUID courseId = UUID.randomUUID();
     UUID teeId = UUID.randomUUID();
     return Stream.of(
-        get(TeeConstants.TEE_ENDPOINT, courseId),
+        get(TeeConstants.TEE_ENDPOINT).param("courseId", courseId.toString()),
         get(TeeConstants.TEE_BY_ID_ENDPOINT, teeId),
-        post(TeeConstants.TEE_ENDPOINT, courseId).with(csrf()),
+        post(TeeConstants.TEE_ENDPOINT).with(csrf()),
         patch(TeeConstants.TEE_BY_ID_ENDPOINT, teeId).with(csrf()),
         delete(TeeConstants.TEE_BY_ID_ENDPOINT, teeId).with(csrf()));
   }
@@ -201,14 +203,13 @@ class TeeControllerTest extends AbstractTeeControllerTest {
   @ValueSource(
       strings = {
         "{\"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"par\": 72, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"par\": 72, \"slope\": 131.0}",
-        "{\"name\": \"\", \"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
-        "{\"name\": \"Blue\", \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"courseId\": \"00000000-0000-0000-0000-000000000001\", \"name\": \"Blue\", \"par\": 72, \"rating\": 71.2}",
+        "{\"courseId\": \"00000000-0000-0000-0000-000000000001\", \"name\": \"Blue\", \"par\": 72, \"slope\": 131.0}",
+        "{\"courseId\": \"00000000-0000-0000-0000-000000000001\", \"name\": \"\", \"par\": 72, \"slope\": 131.0, \"rating\": 71.2}",
+        "{\"courseId\": \"00000000-0000-0000-0000-000000000001\", \"name\": \"Blue\", \"slope\": 131.0, \"rating\": 71.2}",
       })
   void createTee_ExpectBadRequest(String requestBody) throws Exception {
-    createTee(UUID.randomUUID(), requestBody, JwtPersona.forGaryGolfer())
-        .andExpect(status().isBadRequest());
+    createTee(requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isBadRequest());
   }
 
   @Test
