@@ -2,9 +2,6 @@ name: API Test
 
 on:
   pull_request:
-    paths:
-      - 'api/**'
-      - '.github/workflows/api*.yml'
 
 permissions:
   contents: read
@@ -15,13 +12,26 @@ jobs:
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
 
-      - name: Set up JDK 21
+      - name: Detect API changes
+        id: changes
+        run: |
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -qE '^(api/|\.github/workflows/api)'; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up JDK 25
+        if: steps.changes.outputs.changed == 'true'
         uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'temurin'
           cache: 'maven'
 
       - name: Run tests
+        if: steps.changes.outputs.changed == 'true'
         run: cd api && ./mvnw --no-transfer-progress verify
