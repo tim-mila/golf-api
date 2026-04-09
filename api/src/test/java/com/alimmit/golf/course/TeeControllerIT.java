@@ -130,7 +130,7 @@ class TeeControllerIT extends AbstractTeeControllerTest {
     createTee(
             new TeeStub(UUID.randomUUID(), "Blue", 72, 131.0, 71.2).asRequestBody(),
             JwtPersona.forGaryGolfer())
-        .andExpect(status().isNotFound());
+        .andExpect(status().isBadRequest());
   }
 
   @Test

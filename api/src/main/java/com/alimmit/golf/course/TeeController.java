@@ -1,6 +1,7 @@
 package com.alimmit.golf.course;
 
 import com.alimmit.golf.GlobalConstants;
+import com.alimmit.golf.errors.BadRequestException;
 import com.alimmit.golf.errors.NotFoundException;
 import com.alimmit.golf.security.CanRead;
 import com.alimmit.golf.security.CanWrite;
@@ -104,15 +105,14 @@ class TeeController {
                     schema = @Schema(implementation = TeeDto.class))),
         @ApiResponse(responseCode = "400", content = @Content),
         @ApiResponse(responseCode = "401", content = @Content),
-        @ApiResponse(responseCode = "403", content = @Content),
-        @ApiResponse(responseCode = "404", content = @Content)
+        @ApiResponse(responseCode = "403", content = @Content)
       })
   @CanWrite(GlobalConstants.SCOPE_COURSE)
   @ResponseStatus(code = HttpStatus.CREATED)
   @PostMapping(path = TeeConstants.TEE_ENDPOINT)
   TeeDto create(@Valid @RequestBody CreateTeeRequest request) {
     logger.debug("create tee | courseId={}", request.courseId());
-    return teeService.create(request).orElseThrow(NotFoundException::new);
+    return teeService.create(request).orElseThrow(BadRequestException::new);
   }
 
   @Operation(

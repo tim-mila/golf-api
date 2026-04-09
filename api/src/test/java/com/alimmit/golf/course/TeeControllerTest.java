@@ -177,7 +177,7 @@ class TeeControllerTest extends AbstractTeeControllerTest {
         """
             .formatted(courseId);
 
-    createTee(requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isNotFound());
+    createTee(requestBody, JwtPersona.forGaryGolfer()).andExpect(status().isBadRequest());
   }
 
   // --- Unauthenticated tests ---
