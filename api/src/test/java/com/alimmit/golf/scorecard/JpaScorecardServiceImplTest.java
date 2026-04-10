@@ -1,6 +1,7 @@
 package com.alimmit.golf.scorecard;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.alimmit.golf.differential.Differential;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class JpaScorecardServiceImplTest {
@@ -48,6 +50,12 @@ class JpaScorecardServiceImplTest {
         ScorecardType.EIGHTEEN,
         14.4,
         true);
+  }
+
+  private ScorecardEntity entityWithId(UUID id) {
+    ScorecardEntity e = entity();
+    e.setId(id);
+    return e;
   }
 
   private ScorecardDto dto(UUID id) {
@@ -84,21 +92,70 @@ class JpaScorecardServiceImplTest {
   }
 
   @Test
-  void listAll_returnsMappedDtos() {
-    ScorecardEntity entity = entity();
-    ScorecardDto expected = dto(UUID.randomUUID());
+  void list_firstPage_returnsMappedDtos() {
+    ScorecardEntity entity = entityWithId(UUID.randomUUID());
+    ScorecardDto expected = dto(entity.getId());
 
-    when(scorecardRepository.findAllForCurrentUser()).thenReturn(List.of(entity));
+    when(scorecardRepository.findFirstPageForCurrentUser(any(Pageable.class)))
+        .thenReturn(List.of(entity));
     when(scorecardMapper.toDto(entity)).thenReturn(expected);
 
-    assertThat(service.listAll()).containsExactly(expected);
+    ScorecardPageDto result = service.list(20, null);
+
+    assertThat(result.data()).containsExactly(expected);
+    assertThat(result.hasNext()).isFalse();
+    assertThat(result.nextCursor()).isNull();
   }
 
   @Test
-  void listAll_emptyResults_returnsEmptyList() {
-    when(scorecardRepository.findAllForCurrentUser()).thenReturn(List.of());
+  void list_firstPage_hasNext_whenMoreResultsExist() {
+    // Return limit+1 entities to trigger hasNext=true
+    int limit = 2;
+    ScorecardEntity e1 = entityWithId(UUID.randomUUID());
+    ScorecardEntity e2 = entityWithId(UUID.randomUUID());
+    ScorecardEntity e3 = entityWithId(UUID.randomUUID()); // the extra row
+    ScorecardDto d1 = dto(e1.getId());
+    ScorecardDto d2 = dto(e2.getId());
 
-    assertThat(service.listAll()).isEmpty();
+    when(scorecardRepository.findFirstPageForCurrentUser(any(Pageable.class)))
+        .thenReturn(List.of(e1, e2, e3));
+    when(scorecardMapper.toDto(e1)).thenReturn(d1);
+    when(scorecardMapper.toDto(e2)).thenReturn(d2);
+
+    ScorecardPageDto result = service.list(limit, null);
+
+    assertThat(result.data()).containsExactly(d1, d2);
+    assertThat(result.hasNext()).isTrue();
+    assertThat(result.nextCursor()).isNotBlank();
+  }
+
+  @Test
+  void list_withCursor_callsKeysetQuery() {
+    ScorecardCursor cursor = new ScorecardCursor(LocalDate.of(2025, 6, 1), UUID.randomUUID());
+    ScorecardEntity entity = entityWithId(UUID.randomUUID());
+    ScorecardDto expected = dto(entity.getId());
+
+    when(scorecardRepository.findNextPageForCurrentUser(
+            any(LocalDate.class), any(UUID.class), any(Pageable.class)))
+        .thenReturn(List.of(entity));
+    when(scorecardMapper.toDto(entity)).thenReturn(expected);
+
+    ScorecardPageDto result = service.list(20, cursor);
+
+    assertThat(result.data()).containsExactly(expected);
+    assertThat(result.hasNext()).isFalse();
+  }
+
+  @Test
+  void list_emptyResults_returnsEmptyPage() {
+    when(scorecardRepository.findFirstPageForCurrentUser(any(Pageable.class)))
+        .thenReturn(List.of());
+
+    ScorecardPageDto result = service.list(20, null);
+
+    assertThat(result.data()).isEmpty();
+    assertThat(result.hasNext()).isFalse();
+    assertThat(result.nextCursor()).isNull();
   }
 
   @Test

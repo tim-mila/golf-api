@@ -9,27 +9,30 @@ import com.alimmit.golf.security.CanWrite;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Validated
 @RestController
 @RequestMapping(SCORECARD_ENDPOINT)
 @Tag(name = "Scorecards")
@@ -83,21 +86,40 @@ class ScorecardController {
       method = "GET",
       operationId = "scorecard.list",
       summary = "List your scorecards",
-      description = "Get a list of your scorecards",
+      description =
+          "Get a paginated list of your scorecards ordered by score date descending. "
+              + "Pass the `nextCursor` from the previous response as `cursor` to retrieve the next page.",
+      parameters = {
+        @Parameter(
+            name = "limit",
+            description = "Maximum number of results to return (1–100)",
+            in = ParameterIn.QUERY,
+            schema =
+                @Schema(type = "integer", defaultValue = "20", minimum = "1", maximum = "100")),
+        @Parameter(
+            name = "cursor",
+            description =
+                "Opaque pagination cursor returned as `nextCursor` in the previous response",
+            in = ParameterIn.QUERY)
+      },
       responses = {
         @ApiResponse(
             responseCode = "200",
             content =
                 @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(implementation = ScorecardDto.class)))),
+                    schema = @Schema(implementation = ScorecardPageDto.class))),
+        @ApiResponse(responseCode = "400", content = @Content),
         @ApiResponse(responseCode = "401", content = @Content),
         @ApiResponse(responseCode = "403", content = @Content)
       })
   @CanRead(GlobalConstants.SCOPE_SCORECARD)
   @GetMapping
-  List<ScorecardDto> list() {
-    return scorecardService.listAll();
+  ScorecardPageDto list(
+      @RequestParam(defaultValue = "20") @Min(1) @Max(100) int limit,
+      @RequestParam(required = false) String cursor) {
+    ScorecardCursor decoded = cursor != null ? ScorecardCursor.decode(cursor) : null;
+    return scorecardService.list(limit, decoded);
   }
 
   @Operation(

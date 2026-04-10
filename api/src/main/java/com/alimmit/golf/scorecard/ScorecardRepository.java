@@ -1,5 +1,6 @@
 package com.alimmit.golf.scorecard;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +38,36 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, UUID> {
   @Query("SELECT s FROM ScorecardEntity s WHERE s.createdBy = :createdBy ORDER BY s.scoreDate DESC")
   List<ScorecardEntity> findMostRecentForUser(
       @Param("createdBy") String createdBy, Pageable pageable);
+
+  /**
+   * First page of scorecards for the current user, ordered by {@code scoreDate DESC, id DESC}.
+   * Fetch {@code limit + 1} rows to determine whether a next page exists.
+   */
+  @Query(
+      """
+      SELECT s FROM ScorecardEntity s
+      WHERE s.createdBy = ?#{authentication.name}
+      ORDER BY s.scoreDate DESC, s.id DESC
+      """)
+  List<ScorecardEntity> findFirstPageForCurrentUser(Pageable pageable);
+
+  /**
+   * Subsequent page of scorecards for the current user using keyset pagination. Returns records
+   * strictly before the cursor position {@code (cursorDate, cursorId)} in the sort order {@code
+   * scoreDate DESC, id DESC}.
+   */
+  @Query(
+      """
+      SELECT s FROM ScorecardEntity s
+      WHERE s.createdBy = ?#{authentication.name}
+        AND (s.scoreDate < :cursorDate
+          OR (s.scoreDate = :cursorDate AND s.id < :cursorId))
+      ORDER BY s.scoreDate DESC, s.id DESC
+      """)
+  List<ScorecardEntity> findNextPageForCurrentUser(
+      @Param("cursorDate") LocalDate cursorDate,
+      @Param("cursorId") UUID cursorId,
+      Pageable pageable);
 
   /**
    * Find a scorecard by ID for the currently authenticated user. Uses SpEL to automatically inject

@@ -5,6 +5,7 @@ import com.alimmit.golf.differential.DifferentialCalculator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,13 +41,28 @@ class JpaScorecardServiceImpl implements ScorecardService {
     return scorecardMapper.toDto(saved);
   }
 
-  /** List all scorecards for the current authenticated user. */
+  /** List scorecards for the current authenticated user using keyset pagination. */
   @Transactional(readOnly = true)
   @Override
-  public List<ScorecardDto> listAll() {
-    return scorecardRepository.findAllForCurrentUser().stream()
-        .map(scorecardMapper::toDto)
-        .toList();
+  public ScorecardPageDto list(int limit, ScorecardCursor cursor) {
+    // Fetch one extra row to determine whether a next page exists
+    var pageable = PageRequest.of(0, limit + 1);
+    List<ScorecardEntity> results =
+        cursor == null
+            ? scorecardRepository.findFirstPageForCurrentUser(pageable)
+            : scorecardRepository.findNextPageForCurrentUser(
+                cursor.scoreDate(), cursor.scorecardId(), pageable);
+
+    boolean hasNext = results.size() > limit;
+    List<ScorecardEntity> page = hasNext ? results.subList(0, limit) : results;
+
+    String nextCursor =
+        hasNext
+            ? new ScorecardCursor(page.getLast().getScoreDate(), page.getLast().getId()).encode()
+            : null;
+
+    List<ScorecardDto> data = page.stream().map(scorecardMapper::toDto).toList();
+    return new ScorecardPageDto(data, nextCursor, hasNext);
   }
 
   /** Get a single scorecard by ID for the current authenticated user. */

@@ -36,6 +36,11 @@ public class GlobalControllerErrorHandler {
     return ResponseEntity.badRequest().build();
   }
 
+  @ExceptionHandler(InvalidCursorException.class)
+  ResponseEntity<String> handleInvalidCursor() {
+    return ResponseEntity.badRequest().build();
+  }
+
   @ExceptionHandler(DuplicateException.class)
   ResponseEntity<String> handleDuplicate() {
     return ResponseEntity.status(HttpStatus.CONFLICT).build();

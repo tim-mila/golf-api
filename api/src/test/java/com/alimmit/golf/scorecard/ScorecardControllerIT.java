@@ -39,7 +39,6 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
     this.objectMapper = objectMapper;
   }
 
-  // , "rating": 72.1, "slope": 125
   private static final String REQUEST_BODY =
       """
       {"scoreDate": "2025-09-21", "courseName": "Test Course", "teeName": "Blue", "score": 88, "par": 72, "rating": 72.1, "slope": 125.0, "scorecardType": "EIGHTEEN"}
@@ -55,17 +54,65 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
   @Test
   void canOnlyListMyScorecards() throws Exception {
-
     // Create scorecard for Gary Golfer
     createAndAssertScorecard(JwtPersona.forGaryGolfer());
 
     // Fetch scorecards for Gary Golfer and expect one result
     listScorecards(JwtPersona.forGaryGolfer(), status().isOk())
-        .andExpectAll(jsonPath("$.length()").value(1));
+        .andExpectAll(jsonPath("$.data.length()").value(1), jsonPath("$.hasNext").value(false));
 
     // Fetch scorecards for Pat Putter and expect empty result
     listScorecards(JwtPersona.forPatPutter(), status().isOk())
-        .andExpectAll(jsonPath("$.length()").value(0));
+        .andExpectAll(jsonPath("$.data.length()").value(0), jsonPath("$.hasNext").value(false));
+  }
+
+  @Test
+  void listScorecards_Pagination() throws Exception {
+    // Create 3 scorecards for Gary Golfer
+    createAndAssertScorecard(JwtPersona.forGaryGolfer());
+    createAndAssertScorecard(JwtPersona.forGaryGolfer());
+    createAndAssertScorecard(JwtPersona.forGaryGolfer());
+
+    // Page 1: limit=2, expect 2 results and hasNext=true
+    String page1Body =
+        listScorecards(JwtPersona.forGaryGolfer(), 2, null, status().isOk())
+            .andExpectAll(
+                jsonPath("$.data.length()").value(2),
+                jsonPath("$.hasNext").value(true),
+                jsonPath("$.nextCursor").isString())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    String nextCursor = objectMapper.readTree(page1Body).at("/nextCursor").asText();
+    assertThat(nextCursor).isNotBlank();
+
+    // Page 2: use cursor from page 1, expect 1 result and hasNext=false
+    String page2Body =
+        listScorecards(JwtPersona.forGaryGolfer(), 2, nextCursor, status().isOk())
+            .andExpectAll(
+                jsonPath("$.data.length()").value(1),
+                jsonPath("$.hasNext").value(false),
+                jsonPath("$.nextCursor").doesNotExist())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    // Assert no overlap between pages
+    var page1Ids = scorecardIds(page1Body);
+    var page2Ids = scorecardIds(page2Body);
+    assertThat(page1Ids).doesNotContainAnyElementsOf(page2Ids);
+    assertThat(page1Ids).hasSize(2);
+    assertThat(page2Ids).hasSize(1);
+  }
+
+  private java.util.Set<String> scorecardIds(String responseBody) throws Exception {
+    var ids = new java.util.HashSet<String>();
+    objectMapper
+        .readTree(responseBody)
+        .at("/data")
+        .forEach(n -> ids.add(n.at("/scorecardId").asText()));
+    return ids;
   }
 
   @Test

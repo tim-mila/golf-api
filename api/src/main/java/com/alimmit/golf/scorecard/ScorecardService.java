@@ -1,6 +1,5 @@
 package com.alimmit.golf.scorecard;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,11 +12,14 @@ public interface ScorecardService {
   ScorecardDto create(ScorecardRequestDto request);
 
   /**
-   * List all scorecards for the current authenticated user.
+   * List scorecards for the current authenticated user using keyset pagination, ordered by {@code
+   * scoreDate DESC, id DESC}.
    *
-   * @return List of scorecards
+   * @param limit maximum number of results (1–100)
+   * @param cursor keyset cursor from the previous page; null for the first page
+   * @return paginated result with an opaque next-cursor when more results exist
    */
-  List<ScorecardDto> listAll();
+  ScorecardPageDto list(int limit, ScorecardCursor cursor);
 
   /**
    * Get a scorecard by identifier
