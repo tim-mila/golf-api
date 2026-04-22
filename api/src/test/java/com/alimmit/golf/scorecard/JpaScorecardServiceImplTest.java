@@ -103,7 +103,6 @@ class JpaScorecardServiceImplTest {
     ScorecardPageDto result = service.list(20, null);
 
     assertThat(result.data()).containsExactly(expected);
-    assertThat(result.hasNext()).isFalse();
     assertThat(result.nextCursor()).isNull();
   }
 
@@ -125,7 +124,6 @@ class JpaScorecardServiceImplTest {
     ScorecardPageDto result = service.list(limit, null);
 
     assertThat(result.data()).containsExactly(d1, d2);
-    assertThat(result.hasNext()).isTrue();
     assertThat(result.nextCursor()).isNotBlank();
   }
 
@@ -143,7 +141,6 @@ class JpaScorecardServiceImplTest {
     ScorecardPageDto result = service.list(20, cursor);
 
     assertThat(result.data()).containsExactly(expected);
-    assertThat(result.hasNext()).isFalse();
   }
 
   @Test
@@ -153,7 +150,6 @@ class JpaScorecardServiceImplTest {
     ScorecardPageDto result = service.list(20, null);
 
     assertThat(result.data()).isEmpty();
-    assertThat(result.hasNext()).isFalse();
     assertThat(result.nextCursor()).isNull();
   }
 

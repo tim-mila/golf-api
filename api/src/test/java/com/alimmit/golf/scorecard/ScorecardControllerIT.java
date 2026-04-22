@@ -61,11 +61,11 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
 
     // Fetch scorecards for Gary Golfer and expect one result
     listScorecards(JwtPersona.forGaryGolfer(), status().isOk())
-        .andExpectAll(jsonPath("$.data.length()").value(1), jsonPath("$.hasNext").value(false));
+        .andExpect(jsonPath("$.data.length()").value(1));
 
     // Fetch scorecards for Pat Putter and expect empty result
     listScorecards(JwtPersona.forPatPutter(), status().isOk())
-        .andExpectAll(jsonPath("$.data.length()").value(0), jsonPath("$.hasNext").value(false));
+        .andExpect(jsonPath("$.data.length()").value(0));
   }
 
   @Test
@@ -80,7 +80,6 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
         listScorecards(JwtPersona.forGaryGolfer(), 2, null, status().isOk())
             .andExpectAll(
                 jsonPath("$.data.length()").value(2),
-                jsonPath("$.hasNext").value(true),
                 jsonPath("$.nextCursor").isString())
             .andReturn()
             .getResponse()
@@ -94,7 +93,6 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
         listScorecards(JwtPersona.forGaryGolfer(), 2, nextCursor, status().isOk())
             .andExpectAll(
                 jsonPath("$.data.length()").value(1),
-                jsonPath("$.hasNext").value(false),
                 jsonPath("$.nextCursor").doesNotExist())
             .andReturn()
             .getResponse()

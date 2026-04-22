@@ -91,13 +91,12 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
   void listScorecards_DefaultPage() throws Exception {
     ScorecardDto mockDto = scorecardDto(UUID.randomUUID(), LocalDate.of(2025, 9, 21));
     when(scorecardService.list(eq(20), isNull()))
-        .thenReturn(new ScorecardPageDto(List.of(mockDto), null, false));
+        .thenReturn(new ScorecardPageDto(List.of(mockDto), null));
 
     listScorecards(JwtPersona.forGaryGolfer(), status().isOk())
         .andExpectAll(
             jsonPath("$.data.length()").value(1),
             jsonPath("$.data[0].scorecardId").value(mockDto.scorecardId().toString()),
-            jsonPath("$.hasNext").value(false),
             jsonPath("$.nextCursor").doesNotExist());
   }
 
@@ -105,7 +104,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
   void listScorecards_WithExplicitLimit() throws Exception {
     ScorecardDto mockDto = scorecardDto(UUID.randomUUID(), LocalDate.of(2025, 9, 21));
     when(scorecardService.list(eq(5), isNull()))
-        .thenReturn(new ScorecardPageDto(List.of(mockDto), null, false));
+        .thenReturn(new ScorecardPageDto(List.of(mockDto), null));
 
     listScorecards(JwtPersona.forGaryGolfer(), 5, null, status().isOk())
         .andExpect(jsonPath("$.data.length()").value(1));
@@ -118,10 +117,10 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
 
     ScorecardDto mockDto = scorecardDto(UUID.randomUUID(), LocalDate.of(2025, 5, 15));
     when(scorecardService.list(eq(20), any(ScorecardCursor.class)))
-        .thenReturn(new ScorecardPageDto(List.of(mockDto), null, false));
+        .thenReturn(new ScorecardPageDto(List.of(mockDto), null));
 
     listScorecards(JwtPersona.forGaryGolfer(), 20, encodedCursor, status().isOk())
-        .andExpectAll(jsonPath("$.data.length()").value(1), jsonPath("$.hasNext").value(false));
+        .andExpect(jsonPath("$.data.length()").value(1));
   }
 
   @Test
@@ -130,11 +129,10 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     String nextCursor =
         new ScorecardCursor(LocalDate.of(2025, 9, 21), mockDto.scorecardId()).encode();
     when(scorecardService.list(eq(20), isNull()))
-        .thenReturn(new ScorecardPageDto(List.of(mockDto), nextCursor, true));
+        .thenReturn(new ScorecardPageDto(List.of(mockDto), nextCursor));
 
     listScorecards(JwtPersona.forGaryGolfer(), status().isOk())
-        .andExpectAll(
-            jsonPath("$.hasNext").value(true), jsonPath("$.nextCursor").value(nextCursor));
+        .andExpect(jsonPath("$.nextCursor").value(nextCursor));
   }
 
   @Test

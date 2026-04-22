@@ -62,7 +62,7 @@ class JpaScorecardServiceImpl implements ScorecardService {
             : null;
 
     List<ScorecardDto> data = page.stream().map(scorecardMapper::toDto).toList();
-    return new ScorecardPageDto(data, nextCursor, hasNext);
+    return new ScorecardPageDto(data, nextCursor);
   }
 
   /** Get a single scorecard by ID for the current authenticated user. */
