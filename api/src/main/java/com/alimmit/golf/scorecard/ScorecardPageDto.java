@@ -11,5 +11,4 @@ public record ScorecardPageDto(
             description =
                 "Opaque cursor to pass as `cursor` on the next request; null on last page",
             nullable = true)
-        String nextCursor,
-    @Schema(description = "Whether more results are available after this page") boolean hasNext) {}
+        String nextCursor) {}
