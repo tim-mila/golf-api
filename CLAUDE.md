@@ -104,6 +104,11 @@ com.alimmit.golf
 **Scorecard** - Represents a golf round score
 - Fields: `teeId`, `score`, `scoreDate`, `scorecardType`, audit fields
 - JPA entity with PostgreSQL persistence
+- `GET /v1/scorecard` uses keyset pagination: `?limit=20&cursor=<opaque>` (limit 1–100, default 20)
+- Response is `ScorecardPageDto` — `{ data: ScorecardDto[], nextCursor: string|null, hasNext: boolean }`
+- Cursor encodes `(scoreDate, scorecardId)` as base64url JSON; ordering is `scoreDate DESC, scorecardId DESC`
+- `ScorecardCursor` — package-private record handling encode/decode; throws `InvalidCursorException` on malformed input
+- `ScorecardRepository.findFirstPageForCurrentUser(Limit)` — first page (no cursor); `findNextPageForCurrentUser(cursorDate, cursorId, Limit)` — subsequent pages via keyset WHERE clause
 
 **Course** - Represents a golf course
 - Fields: `club`, `course`, `city`, `state`, audit fields
@@ -269,13 +274,14 @@ All DTOs have class-level and field-level `@Schema` annotations for Swagger UI /
 - Prevents hardcoded strings in controllers
 
 ### Exception Handling
-- Custom exceptions: `NotFoundException`, `DuplicateException`
+- Custom exceptions: `NotFoundException`, `DuplicateException`, `InvalidCursorException`
 - Global handler: `GlobalControllerErrorHandler` with `@ControllerAdvice`
 - Maps exceptions to HTTP status codes (404, 409, 500, etc.)
 - `IllegalStateException` → 500 (e.g. delete returning more than 1 row)
 - `MethodArgumentNotValidException` → 400 (triggered by `@Valid` on `@RequestBody`)
 - `ConstraintViolationException` → 400 (triggered by `@NotBlank`/`@NotNull` on `@RequestParam`; requires `@Validated` on the controller class)
 - `HttpMessageNotReadableException` → 400 (e.g. invalid enum values in JSON)
+- `InvalidCursorException` → 400 (thrown by `ScorecardCursor.decode()` for any malformed opaque cursor; generic — usable by any future paginated endpoint)
 - `DuplicateException` → 409 (course POST/PATCH violates unique constraint on `created_by, club, course, city, state`)
 
 ### Duplicate Course Detection

@@ -1,6 +1,8 @@
 package com.alimmit.golf.scorecard;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -83,51 +85,83 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
             jsonPath("$.createdAt").isString());
   }
 
-  @Test
-  void listScorecards() throws Exception {
-    ScorecardDto mockDto =
-        new ScorecardDto(
-            UUID.randomUUID(),
-            Instant.now(),
-            JwtPersona.GARY_GOLFER.sub(),
-            LocalDate.of(2025, 9, 21),
-            "Test Course",
-            "Test Tee",
-            88,
-            72,
-            72.1,
-            125.0,
-            ScorecardType.EIGHTEEN,
-            14.4,
-            true);
+  // --- List scorecard tests ---
 
-    when(scorecardService.listAll()).thenReturn(List.of(mockDto));
+  @Test
+  void listScorecards_DefaultPage() throws Exception {
+    ScorecardDto mockDto = scorecardDto(UUID.randomUUID(), LocalDate.of(2025, 9, 21));
+    when(scorecardService.list(eq(20), isNull()))
+        .thenReturn(new ScorecardPageDto(List.of(mockDto), null));
 
     listScorecards(JwtPersona.forGaryGolfer(), status().isOk())
         .andExpectAll(
-            jsonPath("$.length()").value(1),
-            jsonPath("$[0].scorecardId").value(mockDto.scorecardId().toString()));
+            jsonPath("$.data.length()").value(1),
+            jsonPath("$.data[0].scorecardId").value(mockDto.scorecardId().toString()),
+            jsonPath("$.nextCursor").doesNotExist());
   }
+
+  @Test
+  void listScorecards_WithExplicitLimit() throws Exception {
+    ScorecardDto mockDto = scorecardDto(UUID.randomUUID(), LocalDate.of(2025, 9, 21));
+    when(scorecardService.list(eq(5), isNull()))
+        .thenReturn(new ScorecardPageDto(List.of(mockDto), null));
+
+    listScorecards(JwtPersona.forGaryGolfer(), 5, null, status().isOk())
+        .andExpect(jsonPath("$.data.length()").value(1));
+  }
+
+  @Test
+  void listScorecards_WithCursor_ReturnsNextPage() throws Exception {
+    ScorecardCursor cursor = new ScorecardCursor(LocalDate.of(2025, 6, 1), UUID.randomUUID());
+    String encodedCursor = cursor.encode();
+
+    ScorecardDto mockDto = scorecardDto(UUID.randomUUID(), LocalDate.of(2025, 5, 15));
+    when(scorecardService.list(eq(20), any(ScorecardCursor.class)))
+        .thenReturn(new ScorecardPageDto(List.of(mockDto), null));
+
+    listScorecards(JwtPersona.forGaryGolfer(), 20, encodedCursor, status().isOk())
+        .andExpect(jsonPath("$.data.length()").value(1));
+  }
+
+  @Test
+  void listScorecards_HasNextPage_ReturnsNextCursor() throws Exception {
+    ScorecardDto mockDto = scorecardDto(UUID.randomUUID(), LocalDate.of(2025, 9, 21));
+    String nextCursor =
+        new ScorecardCursor(LocalDate.of(2025, 9, 21), mockDto.scorecardId()).encode();
+    when(scorecardService.list(eq(20), isNull()))
+        .thenReturn(new ScorecardPageDto(List.of(mockDto), nextCursor));
+
+    listScorecards(JwtPersona.forGaryGolfer(), status().isOk())
+        .andExpect(jsonPath("$.nextCursor").value(nextCursor));
+  }
+
+  @Test
+  void listScorecards_InvalidCursor_Expect400() throws Exception {
+    listScorecards(JwtPersona.forGaryGolfer(), 20, "not-valid-base64!!!", status().isBadRequest());
+  }
+
+  @Test
+  void listScorecards_TamperedCursor_Expect400() throws Exception {
+    // Valid base64url but content that decodes to garbage JSON — simulates a tampered token
+    String tampered =
+        java.util.Base64.getUrlEncoder()
+            .withoutPadding()
+            .encodeToString("tampered-payload".getBytes());
+    listScorecards(JwtPersona.forGaryGolfer(), 20, tampered, status().isBadRequest());
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {0, 101})
+  void listScorecards_InvalidLimit_Expect400(int limit) throws Exception {
+    listScorecards(JwtPersona.forGaryGolfer(), limit, null, status().isBadRequest());
+  }
+
+  // --- Get / Delete tests ---
 
   @Test
   void getScorecardById() throws Exception {
     UUID scorecardId = UUID.randomUUID();
-
-    ScorecardDto mockDto =
-        new ScorecardDto(
-            scorecardId,
-            Instant.now(),
-            JwtPersona.GARY_GOLFER.sub(),
-            LocalDate.of(2025, 9, 21),
-            "Test Course",
-            "Test Tee",
-            88,
-            72,
-            72.1,
-            125.0,
-            ScorecardType.EIGHTEEN,
-            14.4,
-            true);
+    ScorecardDto mockDto = scorecardDto(scorecardId, LocalDate.of(2025, 9, 21));
 
     when(scorecardService.getById(scorecardId)).thenReturn(Optional.of(mockDto));
 
@@ -148,7 +182,6 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
   void deleteScorecard() throws Exception {
     UUID scorecardId = UUID.randomUUID();
 
-    // doNothing() is default for void methods, so no need to mock success case
     when(scorecardService.deleteById(scorecardId)).thenReturn(1);
 
     deleteScorecard(JwtPersona.forGaryGolfer(), scorecardId).andExpect(status().isNoContent());
@@ -186,7 +219,6 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
   @ParameterizedTest
   @ValueSource(strings = {JwtPersona.SCOPE_WRITE_SCORECARD, JwtPersona.SCOPE_READ_HANDICAP, ""})
   void listScorecardsWithDisallowedScope_ExpectForbidden(String scope) throws Exception {
-    when(scorecardService.listAll()).thenReturn(List.of());
     listScorecards(JwtPersona.forGaryGolfer(scope)).andExpect(status().isForbidden());
   }
 
@@ -209,21 +241,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     String requestBody =
         "{\"scoreDate\": \"2025-09-21\", \"courseName\": \"Test Course\", \"teeName\": \"blue\", \"score\": 88, \"par\": 72, \"rating\": 72.1, \"slope\": 125.0, \"scorecardType\": \"EIGHTEEN\"}";
     UUID scorecardId = UUID.randomUUID();
-    ScorecardDto mockDto =
-        new ScorecardDto(
-            scorecardId,
-            Instant.now(),
-            JwtPersona.GARY_GOLFER.sub(),
-            LocalDate.of(2025, 9, 21),
-            "Test Course",
-            "blue",
-            88,
-            72,
-            72.1,
-            125.0,
-            ScorecardType.EIGHTEEN,
-            14.4,
-            true);
+    ScorecardDto mockDto = scorecardDto(scorecardId, LocalDate.of(2025, 9, 21));
     when(scorecardService.create(any(ScorecardRequestDto.class))).thenReturn(mockDto);
 
     createScorecard(JwtPersona.forGaryGolfer(), requestBody).andExpect(status().isCreated());
@@ -236,8 +254,6 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     deleteScorecard(JwtPersona.forGaryGolfer(JwtPersona.SCOPE_WRITE_SCORECARD), scorecardId)
         .andExpect(status().isNoContent());
   }
-
-  // --- Validation tests ---
 
   // --- Unauthenticated tests ---
 
@@ -265,7 +281,7 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
     createScorecard(JwtPersona.forGaryGolfer(), requestBody).andExpect(status().isBadRequest());
   }
 
-  // --- Validation tests ---
+  // --- Request body validation tests ---
 
   @ParameterizedTest
   @ValueSource(
@@ -283,5 +299,24 @@ class ScorecardControllerTest extends AbstractScorecardControllerMockMvc {
       })
   void createAndExpectBadRequest(String requestBody) throws Exception {
     createScorecard(JwtPersona.forGaryGolfer(), requestBody).andExpect(status().isBadRequest());
+  }
+
+  // --- Helpers ---
+
+  private ScorecardDto scorecardDto(UUID scorecardId, LocalDate scoreDate) {
+    return new ScorecardDto(
+        scorecardId,
+        Instant.now(),
+        JwtPersona.GARY_GOLFER.sub(),
+        scoreDate,
+        "Test Course",
+        "Test Tee",
+        88,
+        72,
+        72.1,
+        125.0,
+        ScorecardType.EIGHTEEN,
+        14.4,
+        true);
   }
 }
