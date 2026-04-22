@@ -53,6 +53,7 @@ class JpaScorecardServiceImpl implements ScorecardService {
             : scorecardRepository.findNextPageForCurrentUser(
                 cursor.scoreDate(), cursor.scorecardId(), limitPlusOne);
 
+    // The extra row is only a probe — trim it before building the response
     boolean hasNext = results.size() > limit;
     List<ScorecardEntity> page = hasNext ? results.subList(0, limit) : results;
 
