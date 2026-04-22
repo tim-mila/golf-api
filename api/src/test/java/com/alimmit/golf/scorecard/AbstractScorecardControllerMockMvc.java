@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 abstract class AbstractScorecardControllerMockMvc extends AbstractControllerMockMvc {
 
@@ -33,7 +34,7 @@ abstract class AbstractScorecardControllerMockMvc extends AbstractControllerMock
 
   ResultActions listScorecards(
       JwtClaimApplier fn, Integer limit, String cursor, ResultMatcher... expect) throws Exception {
-    var request = get(ScorecardConstants.SCORECARD_ENDPOINT);
+    MockHttpServletRequestBuilder request = get(ScorecardConstants.SCORECARD_ENDPOINT);
     if (limit != null) request.param("limit", String.valueOf(limit));
     if (cursor != null) request.param("cursor", cursor);
     return performMockMvc(fn, request, expect);

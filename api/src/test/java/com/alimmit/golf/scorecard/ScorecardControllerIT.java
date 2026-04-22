@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.alimmit.golf.utils.JwtClaimApplier;
 import com.alimmit.golf.utils.JwtPersona;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
@@ -99,15 +101,15 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
             .getContentAsString();
 
     // Assert no overlap between pages
-    var page1Ids = scorecardIds(page1Body);
-    var page2Ids = scorecardIds(page2Body);
+    Set<String> page1Ids = scorecardIds(page1Body);
+    Set<String> page2Ids = scorecardIds(page2Body);
     assertThat(page1Ids).doesNotContainAnyElementsOf(page2Ids);
     assertThat(page1Ids).hasSize(2);
     assertThat(page2Ids).hasSize(1);
   }
 
   private java.util.Set<String> scorecardIds(String responseBody) throws Exception {
-    var ids = new java.util.HashSet<String>();
+    Set<String> ids = new HashSet<>();
     objectMapper
         .readTree(responseBody)
         .at("/data")

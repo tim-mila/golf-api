@@ -46,7 +46,7 @@ class JpaScorecardServiceImpl implements ScorecardService {
   @Override
   public ScorecardPageDto list(int limit, ScorecardCursor cursor) {
     // Fetch one extra row to determine whether a next page exists
-    var pageable = PageRequest.of(0, limit + 1);
+    PageRequest pageable = PageRequest.of(0, limit + 1);
     List<ScorecardEntity> results =
         cursor == null
             ? scorecardRepository.findFirstPageForCurrentUser(pageable)
