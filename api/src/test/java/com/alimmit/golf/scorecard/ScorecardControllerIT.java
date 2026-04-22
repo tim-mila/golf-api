@@ -78,9 +78,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
     // Page 1: limit=2, expect 2 results and hasNext=true
     String page1Body =
         listScorecards(JwtPersona.forGaryGolfer(), 2, null, status().isOk())
-            .andExpectAll(
-                jsonPath("$.data.length()").value(2),
-                jsonPath("$.nextCursor").isString())
+            .andExpectAll(jsonPath("$.data.length()").value(2), jsonPath("$.nextCursor").isString())
             .andReturn()
             .getResponse()
             .getContentAsString();
@@ -92,8 +90,7 @@ class ScorecardControllerIT extends AbstractScorecardControllerMockMvc {
     String page2Body =
         listScorecards(JwtPersona.forGaryGolfer(), 2, nextCursor, status().isOk())
             .andExpectAll(
-                jsonPath("$.data.length()").value(1),
-                jsonPath("$.nextCursor").doesNotExist())
+                jsonPath("$.data.length()").value(1), jsonPath("$.nextCursor").doesNotExist())
             .andReturn()
             .getResponse()
             .getContentAsString();
