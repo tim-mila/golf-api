@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -40,8 +41,8 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, UUID> {
       @Param("createdBy") String createdBy, Pageable pageable);
 
   /**
-   * First page of scorecards for the current user, ordered by {@code scoreDate DESC, id DESC}.
-   * Fetch {@code limit + 1} rows to determine whether a next page exists.
+   * First page of scorecards for the current user, ordered by {@code scoreDate DESC, id DESC}. Pass
+   * {@code Limit.of(limit + 1)} to fetch one extra row for {@code hasNext} detection.
    */
   @Query(
       """
@@ -49,12 +50,13 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, UUID> {
       WHERE s.createdBy = ?#{authentication.name}
       ORDER BY s.scoreDate DESC, s.id DESC
       """)
-  List<ScorecardEntity> findFirstPageForCurrentUser(Pageable pageable);
+  List<ScorecardEntity> findFirstPageForCurrentUser(Limit limit);
 
   /**
    * Subsequent page of scorecards for the current user using keyset pagination. Returns records
    * strictly before the cursor position {@code (cursorDate, cursorId)} in the sort order {@code
-   * scoreDate DESC, id DESC}.
+   * scoreDate DESC, id DESC}. Pass {@code Limit.of(limit + 1)} to fetch one extra row for {@code
+   * hasNext} detection.
    */
   @Query(
       """
@@ -65,9 +67,7 @@ interface ScorecardRepository extends JpaRepository<ScorecardEntity, UUID> {
       ORDER BY s.scoreDate DESC, s.id DESC
       """)
   List<ScorecardEntity> findNextPageForCurrentUser(
-      @Param("cursorDate") LocalDate cursorDate,
-      @Param("cursorId") UUID cursorId,
-      Pageable pageable);
+      @Param("cursorDate") LocalDate cursorDate, @Param("cursorId") UUID cursorId, Limit limit);
 
   /**
    * Find a scorecard by ID for the currently authenticated user. Uses SpEL to automatically inject

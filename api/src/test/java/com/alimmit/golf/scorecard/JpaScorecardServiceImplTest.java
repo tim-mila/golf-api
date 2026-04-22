@@ -16,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Limit;
 
 @ExtendWith(MockitoExtension.class)
 class JpaScorecardServiceImplTest {
@@ -96,7 +96,7 @@ class JpaScorecardServiceImplTest {
     ScorecardEntity entity = entityWithId(UUID.randomUUID());
     ScorecardDto expected = dto(entity.getId());
 
-    when(scorecardRepository.findFirstPageForCurrentUser(any(Pageable.class)))
+    when(scorecardRepository.findFirstPageForCurrentUser(any(Limit.class)))
         .thenReturn(List.of(entity));
     when(scorecardMapper.toDto(entity)).thenReturn(expected);
 
@@ -117,7 +117,7 @@ class JpaScorecardServiceImplTest {
     ScorecardDto d1 = dto(e1.getId());
     ScorecardDto d2 = dto(e2.getId());
 
-    when(scorecardRepository.findFirstPageForCurrentUser(any(Pageable.class)))
+    when(scorecardRepository.findFirstPageForCurrentUser(any(Limit.class)))
         .thenReturn(List.of(e1, e2, e3));
     when(scorecardMapper.toDto(e1)).thenReturn(d1);
     when(scorecardMapper.toDto(e2)).thenReturn(d2);
@@ -136,7 +136,7 @@ class JpaScorecardServiceImplTest {
     ScorecardDto expected = dto(entity.getId());
 
     when(scorecardRepository.findNextPageForCurrentUser(
-            any(LocalDate.class), any(UUID.class), any(Pageable.class)))
+            any(LocalDate.class), any(UUID.class), any(Limit.class)))
         .thenReturn(List.of(entity));
     when(scorecardMapper.toDto(entity)).thenReturn(expected);
 
@@ -148,8 +148,7 @@ class JpaScorecardServiceImplTest {
 
   @Test
   void list_emptyResults_returnsEmptyPage() {
-    when(scorecardRepository.findFirstPageForCurrentUser(any(Pageable.class)))
-        .thenReturn(List.of());
+    when(scorecardRepository.findFirstPageForCurrentUser(any(Limit.class))).thenReturn(List.of());
 
     ScorecardPageDto result = service.list(20, null);
 

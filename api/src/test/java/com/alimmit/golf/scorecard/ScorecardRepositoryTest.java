@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -202,8 +203,7 @@ class ScorecardRepositoryTest {
 
     // When: Gary fetches first page (limit=2)
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
-    List<ScorecardEntity> results =
-        scorecardRepository.findFirstPageForCurrentUser(PageRequest.of(0, 2));
+    List<ScorecardEntity> results = scorecardRepository.findFirstPageForCurrentUser(Limit.of(2));
 
     // Then: 2 most recent of Gary's scorecards, newest first, no Pat records
     assertThat(results)
@@ -222,8 +222,7 @@ class ScorecardRepositoryTest {
     scorecardRepository.save(createScorecard(85, LocalDate.of(2025, 1, 5)));
 
     // When: fetching limit+1=3 rows (limit=2)
-    List<ScorecardEntity> results =
-        scorecardRepository.findFirstPageForCurrentUser(PageRequest.of(0, 3));
+    List<ScorecardEntity> results = scorecardRepository.findFirstPageForCurrentUser(Limit.of(3));
 
     // Then: all 3 returned, caller can infer hasNext=true (size > limit)
     assertThat(results).hasSize(3);
@@ -242,7 +241,7 @@ class ScorecardRepositoryTest {
     // When: fetching the page after the newest scorecard (cursor = newest)
     List<ScorecardEntity> results =
         scorecardRepository.findNextPageForCurrentUser(
-            newest.getScoreDate(), newest.getId(), PageRequest.of(0, 10));
+            newest.getScoreDate(), newest.getId(), Limit.of(10));
 
     // Then: only the two older scorecards are returned, newest-first
     assertThat(results).hasSize(2);
@@ -265,7 +264,7 @@ class ScorecardRepositoryTest {
     setSecurityContext(JwtPersona.GARY_GOLFER.sub());
     List<ScorecardEntity> results =
         scorecardRepository.findNextPageForCurrentUser(
-            garyNewest.getScoreDate(), garyNewest.getId(), PageRequest.of(0, 10));
+            garyNewest.getScoreDate(), garyNewest.getId(), Limit.of(10));
 
     // Then: only Gary's older record, no Pat records
     assertThat(results)
@@ -287,7 +286,7 @@ class ScorecardRepositoryTest {
     // Keyset: (sameDay, second.id) — should return only first (smaller ID on same date)
     List<ScorecardEntity> results =
         scorecardRepository.findNextPageForCurrentUser(
-            second.getScoreDate(), second.getId(), PageRequest.of(0, 10));
+            second.getScoreDate(), second.getId(), Limit.of(10));
 
     // Then: only the record with the smallest ID (first inserted) is after the cursor
     assertThat(results).hasSize(1);

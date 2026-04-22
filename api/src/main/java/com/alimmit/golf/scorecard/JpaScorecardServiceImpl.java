@@ -5,7 +5,7 @@ import com.alimmit.golf.differential.DifferentialCalculator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,12 +46,12 @@ class JpaScorecardServiceImpl implements ScorecardService {
   @Override
   public ScorecardPageDto list(int limit, ScorecardCursor cursor) {
     // Fetch one extra row to determine whether a next page exists
-    PageRequest pageable = PageRequest.of(0, limit + 1);
+    Limit limitPlusOne = Limit.of(limit + 1);
     List<ScorecardEntity> results =
         cursor == null
-            ? scorecardRepository.findFirstPageForCurrentUser(pageable)
+            ? scorecardRepository.findFirstPageForCurrentUser(limitPlusOne)
             : scorecardRepository.findNextPageForCurrentUser(
-                cursor.scoreDate(), cursor.scorecardId(), pageable);
+                cursor.scoreDate(), cursor.scorecardId(), limitPlusOne);
 
     boolean hasNext = results.size() > limit;
     List<ScorecardEntity> page = hasNext ? results.subList(0, limit) : results;
