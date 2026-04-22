@@ -108,7 +108,7 @@ com.alimmit.golf
 - Response is `ScorecardPageDto` — `{ data: ScorecardDto[], nextCursor: string|null, hasNext: boolean }`
 - Cursor encodes `(scoreDate, scorecardId)` as base64url JSON; ordering is `scoreDate DESC, scorecardId DESC`
 - `ScorecardCursor` — package-private record handling encode/decode; throws `InvalidCursorException` on malformed input
-- `ScorecardRepository.findFirstPageForCurrentUser(Pageable)` — first page (no cursor); `findNextPageForCurrentUser(cursorDate, cursorId, Pageable)` — subsequent pages via keyset WHERE clause
+- `ScorecardRepository.findFirstPageForCurrentUser(Limit)` — first page (no cursor); `findNextPageForCurrentUser(cursorDate, cursorId, Limit)` — subsequent pages via keyset WHERE clause
 
 **Course** - Represents a golf course
 - Fields: `club`, `course`, `city`, `state`, audit fields
