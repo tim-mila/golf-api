@@ -28,7 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
-		<org.springdoc.version>3.0.2</org.springdoc.version>
+		<org.springdoc.version>3.0.3</org.springdoc.version>
 	</properties>
 	<dependencies>
 		<dependency>
