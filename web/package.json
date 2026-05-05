@@ -3,17 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "generate-api": "openapi-ts",
     "dev": "next dev",
+    "predev": "npm run generate-api",
     "build": "next build",
+    "prebuild": "npm run generate-api",
     "start": "next start",
     "test": "tsc --noEmit"
   },
   "dependencies": {
+    "@hey-api/client-next": "^0.5.1",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@hey-api/openapi-ts": "^0.97.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^25",
     "@types/react": "^19",
