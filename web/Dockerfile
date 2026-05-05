@@ -10,6 +10,7 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY web/ .
+COPY open-api.json /open-api.json
 
 RUN npm run build
 
