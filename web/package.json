@@ -9,9 +9,11 @@
     "build": "next build",
     "prebuild": "npm run generate-api",
     "start": "next start",
+    "local-setup": "op inject -i ../.local/.env.web.example -o .env.local -f",
     "test": "tsc --noEmit"
   },
   "dependencies": {
+    "@auth0/nextjs-auth0": "^4.20.0",
     "@hey-api/client-next": "^0.5.1",
     "next": "16.2.4",
     "react": "19.2.4",
