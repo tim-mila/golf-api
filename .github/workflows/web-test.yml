@@ -35,9 +35,13 @@ jobs:
           cache: 'npm'
           cache-dependency-path: web/package-lock.json
 
+      - name: Audit dependencies
+        if: steps.web-check.outputs.exists == 'true'
+        run: cd web && npm audit --audit-level=high
+
       - name: Install dependencies
         if: steps.web-check.outputs.exists == 'true'
-        run: cd web && npm ci
+        run: cd web && npm ci --ignore-scripts
 
       - name: Generate API client
         if: steps.web-check.outputs.exists == 'true'
