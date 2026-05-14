@@ -10,6 +10,7 @@
     "prebuild": "npm run generate-api",
     "start": "next start",
     "local-setup": "op inject -i ../.local/.env.web.example -o .env.local -f",
+    "install:local": "npm audit --audit-level=high && npm ci --ignore-scripts",
     "test": "tsc --noEmit"
   },
   "dependencies": {

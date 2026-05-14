@@ -2,7 +2,7 @@
 FROM node:24-alpine AS deps
 WORKDIR /app
 COPY web/package.json web/package-lock.json ./
-RUN npm ci
+RUN npm audit --audit-level=high && npm ci --ignore-scripts
 
 # Stage 2: Build
 FROM node:24-alpine AS build
