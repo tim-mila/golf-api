@@ -1,31 +1,31 @@
 ---
 name: new-task
-description: Start a new development task from a GitHub issue by setting up the correct git branch or worktree, then producing an implementation plan. Use this skill whenever the user says they want to start a new task, story, ticket, issue, feature, fix, or chore — or when they mention a GitHub issue number, or ask to set up a branch or worktree for upcoming work. Trigger even for brief prompts like "start issue 42" or "I'm picking up #123".
+description: Start a new development task by setting up the correct git branch or worktree, then producing an implementation plan. Use this skill whenever the user says they want to start a new task, story, ticket, issue, feature, fix, or chore — or when they mention a GitHub issue number, or ask to set up a branch or worktree for upcoming work. Trigger even for brief prompts like "start issue 42", "I'm picking up #123", or "let's add X".
 ---
 
 # New Task Setup Skill
 
-Sets up a git branch or worktree for a GitHub issue, then reads the issue and either produces a clear implementation plan or interviews the user to clarify an underspecified issue.
- 
+Sets up a git branch or worktree for a task, then either reads the linked GitHub issue or interviews the user to establish clarity, before producing a concrete implementation plan.
+
 ---
 
-## Step 1: Get the GitHub Issue Number
+## Step 1: Check for a GitHub Issue
 
-If the user hasn't provided an issue number, ask for it. Almost all tasks should be tied to a GitHub issue.
-
-The rare exceptions (no issue number needed): purely local chores with no user-facing impact, e.g. "bump a dev dependency", "fix a typo in a comment".
-
-Once you have the issue number, fetch it:
+Ask if there's a linked GitHub issue. If the user provides a number, fetch it:
 
 ```bash
 gh issue view <NUMBER> --json number,title,body,labels,assignees,comments
 ```
 
 If `gh` is not available or not authenticated, ask the user to paste the issue title and description directly.
- 
+
+**If there is no issue** (task came from a conversation, ad-hoc request, or the user says there's no ticket) — skip to Step 2b to interview the user directly.
+
 ---
 
-## Step 2: Assess Issue Clarity
+## Step 2: Assess Clarity
+
+### With an issue
 
 Read the issue title, body, and any comments. Decide: **is this issue clear enough to act on?**
 
@@ -38,20 +38,18 @@ An unclear issue is missing one or more of those things — vague goals, no repr
 
 **Also treat as unclear:** an issue that presents two or more design options without making a decision. Even if acceptance criteria exist, they are conditional on the choice. Always ask before formulating a plan.
 
-**If clear → proceed to Step 3.**  
-**If unclear → go to Step 2b: Interview.**
+**If clear → proceed to Step 3.**
+**If unclear → go to Step 2b.**
 
 ### Step 2b: Interview for Clarity
 
-Ask focused questions to fill the gaps. Do not ask everything at once — prioritize the 1–3 most important unknowns. Examples:
+Whether there's no issue or the issue is underspecified, ask focused questions to establish:
+- What is the goal or problem being solved?
+- What is the scope — what's in and what's out?
+- What does "done" look like?
 
-- "What should the user experience be when X happens?"
-- "Is this scoped to Y, or does it need to cover Z as well?"
-- "What does 'done' look like — is there a specific output or behavior to verify?"
-- "Is there a repro case, or should I look for one first?"
+Do not ask everything at once — prioritize the 1–3 most important unknowns. Once you have enough clarity, continue to Step 3.
 
-Once you have enough clarity, continue to Step 3.
- 
 ---
 
 ## Step 3: Propose Branch Name
@@ -59,7 +57,8 @@ Once you have enough clarity, continue to Step 3.
 Construct a branch name using the convention:
 
 ```
-<prefix>/<issue-number>-<brief-description>
+<prefix>/<issue-number>-<brief-description>   # when there is a linked issue
+<prefix>/<brief-description>                  # when there is no issue
 ```
 
 ### Prefixes (Conventional Commits)
@@ -79,7 +78,7 @@ Construct a branch name using the convention:
 
 ### Description rules
 - lowercase, hyphen-separated
-- 2–5 words derived from the issue title
+- 2–5 words derived from the issue title or task description
 - Omit filler words ("a", "the", "for", "to")
 
 **Examples:**
@@ -89,10 +88,12 @@ fix/117-login-timeout-error
 docs/88-update-api-reference
 chore/204-upgrade-eslint-v9
 refactor/310-extract-payment-service
+chore/brace-style               # no issue — description only
+feat/scorecard-export           # no issue — description only
 ```
 
 Propose the name and confirm with the user before creating anything.
- 
+
 ---
 
 ## Step 4: Create Branch or Worktree
@@ -110,7 +111,7 @@ If in doubt, use a worktree.
 
 ```bash
 git checkout main && git pull
-git checkout -b <prefix>/<issue-number>-<brief-description>
+git checkout -b <branch-name>
 git branch --show-current
 ```
 
@@ -118,16 +119,14 @@ git branch --show-current
 
 ```bash
 git checkout main && git pull
- 
-# Worktree lands in a sibling directory named after the branch slug
-git worktree add ../<repo-name>-<issue-number>-<brief-description> \
-  -b <prefix>/<issue-number>-<brief-description>
- 
+
+git worktree add .worktrees/<branch-name> -b <branch-name>
+
 git worktree list
 ```
 
-Inform the user of the worktree path and that they should open that directory for their work.
- 
+Inform the user of the worktree path.
+
 ---
 
 ## Step 5: Write an Implementation Plan
@@ -135,29 +134,31 @@ Inform the user of the worktree path and that they should open that directory fo
 Now that context is clear and the workspace is set up, produce a concise implementation plan in this structure:
 
 ```
-## Implementation Plan — #<issue-number>: <issue title>
- 
+## Implementation Plan — <title>
+
 ### Goal
 One or two sentences on what this change achieves and why.
- 
+
 ### Approach
 Brief description of the strategy (e.g., "Add a middleware layer", "Extend the existing X service", "Replace Y with Z").
- 
+
 ### Steps
 1. ...
 2. ...
 3. ...
 (ordered, actionable, specific — not generic)
- 
+
 ### Files likely affected
 - `path/to/file` — reason
- 
+
 ### Open questions / risks
 - Any remaining unknowns or things to watch for (omit section if none)
 ```
 
+If there is a linked issue, include it in the title: `#<number>: <issue title>`.
+
 Keep steps concrete enough that a developer can act on them without further research. If you need to explore the codebase to make the plan specific, do so using `find`, `grep`, or file reads before writing the plan.
- 
+
 ---
 
 ## Important Rules
@@ -165,5 +166,4 @@ Keep steps concrete enough that a developer can act on them without further rese
 - **Never commit directly to `main`.** Always branch or worktree first.
 - Always `git pull` before branching to avoid divergence.
 - If the default branch is not `main` (e.g., `master`, `develop`), substitute accordingly.
-- The issue number must appear in every branch name — it's the link between code and context.
- 
+- Include the issue number in the branch name when one exists — it's the link between code and context.
