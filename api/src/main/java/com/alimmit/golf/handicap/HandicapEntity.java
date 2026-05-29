@@ -108,7 +108,9 @@ class HandicapEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     HandicapEntity entity = (HandicapEntity) o;
     return Objects.equals(id, entity.id)
         && Objects.equals(createdAt, entity.createdAt)
