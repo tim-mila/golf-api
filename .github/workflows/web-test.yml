@@ -47,6 +47,10 @@ jobs:
         if: steps.web-check.outputs.exists == 'true'
         run: cd web && npm run generate-api
 
+      - name: Lint
+        if: steps.web-check.outputs.exists == 'true'
+        run: cd web && npm run lint
+
       - name: Run tests
         if: steps.web-check.outputs.exists == 'true'
         run: cd web && npm test

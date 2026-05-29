@@ -86,22 +86,44 @@ class HandicapCalculatorImpl implements HandicapCalculator {
 
   /** Determine how many differentials to use based on total holes played. */
   private int getDifferentialsToUse(int totalRounds) {
-    if (totalRounds >= 20) return 8;
-    if (totalRounds == 19) return 7;
-    if (totalRounds >= 17) return 6;
-    if (totalRounds >= 15) return 5;
-    if (totalRounds >= 12) return 4;
-    if (totalRounds >= 9) return 3;
-    if (totalRounds >= 7) return 2;
-    if (totalRounds >= 5) return 1;
-    if (totalRounds >= 3) return 1;
+    if (totalRounds >= 20) {
+      return 8;
+    }
+    if (totalRounds == 19) {
+      return 7;
+    }
+    if (totalRounds >= 17) {
+      return 6;
+    }
+    if (totalRounds >= 15) {
+      return 5;
+    }
+    if (totalRounds >= 12) {
+      return 4;
+    }
+    if (totalRounds >= 9) {
+      return 3;
+    }
+    if (totalRounds >= 7) {
+      return 2;
+    }
+    if (totalRounds >= 5) {
+      return 1;
+    }
+    if (totalRounds >= 3) {
+      return 1;
+    }
     return 0;
   }
 
   /** Get adjustment value based on holes played (applied before multiplier). */
   private double getAdjustment(int totalRounds) {
-    if (totalRounds == 3) return 2.0;
-    if (totalRounds == 4 || totalRounds == 6) return 1.0;
+    if (totalRounds == 3) {
+      return 2.0;
+    }
+    if (totalRounds == 4 || totalRounds == 6) {
+      return 1.0;
+    }
     return 0.0;
   }
 }

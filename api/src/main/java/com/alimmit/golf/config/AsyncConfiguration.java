@@ -22,7 +22,9 @@ class AsyncConfiguration {
           Map<String, String> mdc = MDC.getCopyOfContextMap();
           return () -> {
             try {
-              if (mdc != null) MDC.setContextMap(mdc);
+              if (mdc != null) {
+                MDC.setContextMap(mdc);
+              }
               runnable.run();
             } finally {
               MDC.clear();

@@ -11,6 +11,7 @@
     "start": "next start",
     "local-setup": "op inject -i ../.local/.env.web.example -o .env.local -f",
     "install:local": "npm audit --audit-level=high && npm ci --ignore-scripts",
+    "lint": "eslint .",
     "test": "tsc --noEmit"
   },
   "dependencies": {
@@ -26,6 +27,8 @@
     "@types/node": "^25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.6",
     "tailwindcss": "^4",
     "typescript": "^6"
   }

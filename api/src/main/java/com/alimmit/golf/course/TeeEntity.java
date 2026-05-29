@@ -133,7 +133,9 @@ class TeeEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     TeeEntity that = (TeeEntity) o;
     return Objects.equals(id, that.id)
         && Objects.equals(name, that.name)
