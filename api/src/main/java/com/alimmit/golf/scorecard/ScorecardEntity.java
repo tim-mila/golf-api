@@ -147,8 +147,12 @@ class ScorecardEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     ScorecardEntity that = (ScorecardEntity) o;
     return Objects.equals(id, that.id);
   }

@@ -243,6 +243,36 @@ For testing async Spring event pipelines (e.g., scorecard event → handicap rec
 
 ## Code Conventions
 
+### Brace Style
+
+All control flow statements (`if`, `else`, `for`, `while`, `do`) must use braces, even for single-statement bodies. Applies to Java, TypeScript, and JavaScript.
+
+```java
+// Java — correct
+if (condition) {
+  doSomething();
+} else {
+  doSomethingElse();
+}
+
+// Java — wrong
+if (condition) doSomething();
+```
+
+```typescript
+// TypeScript — correct
+if (condition) {
+  doSomething();
+}
+
+// TypeScript — wrong
+if (condition) doSomething();
+```
+
+Enforced by:
+- **Java**: `maven-checkstyle-plugin` with `NeedBraces` check (runs during `./mvnw verify`)
+- **TypeScript/JavaScript**: ESLint `curly: error` rule (runs via `npm run lint`)
+
 ### ID Generation
 All entity primary keys are UUIDs generated via PostgreSQL's `uuidv7()` function:
 ```java
