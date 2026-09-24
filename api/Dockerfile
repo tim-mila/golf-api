@@ -5,6 +5,7 @@ WORKDIR /build
 COPY api/mvnw .
 COPY api/.mvn .mvn
 COPY api/pom.xml .
+COPY api/checkstyle.xml .
 # Download dependencies first for better layer caching
 RUN ./mvnw dependency:go-offline -q
 
