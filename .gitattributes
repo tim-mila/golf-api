@@ -1,2 +1,4 @@
-/mvnw text eol=lf
-*.cmd text eol=crlf
+# Match mvnw in the root or any subdirectory
+**/mvnw text eol=lf
+# Explicitly handle mvnw.cmd anywhere in the project
+**/mvnw.cmd text eol=crlf
