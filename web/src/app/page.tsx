@@ -11,8 +11,8 @@ export default async function Home() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen gap-6 p-8">
       <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">Golf Tracker</h1>
-        <p className="text-gray-500">Track your rounds and monitor your handicap index.</p>
+        <h1 className="text-4xl font-bold tracking-tight">Fairway.</h1>
+        <p className="text-gray-500">Know your number.</p>
       </div>
       <a
         href="/auth/login?returnTo=/dashboard"

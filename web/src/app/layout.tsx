@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Hanken_Grotesk } from "next/font/google";
 import { Auth0Provider } from "@auth0/nextjs-auth0/client";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const hankenGrotesk = Hanken_Grotesk({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-hanken-grotesk",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Golf Tracker",
+  title: "Fairway.",
   description: "Track your golf rounds and handicap index",
 };
 
@@ -24,10 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${hankenGrotesk.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Auth0Provider>{children}</Auth0Provider>
       </body>
