@@ -3,14 +3,20 @@ import Link from "next/link";
 export default function NavItem({
   href,
   text,
+  active,
 }: {
   href: string;
   text: string;
+  active?: boolean;
 }) {
   return (
     <Link
+      className={`border-b-2 px-0.5 py-2 text-[15px] transition-colors ${
+        active
+          ? "border-accent text-foreground"
+          : "border-transparent text-muted hover:text-foreground"
+      }`}
       href={href}
-      className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
     >
       {text}
     </Link>

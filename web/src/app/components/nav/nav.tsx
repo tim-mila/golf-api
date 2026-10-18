@@ -4,6 +4,7 @@ import { auth0 } from "@/lib/auth0";
 import { useState } from "react";
 import UserName from "../user/user-name";
 import NavItem from "./nav-item/nav-item";
+import { usePathname } from "next/navigation";
 
 /**
  * Navigation
@@ -65,17 +66,31 @@ export default function Navigation({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const pathname = usePathname();
+
   return (
     <header className="w-full sticky top-0 z-50">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+      <nav className="mx-auto flex max-w-8xl items-center justify-between px-4 py-3 sm:px-6">
         <a href="#" className="text-lg font-semibold">
           {brand}
         </a>
 
-        <div className="hidden items-center gap-1 md:flex">
-          <NavItem href="/dashboard" text="Dashboard" />
-          <NavItem href="/dashboard/rounds" text="Rounds" />
-          <NavItem href="/dashboard/handicap" text="Handicap" />
+        <div className="hidden md:flex mx-auto max-w-[1120px] flex-wrap items-center justify-between gap-20 px-8">
+          <NavItem
+            href="/dashboard"
+            text="Dashboard"
+            active={pathname === "/dashboard"}
+          />
+          <NavItem
+            href="/dashboard/rounds"
+            text="All Rounds"
+            active={pathname === "/dashboard/rounds"}
+          />
+          <NavItem
+            href="/dashboard/handicap"
+            text="Handicap History"
+            active={pathname === "/dashboard/handicap"}
+          />
         </div>
 
         <div className="flex items-center gap-4 shrink-0">
