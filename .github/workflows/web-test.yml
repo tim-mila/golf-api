@@ -37,7 +37,7 @@ jobs:
 
       - name: Audit dependencies
         if: steps.web-check.outputs.exists == 'true'
-        run: cd web && npm audit --audit-level=high
+        run: cd web && npx audit-ci --config ./audit-ci.jsonc
 
       - name: Install dependencies
         if: steps.web-check.outputs.exists == 'true'

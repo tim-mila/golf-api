@@ -1,0 +1,9 @@
+{
+  "$schema": "https://github.com",
+  "high": true,
+  "critical": true,
+  "allowlist": [
+    "GHSA-vfj7-8cjw-p6xm",
+    "CVE-2026-93687"
+  ]
+}
