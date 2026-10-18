@@ -3,6 +3,7 @@
 import { auth0 } from "@/lib/auth0";
 import { useState } from "react";
 import UserName from "../user/user-name";
+import NavItem from "./nav-item/nav-item";
 
 /**
  * Navigation
@@ -56,7 +57,7 @@ function CloseIcon() {
 }
 
 export default function Navigation({
-  brand = "Golf Tracker",
+  brand = "Fairway.",
   session,
 }: {
   readonly brand?: string;
@@ -65,11 +66,17 @@ export default function Navigation({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="w-full border-b border-slate-200 bg-white">
+    <header className="w-full sticky top-0 z-50">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <a href="#" className="text-lg font-semibold text-slate-900">
+        <a href="#" className="text-lg font-semibold">
           {brand}
         </a>
+
+        <div className="hidden items-center gap-1 md:flex">
+          <NavItem href="/dashboard" text="Dashboard" />
+          <NavItem href="/dashboard/rounds" text="Rounds" />
+          <NavItem href="/dashboard/handicap" text="Handicap" />
+        </div>
 
         <div className="flex items-center gap-4 shrink-0">
           <UserName session={session} />

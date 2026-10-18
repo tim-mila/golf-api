@@ -1,5 +1,5 @@
 import { auth0 } from "@/lib/auth0";
-import Navigation from "../components/navigation/nav";
+import Navigation from "../components/nav/nav";
 
 export default async function DashboardLayout({
   children,
