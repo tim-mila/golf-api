@@ -12,11 +12,11 @@ export default async function Home() {
     <main className="flex flex-col items-center justify-center min-h-screen gap-6 p-8">
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold tracking-tight">Fairway.</h1>
-        <p className="text-gray-500">Know your number.</p>
+        <p>Know your number.</p>
       </div>
       <a
         href="/auth/login?returnTo=/dashboard"
-        className="px-6 py-3 rounded-lg bg-green-700 text-white font-semibold hover:bg-green-800 transition-colors"
+        className="px-6 py-3 rounded-lg font-semibold"
       >
         Sign In
       </a>

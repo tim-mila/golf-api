@@ -13,6 +13,22 @@
   --accent-hover: #245640; /* button hover */
 }
 
+/* 🟢 Integrate the dark theme by overriding the variables here */
+.dark {
+  --background: #0d1511; /* Example deep dark slate/green background */
+  --surface: #14201a; /* Darker surface for cards */
+  --foreground: #f4f6f5; /* Light primary text */
+  --muted: #9ba5a0; /* Lightened secondary text */
+  --label: #7a847d; /* Adjusted label colors */
+  --placeholder: #3e4a43;
+  --border: #1e2d26; /* Subtle dark borders */
+  --divider: #18251f; /* Subtle dark rows */
+  --accent: #43966f; /* Slightly brighter accent for dark background visibility */
+  --accent-hover: #53ad82;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

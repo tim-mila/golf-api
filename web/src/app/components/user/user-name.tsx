@@ -7,9 +7,7 @@ export default function UserName({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm font-medium text-slate-900">
-        {session?.user?.name}
-      </span>
+      <span className="text-sm font-medium ">{session?.user?.name}</span>
       <img
         src={session?.user?.picture ?? ""}
         alt={session?.user?.name ?? ""}

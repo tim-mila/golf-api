@@ -1,5 +1,6 @@
 import { auth0 } from "@/lib/auth0";
 import { redirect } from "next/navigation";
+import { ThemeToggle } from "../components/theme/theme-toggle";
 
 export default async function Dashboard() {
   const session = await auth0.getSession();
@@ -14,11 +15,12 @@ export default async function Dashboard() {
         <h1 className="text-4xl font-bold tracking-tight">
           Welcome, {session.user.name}!
         </h1>
-        <p className="text-gray-500">{session.user.email}</p>
+        <p>{session.user.email}</p>
+        <ThemeToggle />
       </div>
       <a
         href="/auth/logout"
-        className="px-6 py-3 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition-colors"
+        className="px-6 py-3 rounded-lg font-semibold  transition-colors"
       >
         Sign Out
       </a>
