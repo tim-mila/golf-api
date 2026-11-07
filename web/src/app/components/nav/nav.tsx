@@ -5,6 +5,7 @@ import { useState } from "react";
 import UserName from "../user/user-name";
 import NavItem from "./nav-item/nav-item";
 import { usePathname } from "next/navigation";
+import LinkButton from "../link-button/link-button";
 
 /**
  * Navigation
@@ -96,12 +97,12 @@ export default function Navigation({
         <div className="flex items-center gap-4 shrink-0">
           <UserName session={session} />
           {session && (
-            <a
+            <LinkButton
               href="/auth/logout"
               className="hidden rounded-md px-3 py-2 text-sm font-medium md:inline-block"
             >
               Sign Out
-            </a>
+            </LinkButton>
           )}
         </div>
 
@@ -121,13 +122,13 @@ export default function Navigation({
         <div className="border-t md:hidden">
           <div className="flex flex-col gap-1 px-4 py-3 sm:px-6">
             {session && (
-              <a
+              <LinkButton
                 href="/auth/logout"
                 className="rounded-md px-3 py-2 text-sm font-medium"
                 onClick={() => setMobileOpen(false)}
               >
                 Sign Out
-              </a>
+              </LinkButton>
             )}
           </div>
         </div>

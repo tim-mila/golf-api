@@ -1,5 +1,6 @@
 import { auth0 } from "@/lib/auth0";
 import { redirect } from "next/navigation";
+import LinkButton from "./components/link-button/link-button";
 
 export default async function Home() {
   const session = await auth0.getSession();
@@ -14,12 +15,7 @@ export default async function Home() {
         <h1 className="text-4xl font-bold tracking-tight">Fairway.</h1>
         <p>Know your number.</p>
       </div>
-      <a
-        href="/auth/login?returnTo=/dashboard"
-        className="px-6 py-3 rounded-lg font-semibold"
-      >
-        Sign In
-      </a>
+      <LinkButton href="/auth/login?returnTo=/dashboard">Sign In</LinkButton>
     </main>
   );
 }
