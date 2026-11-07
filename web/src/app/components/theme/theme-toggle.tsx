@@ -1,15 +1,16 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import Button from "../button/button";
+
+const DARK: string = "dark";
+const LIGHT: string = "light";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-2 rounded-md border"
-    >
+    <Button onClick={() => setTheme(theme === DARK ? LIGHT : DARK)}>
       <svg
         className="hidden dark:block w-6 h-6"
         fill="none"
@@ -39,6 +40,6 @@ export function ThemeToggle() {
           d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
         ></path>
       </svg>
-    </button>
+    </Button>
   );
 }
