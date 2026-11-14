@@ -1,5 +1,5 @@
 # Stage 1 — build
-FROM eclipse-temurin:25-jdk-alpine@sha256:3fd2d245c4e0eba615fe366a71b8bd25f5db7104f53e4026b24bf508b880bd2a AS builder
+FROM eclipse-temurin:25-jdk-alpine@sha256:c7c3d0bdf7f2bbc5a05a6712ed334d198360105634ea9adf76fca94f381b1e3f AS builder
 WORKDIR /build
 
 COPY api/mvnw .
@@ -16,7 +16,7 @@ RUN ./mvnw package -DskipTests -q
 RUN java -Djarmode=tools -jar target/golf-api-*.jar extract --layers --launcher --destination target/extracted
 
 # Stage 2 — runtime
-FROM eclipse-temurin:25-jre-alpine@sha256:3c0a9084927a221ccd1d007fcaf614465672c0af37aaa834c5184483afe56d61 AS runtime
+FROM eclipse-temurin:25-jre-alpine@sha256:e1898fd6a11fc965a994d8ace186fd3585aeb636cf8f05f47a723fcfee0b0918 AS runtime
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
