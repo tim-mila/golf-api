@@ -6,6 +6,7 @@ import UserName from "../user/user-name";
 import NavItem from "./nav-item/nav-item";
 import { usePathname } from "next/navigation";
 import LinkButton from "../link-button/link-button";
+import { ThemeToggle } from "../theme/theme-toggle";
 
 /**
  * Navigation
@@ -96,6 +97,7 @@ export default function Navigation({
 
         <div className="flex items-center gap-4 shrink-0">
           <UserName session={session} />
+          <ThemeToggle />
           {session && (
             <LinkButton
               href="/auth/logout"
