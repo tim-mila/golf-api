@@ -1,7 +1,8 @@
 import { auth0 } from "@/lib/auth0";
 import { redirect } from "next/navigation";
-import { ThemeToggle } from "../components/theme/theme-toggle";
-import LinkButton from "../components/link-button/link-button";
+import HandicapIndex from "../components/handicap-index/handicap-index";
+import SeasonSummary from "../components/season-summary/season-summary";
+import RoundsList from "../components/rounds-list/rounds-list";
 
 export default async function Dashboard() {
   const session = await auth0.getSession();
@@ -11,15 +12,16 @@ export default async function Dashboard() {
   }
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen gap-6 p-8">
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Welcome, {session.user.name}!
-        </h1>
-        <p>{session.user.email}</p>
-        <ThemeToggle />
+    <main className="grid grid-cols-[2fr_3fr] gap-6 p-8">
+      <div className="dashboard-card">
+        <HandicapIndex />
       </div>
-      <LinkButton href="/auth/logout">Sign Out</LinkButton>
+      <div className="dashboard-card">
+        <SeasonSummary />
+      </div>
+      <div className="dashboard-card col-span-2">
+        <RoundsList />
+      </div>
     </main>
   );
 }
