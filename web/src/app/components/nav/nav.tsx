@@ -1,26 +1,12 @@
 "use client";
 
-import { auth0 } from "@/lib/auth0";
+import type { auth0 } from "@/lib/auth0";
 import { useState } from "react";
 import UserName from "../user/user-name";
 import NavItem from "./nav-item/nav-item";
 import { usePathname } from "next/navigation";
 import LinkButton from "../link-button/link-button";
 import { ThemeToggle } from "../theme/theme-toggle";
-
-/**
- * Navigation
- * A responsive top nav bar with:
- *  - Desktop horizontal menu, including one dropdown submenu
- *  - Mobile hamburger menu that slides down into a stacked list
- *  - Active-link highlighting
- *  - Zero dependencies beyond React (icons are inline SVG)
- *
- * Usage:
- *   <Navigation
- *     brand="Acme"
- *   />
- */
 
 function MenuIcon() {
   return (
@@ -66,18 +52,19 @@ export default function Navigation({
   readonly brand?: string;
   readonly session: Awaited<ReturnType<typeof auth0.getSession>>;
 }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isOpen, setOpen] = useState(false);
 
   const pathname = usePathname();
 
   return (
-    <header className="w-full sticky top-0 z-50">
+    <header className="w-full sticky top-0 z-50 ">
       <nav className="mx-auto flex max-w-8xl items-center justify-between px-4 py-3 sm:px-6">
         <a href="#" className="text-lg font-semibold">
           {brand}
         </a>
 
-        <div className="hidden md:flex mx-auto max-w-[1120px] flex-wrap items-center justify-between gap-20 px-8">
+        {/* Desktop Links */}
+        <div className="hidden md:flex md:items-center md:gap-8">
           <NavItem
             href="/dashboard"
             text="Dashboard"
@@ -96,38 +83,49 @@ export default function Navigation({
         </div>
 
         <div className="flex items-center gap-4 shrink-0">
-          <UserName session={session} />
-          <ThemeToggle />
-          {session && (
-            <LinkButton
-              href="/auth/logout"
-              className="hidden rounded-md px-3 py-2 text-sm font-medium md:inline-block"
-            >
-              Sign Out
-            </LinkButton>
-          )}
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-label="Toggle menu"
+            aria-expanded={isOpen}
+            className="inline-flex cursor-pointer touch-manipulation items-center justify-center rounded-md p-2"
+          >
+            {isOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
         </div>
-
-        {/* Mobile toggle */}
-        <button
-          className="inline-flex items-center justify-center rounded-md p-2 md:hidden"
-          onClick={() => setMobileOpen((o) => !o)}
-          aria-label="Toggle menu"
-          aria-expanded={mobileOpen}
-        >
-          {mobileOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
       </nav>
 
+      {/* Desktop submenu */}
+      {isOpen && (
+        <div className="border-t hidden md:block">
+          <div className="flex flex-col gap-1 px-4 py-3 sm:px-6">
+            {session && (
+              <>
+                <UserName session={session} />
+                <ThemeToggle />
+                {session && (
+                  <LinkButton
+                    href="/auth/logout"
+                    className="hidden rounded-md px-3 py-2 text-sm font-medium md:inline-block"
+                  >
+                    Sign Out
+                  </LinkButton>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Mobile menu */}
-      {mobileOpen && (
+      {isOpen && (
         <div className="border-t md:hidden">
           <div className="flex flex-col gap-1 px-4 py-3 sm:px-6">
             {session && (
               <LinkButton
                 href="/auth/logout"
                 className="rounded-md px-3 py-2 text-sm font-medium"
-                onClick={() => setMobileOpen(false)}
+                onClick={() => setOpen(false)}
               >
                 Sign Out
               </LinkButton>
