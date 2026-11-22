@@ -12,14 +12,14 @@ export default async function Dashboard() {
   }
 
   return (
-    <main className="grid grid-cols-[2fr_3fr] gap-6 p-8">
+    <main className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-6 p-8">
       <div className="dashboard-card">
         <HandicapIndex />
       </div>
       <div className="dashboard-card">
         <SeasonSummary />
       </div>
-      <div className="dashboard-card col-span-2">
+      <div className="dashboard-card md:col-span-2">
         <RoundsList />
       </div>
     </main>
