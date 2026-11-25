@@ -1,12 +1,12 @@
 export default function Button({
   children,
-  onClick,
+  props,
 }: {
-  children: React.ReactNode;
-  onClick: () => void;
+  children?: React.ReactNode;
+  props?: React.ButtonHTMLAttributes<HTMLButtonElement>;
 }) {
   return (
-    <button onClick={onClick} className="p-2 rounded-md border">
+    <button className="self-start p-2 rounded-md border" {...props}>
       {children}
     </button>
   );
