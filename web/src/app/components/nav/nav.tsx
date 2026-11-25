@@ -7,6 +7,7 @@ import NavItem from "./nav-item/nav-item";
 import { usePathname } from "next/navigation";
 import LinkButton from "../link-button/link-button";
 import { ThemeToggle } from "../theme/theme-toggle";
+import UserMenu from "./user-menu/user-menu";
 
 function MenuIcon() {
   return (
@@ -83,55 +84,39 @@ export default function Navigation({
         </div>
 
         <div className="flex items-center gap-4 shrink-0">
+          <UserMenu session={session} />
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
             aria-expanded={isOpen}
-            className="inline-flex cursor-pointer touch-manipulation items-center justify-center rounded-md p-2"
+            className="md:hidden inline-flex cursor-pointer touch-manipulation items-center justify-center rounded-md p-2"
           >
             {isOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
         </div>
       </nav>
 
-      {/* Desktop submenu */}
       {isOpen && (
-        <div className="border-t hidden md:block">
-          <div className="flex flex-col gap-1 px-4 py-3 sm:px-6">
-            {session && (
-              <>
-                <UserName session={session} />
-                <ThemeToggle />
-                {session && (
-                  <LinkButton
-                    href="/auth/logout"
-                    className="hidden rounded-md px-3 py-2 text-sm font-medium md:inline-block"
-                  >
-                    Sign Out
-                  </LinkButton>
-                )}
-              </>
-            )}
+        <aside>
+          <div className="flex items-center gap-8 p-2 justify-between md:hidden">
+            <NavItem
+              href="/dashboard"
+              text="Dashboard"
+              active={pathname === "/dashboard"}
+            />
+            <NavItem
+              href="/dashboard/rounds"
+              text="All Rounds"
+              active={pathname === "/dashboard/rounds"}
+            />
+            <NavItem
+              href="/dashboard/handicap"
+              text="Handicap History"
+              active={pathname === "/dashboard/handicap"}
+            />
           </div>
-        </div>
-      )}
-
-      {/* Mobile menu */}
-      {isOpen && (
-        <div className="border-t md:hidden">
-          <div className="flex flex-col gap-1 px-4 py-3 sm:px-6">
-            {session && (
-              <LinkButton
-                href="/auth/logout"
-                className="rounded-md px-3 py-2 text-sm font-medium"
-                onClick={() => setOpen(false)}
-              >
-                Sign Out
-              </LinkButton>
-            )}
-          </div>
-        </div>
+        </aside>
       )}
     </header>
   );

@@ -10,7 +10,12 @@ export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <Button onClick={() => setTheme(theme === DARK ? LIGHT : DARK)}>
+    <Button
+      props={{
+        onClick: () => setTheme(theme === DARK ? LIGHT : DARK),
+        "aria-label": "theme-toggle",
+      }}
+    >
       <svg
         className="hidden dark:block w-6 h-6"
         fill="none"
