@@ -61,11 +61,10 @@ class ScorecardEventPipelineIT extends AbstractScorecardControllerMockMvc {
 
     await()
         .atMost(Duration.ofSeconds(5))
-        .untilAsserted(
-            () -> {
-              assertThat(output.toString()).contains("scorecardEvent | event received");
-              verify(handicapService).calculate(anyList(), eq(JwtPersona.GARY_GOLFER.sub()));
-            });
+        .untilAsserted(() -> {
+          assertThat(output.toString()).contains("scorecardEvent | event received");
+          verify(handicapService).calculate(anyList(), eq(JwtPersona.GARY_GOLFER.sub()));
+        });
   }
 
   @Test
@@ -82,22 +81,19 @@ class ScorecardEventPipelineIT extends AbstractScorecardControllerMockMvc {
     // Wait for the CREATED event to settle before issuing the DELETE
     await()
         .atMost(Duration.ofSeconds(5))
-        .untilAsserted(
-            () ->
-                verify(handicapService, times(1))
-                    .calculate(anyList(), eq(JwtPersona.GARY_GOLFER.sub())));
+        .untilAsserted(() ->
+            verify(handicapService, times(1))
+                .calculate(anyList(), eq(JwtPersona.GARY_GOLFER.sub())));
 
     deleteScorecard(JwtPersona.forGaryGolfer(), scorecardId, status().isNoContent());
 
     await()
         .atMost(Duration.ofSeconds(5))
-        .untilAsserted(
-            () -> {
-              assertThat(output.toString())
-                  .contains(
-                      "ScorecardEvent[userId=" + JwtPersona.GARY_GOLFER.sub() + ", type=DELETED]");
-              verify(handicapService, times(2))
-                  .calculate(anyList(), eq(JwtPersona.GARY_GOLFER.sub()));
-            });
+        .untilAsserted(() -> {
+          assertThat(output.toString())
+              .contains(
+                  "ScorecardEvent[userId=" + JwtPersona.GARY_GOLFER.sub() + ", type=DELETED]");
+          verify(handicapService, times(2)).calculate(anyList(), eq(JwtPersona.GARY_GOLFER.sub()));
+        });
   }
 }

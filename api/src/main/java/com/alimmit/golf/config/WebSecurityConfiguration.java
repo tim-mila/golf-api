@@ -26,11 +26,10 @@ class WebSecurityConfiguration {
   SecurityFilterChain filterChain(HttpSecurity http) {
     return http.securityMatcher("/**")
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .authorizeHttpRequests(
-            requests -> {
-              requests.requestMatchers("/v1/api-docs/**").permitAll();
-              requests.anyRequest().authenticated();
-            })
+        .authorizeHttpRequests(requests -> {
+          requests.requestMatchers("/v1/api-docs/**").permitAll();
+          requests.anyRequest().authenticated();
+        })
         .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()))
         .build();
   }

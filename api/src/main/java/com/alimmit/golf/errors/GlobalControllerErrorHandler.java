@@ -57,18 +57,17 @@ public class GlobalControllerErrorHandler {
     logger.debug("handle MethodArgumentNotValidException | {}", exception.getMessage());
     String joinedErrors =
         exception.getAllErrors().stream()
-            .map(
-                e -> {
-                  String message;
-                  if (e.getCode() != null) {
-                    message =
-                        messageSource.getMessage(
-                            e.getCode(), e.getArguments(), LocaleContextHolder.getLocale());
-                  } else {
-                    message = e.getDefaultMessage();
-                  }
-                  return message;
-                })
+            .map(e -> {
+              String message;
+              if (e.getCode() != null) {
+                message =
+                    messageSource.getMessage(
+                        e.getCode(), e.getArguments(), LocaleContextHolder.getLocale());
+              } else {
+                message = e.getDefaultMessage();
+              }
+              return message;
+            })
             .filter(Objects::nonNull)
             .collect(Collectors.joining(","));
 

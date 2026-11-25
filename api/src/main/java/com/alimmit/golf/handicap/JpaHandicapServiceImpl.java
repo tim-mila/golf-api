@@ -30,16 +30,15 @@ class JpaHandicapServiceImpl implements HandicapService {
     // handicap may not be calculated based on number of holes played
     handicapCalculator
         .calculate(scorecards)
-        .ifPresent(
-            handicapDto -> {
-              // Update existing or create new handicap
-              HandicapEntity handicap =
-                  handicapRepository
-                      .findHandicapForUser(golferId)
-                      .map(entity -> handicapMapper.updateEntity(entity, handicapDto))
-                      .orElse(handicapMapper.toEntity(handicapDto, golferId));
-              handicapRepository.save(handicap);
-            });
+        .ifPresent(handicapDto -> {
+          // Update existing or create new handicap
+          HandicapEntity handicap =
+              handicapRepository
+                  .findHandicapForUser(golferId)
+                  .map(entity -> handicapMapper.updateEntity(entity, handicapDto))
+                  .orElse(handicapMapper.toEntity(handicapDto, golferId));
+          handicapRepository.save(handicap);
+        });
   }
 
   @Override

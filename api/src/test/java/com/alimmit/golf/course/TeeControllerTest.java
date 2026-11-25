@@ -129,12 +129,11 @@ class TeeControllerTest extends AbstractTeeControllerTest {
   void createTee_ExpectCreated() throws Exception {
     UUID courseId = UUID.randomUUID();
     when(teeService.create(
-            argThat(
-                m ->
-                    m.courseId().equals(courseId)
-                        && m.name().equals("Blue")
-                        && m.slope().compareTo(new BigDecimal("131.0")) == 0
-                        && m.rating().compareTo(new BigDecimal("71.2")) == 0)))
+            argThat(m ->
+                m.courseId().equals(courseId)
+                    && m.name().equals("Blue")
+                    && m.slope().compareTo(new BigDecimal("131.0")) == 0
+                    && m.rating().compareTo(new BigDecimal("71.2")) == 0)))
         .thenReturn(
             Optional.of(
                 new TeeDto(

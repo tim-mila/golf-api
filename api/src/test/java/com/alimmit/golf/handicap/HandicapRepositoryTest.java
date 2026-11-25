@@ -122,13 +122,12 @@ class HandicapRepositoryTest {
 
     return handicapRepository
         .findHandicapForUser(golferId)
-        .map(
-            h -> {
-              h.setHandicapIndex(index);
-              h.setTotalRounds(totalRounds);
-              h.setRoundsUsed(roundsUsed);
-              return h;
-            })
+        .map(h -> {
+          h.setHandicapIndex(index);
+          h.setTotalRounds(totalRounds);
+          h.setRoundsUsed(roundsUsed);
+          return h;
+        })
         .orElse(new HandicapEntity(golferId, index, roundsUsed, totalRounds));
   }
 

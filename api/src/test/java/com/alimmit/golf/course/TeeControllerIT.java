@@ -242,8 +242,8 @@ class TeeControllerIT extends AbstractTeeControllerTest {
 
     String asRequestBody() {
       return """
-        {"courseId": "%s", "name": "%s", "par": %d, "slope": %.1f, "rating": %.1f}
-        """
+      {"courseId": "%s", "name": "%s", "par": %d, "slope": %.1f, "rating": %.1f}
+      """
           .formatted(courseId, name, par, slope, rating);
     }
 
