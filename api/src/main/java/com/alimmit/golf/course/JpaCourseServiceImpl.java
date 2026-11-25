@@ -56,30 +56,28 @@ class JpaCourseServiceImpl implements CourseService {
   public Optional<CourseDto> patch(UUID courseId, PatchCourseRequest request) {
     return courseRepository
         .findByIdForCurrentUser(courseId)
-        .map(
-            c -> {
-              String mergedClub = request.club().orElse(c.getClub());
-              String mergedCourse = request.course().orElse(c.getCourse());
-              String mergedCity = request.city().orElse(c.getCity());
-              USState mergedState = request.state().orElse(c.getState());
-              if (courseRepository.existsByUniqueConstraintForCurrentUserExcluding(
-                  mergedClub, mergedCourse, mergedCity, mergedState, courseId)) {
-                throw new DuplicateException();
-              }
-              c.setClub(mergedClub);
-              c.setCourse(mergedCourse);
-              c.setCity(mergedCity);
-              c.setState(mergedState);
-              return c;
-            })
-        .map(
-            c -> {
-              try {
-                return courseMapper.map(courseRepository.save(c));
-              } catch (DataIntegrityViolationException e) {
-                throw new DuplicateException();
-              }
-            });
+        .map(c -> {
+          String mergedClub = request.club().orElse(c.getClub());
+          String mergedCourse = request.course().orElse(c.getCourse());
+          String mergedCity = request.city().orElse(c.getCity());
+          USState mergedState = request.state().orElse(c.getState());
+          if (courseRepository.existsByUniqueConstraintForCurrentUserExcluding(
+              mergedClub, mergedCourse, mergedCity, mergedState, courseId)) {
+            throw new DuplicateException();
+          }
+          c.setClub(mergedClub);
+          c.setCourse(mergedCourse);
+          c.setCity(mergedCity);
+          c.setState(mergedState);
+          return c;
+        })
+        .map(c -> {
+          try {
+            return courseMapper.map(courseRepository.save(c));
+          } catch (DataIntegrityViolationException e) {
+            throw new DuplicateException();
+          }
+        });
   }
 
   @Override

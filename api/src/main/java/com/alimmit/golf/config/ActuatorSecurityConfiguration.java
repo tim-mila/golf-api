@@ -17,17 +17,16 @@ class ActuatorSecurityConfiguration {
   @Order(1)
   SecurityFilterChain actuatorFilterChain(HttpSecurity http) {
     return http.securityMatcher(EndpointRequest.toAnyEndpoint())
-        .authorizeHttpRequests(
-            requests ->
-                requests
-                    .requestMatchers(EndpointRequest.to(HealthEndpoint.class))
-                    .permitAll()
-                    .anyRequest()
-                    .hasAuthority(
-                        "SCOPE_"
-                            + GlobalConstants.SCOPE_PERMISSION_READ
-                            + ":"
-                            + GlobalConstants.SCOPE_ACTUATOR))
+        .authorizeHttpRequests(requests ->
+            requests
+                .requestMatchers(EndpointRequest.to(HealthEndpoint.class))
+                .permitAll()
+                .anyRequest()
+                .hasAuthority(
+                    "SCOPE_"
+                        + GlobalConstants.SCOPE_PERMISSION_READ
+                        + ":"
+                        + GlobalConstants.SCOPE_ACTUATOR))
         .oauth2ResourceServer(c -> c.jwt(Customizer.withDefaults()))
         .build();
   }

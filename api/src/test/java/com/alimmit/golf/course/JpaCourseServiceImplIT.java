@@ -69,16 +69,15 @@ class JpaCourseServiceImplIT {
     assertThat(patched)
         .isPresent()
         .get()
-        .satisfies(
-            toAssert -> {
-              assertThat(toAssert.courseId()).isEqualTo(created.courseId());
-              assertThat(toAssert.createdAt())
-                  .isCloseTo(created.createdAt(), within(1000, ChronoUnit.NANOS));
-              assertThat(toAssert.club()).isEqualTo("After Club");
-              assertThat(toAssert.course()).isEqualTo("After Course");
-              assertThat(toAssert.city()).isEqualTo("After City");
-              assertThat(toAssert.state()).isEqualTo(USState.RHODE_ISLAND);
-            });
+        .satisfies(toAssert -> {
+          assertThat(toAssert.courseId()).isEqualTo(created.courseId());
+          assertThat(toAssert.createdAt())
+              .isCloseTo(created.createdAt(), within(1000, ChronoUnit.NANOS));
+          assertThat(toAssert.club()).isEqualTo("After Club");
+          assertThat(toAssert.course()).isEqualTo("After Course");
+          assertThat(toAssert.city()).isEqualTo("After City");
+          assertThat(toAssert.state()).isEqualTo(USState.RHODE_ISLAND);
+        });
 
     Optional<CourseDto> read = courseService.get(created.courseId());
     assertThat(read.orElseThrow().lastModifiedAt()).isAfter(created.lastModifiedAt());

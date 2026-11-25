@@ -17,20 +17,19 @@ class AsyncConfiguration {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(3);
     executor.setMaxPoolSize(3);
-    executor.setTaskDecorator(
-        runnable -> {
-          Map<String, String> mdc = MDC.getCopyOfContextMap();
-          return () -> {
-            try {
-              if (mdc != null) {
-                MDC.setContextMap(mdc);
-              }
-              runnable.run();
-            } finally {
-              MDC.clear();
-            }
-          };
-        });
+    executor.setTaskDecorator(runnable -> {
+      Map<String, String> mdc = MDC.getCopyOfContextMap();
+      return () -> {
+        try {
+          if (mdc != null) {
+            MDC.setContextMap(mdc);
+          }
+          runnable.run();
+        } finally {
+          MDC.clear();
+        }
+      };
+    });
     executor.initialize();
     return executor;
   }

@@ -78,18 +78,17 @@ class JpaTeeServiceImplIT {
     assertThat(read)
         .isPresent()
         .get()
-        .satisfies(
-            toAssert -> {
-              final TeeDto createdDto = created.orElseThrow();
-              assertThat(toAssert.teeId()).isEqualTo(createdDto.teeId());
-              assertThat(toAssert.courseId()).isEqualTo(createdDto.courseId());
-              assertThat(toAssert.createdAt())
-                  .isCloseTo(createdDto.createdAt(), within(1000, ChronoUnit.NANOS));
-              assertThat(toAssert.name()).isEqualTo(createdDto.name());
-              assertThat(toAssert.par()).isEqualTo(createdDto.par());
-              assertThat(toAssert.rating()).isEqualTo(createdDto.rating());
-              assertThat(toAssert.slope()).isEqualTo(createdDto.slope());
-            });
+        .satisfies(toAssert -> {
+          final TeeDto createdDto = created.orElseThrow();
+          assertThat(toAssert.teeId()).isEqualTo(createdDto.teeId());
+          assertThat(toAssert.courseId()).isEqualTo(createdDto.courseId());
+          assertThat(toAssert.createdAt())
+              .isCloseTo(createdDto.createdAt(), within(1000, ChronoUnit.NANOS));
+          assertThat(toAssert.name()).isEqualTo(createdDto.name());
+          assertThat(toAssert.par()).isEqualTo(createdDto.par());
+          assertThat(toAssert.rating()).isEqualTo(createdDto.rating());
+          assertThat(toAssert.slope()).isEqualTo(createdDto.slope());
+        });
   }
 
   @Test
@@ -132,16 +131,15 @@ class JpaTeeServiceImplIT {
     assertThat(patched)
         .isPresent()
         .get()
-        .satisfies(
-            toAssert -> {
-              assertThat(toAssert.teeId()).isEqualTo(created.teeId());
-              assertThat(toAssert.courseId()).isEqualTo(created.courseId());
-              assertThat(toAssert.createdAt())
-                  .isCloseTo(created.createdAt(), within(1000, ChronoUnit.NANOS));
-              assertThat(toAssert.name()).isEqualTo("White");
-              assertThat(toAssert.rating()).isEqualTo(new BigDecimal("69.5"));
-              assertThat(toAssert.slope()).isEqualTo(new BigDecimal("125.0"));
-            });
+        .satisfies(toAssert -> {
+          assertThat(toAssert.teeId()).isEqualTo(created.teeId());
+          assertThat(toAssert.courseId()).isEqualTo(created.courseId());
+          assertThat(toAssert.createdAt())
+              .isCloseTo(created.createdAt(), within(1000, ChronoUnit.NANOS));
+          assertThat(toAssert.name()).isEqualTo("White");
+          assertThat(toAssert.rating()).isEqualTo(new BigDecimal("69.5"));
+          assertThat(toAssert.slope()).isEqualTo(new BigDecimal("125.0"));
+        });
 
     Optional<TeeDto> read = teeService.get(created.teeId());
     assertThat(read.orElseThrow().lastModifiedAt()).isAfter(created.lastModifiedAt());

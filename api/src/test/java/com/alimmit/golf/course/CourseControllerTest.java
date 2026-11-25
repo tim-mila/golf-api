@@ -112,12 +112,11 @@ class CourseControllerTest extends AbstractCourseControllerTest {
   @Test
   void createCourse_ExpectedCreated() throws Exception {
     when(courseService.create(
-            argThat(
-                m ->
-                    m.club().equals("Acme Club")
-                        && m.course().equals("Acme Course")
-                        && m.city().equals("Someplace")
-                        && m.state() == USState.MICHIGAN)))
+            argThat(m ->
+                m.club().equals("Acme Club")
+                    && m.course().equals("Acme Course")
+                    && m.city().equals("Someplace")
+                    && m.state() == USState.MICHIGAN)))
         .thenReturn(
             new CourseDto(
                 UUID.randomUUID(),
@@ -175,12 +174,11 @@ class CourseControllerTest extends AbstractCourseControllerTest {
     UUID courseId = UUID.randomUUID();
     when(courseService.patch(
             eq(courseId),
-            argThat(
-                m ->
-                    m.club().orElseThrow().equals("Acme Club")
-                        && m.course().orElseThrow().equals("Acme Course")
-                        && m.city().orElseThrow().equals("Someplace")
-                        && m.state().orElseThrow() == USState.MICHIGAN)))
+            argThat(m ->
+                m.club().orElseThrow().equals("Acme Club")
+                    && m.course().orElseThrow().equals("Acme Course")
+                    && m.city().orElseThrow().equals("Someplace")
+                    && m.state().orElseThrow() == USState.MICHIGAN)))
         .thenReturn(
             Optional.of(
                 new CourseDto(
